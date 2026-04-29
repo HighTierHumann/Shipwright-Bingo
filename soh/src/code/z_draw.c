@@ -81,6 +81,8 @@
 
 #include "soh_assets.h"
 
+
+
 // "Get Item" Model Draw Functions
 void GetItem_DrawMaskOrBombchu(PlayState* play, s16 drawId);
 void GetItem_DrawSoldOut(PlayState* play, s16 drawId);
@@ -390,6 +392,7 @@ DrawItemTableEntry sDrawItemTable[] = {
     { GetItem_DrawGenericMusicNote, { gGiSongNoteDL } },  // Sun's song
     { GetItem_DrawGenericMusicNote, { gGiSongNoteDL } },  // Song of time
     { GetItem_DrawGenericMusicNote, { gGiSongNoteDL } },  // Song of storms
+
     { GetItem_DrawTriforcePiece, { gTriforcePiece0DL } }, // Triforce Piece
     { GetItem_DrawFishingPole, { gFishingPoleGiDL } },    // Fishing Pole
 };
@@ -798,22 +801,34 @@ void GetItem_DrawOpa0Xlu1(PlayState* play, s16 drawId) {
 }
 
 void GetItem_DrawGenericMusicNote(PlayState* play, s16 drawId) {
-    s32 pad;
-    s16 color_slot = drawId - 120; // 0 = generic
-    s16* colors[7][3] = {
-        { 255, 255, 255 }, // Generic Song (full white)
-        { 109, 73, 143 },  // Lullaby
-        { 217, 110, 48 },  // Epona
-        { 62, 109, 23 },   // Saria
-        { 237, 231, 62 },  // Sun
-        { 98, 177, 211 },  // Time
-        { 146, 146, 146 }  // Storms
-    };
+    // Generic Song, full white
+    Color_RGB8 songColor = { 255, 255, 255 };
+
+    switch (drawId) {
+        case 121: // Zelda's Lullaby
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.ZeldasLullaby.Value"), (Color_RGB8){ 109, 73, 143 });
+            break;
+        case 122: // Epona's Song
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.EponasSong.Value"), (Color_RGB8){ 217, 110, 48 });
+            break;
+        case 123: // Saria's Song
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.SariasSong.Value"), (Color_RGB8){ 62, 109, 23 });
+            break;
+        case 124: // Sun's Song
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.SunsSong.Value"), (Color_RGB8){ 237, 231, 62 });
+            break;
+        case 125: // Song of Time
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.SongOfTime.Value"), (Color_RGB8){ 98, 177, 211 });
+            break;
+        case 126: // Song of Storms
+            songColor = CVarGetColor24(CVAR_COSMETIC("Song.SongOfStorms.Value"), (Color_RGB8){ 146, 146, 146 });
+            break;
+    }
 
     OPEN_DISPS(play->state.gfxCtx);
 
     gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, __FILE__, __LINE__), G_MTX_MODELVIEW | G_MTX_LOAD);
-    gDPSetGrayscaleColor(POLY_XLU_DISP++, colors[color_slot][0], colors[color_slot][1], colors[color_slot][2], 255);
+    gDPSetGrayscaleColor(POLY_XLU_DISP++, songColor.r, songColor.g, songColor.b, 255);
     gSPGrayscale(POLY_XLU_DISP++, true);
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
     gSPDisplayList(POLY_XLU_DISP++, sDrawItemTable[drawId].dlists[0]);

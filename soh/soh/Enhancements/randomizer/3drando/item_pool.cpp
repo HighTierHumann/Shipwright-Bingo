@@ -157,26 +157,57 @@ void GenerateItemPool() {
     int reservedSlots = 0;
 
     // clang-format off
-    AddItemToPool(RG_BOOMERANG, 2, 1, 1, 1);
-    AddItemToPool(RG_LENS_OF_TRUTH, 2, 1, 1, 1);
-    AddItemToPool(RG_MEGATON_HAMMER, 2, 1, 1, 1);
-    AddItemToPool(RG_IRON_BOOTS, 2, 1, 1, 1);
-    AddItemToPool(RG_GORON_TUNIC, 2, 1, 1, 1);
-    AddItemToPool(RG_ZORA_TUNIC, 2, 1, 1, 1);
-    AddItemToPool(RG_HOVER_BOOTS, 2, 1, 1, 1);
-    AddItemToPool(RG_MIRROR_SHIELD, 2, 1, 1, 1);
+    if (!ctx->GetOption(RSK_STARTING_BOOMERANG).Get()) {
+        AddItemToPool(RG_BOOMERANG, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_LENS).Get()) {
+        AddItemToPool(RG_LENS_OF_TRUTH, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_HAMMER).Get()) {
+        AddItemToPool(RG_MEGATON_HAMMER, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_IRON_BOOTS).Get()) {
+        AddItemToPool(RG_IRON_BOOTS, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_GORON_TUNIC).Get()) {
+        AddItemToPool(RG_GORON_TUNIC, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_ZORA_TUNIC).Get()) {
+        AddItemToPool(RG_ZORA_TUNIC, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_HOVER_BOOTS).Get()) {
+        AddItemToPool(RG_HOVER_BOOTS, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_MIRROR_SHIELD).Get()) {
+        AddItemToPool(RG_MIRROR_SHIELD, 2, 1, 1, 1);
+    }
     AddItemToPool(RG_STONE_OF_AGONY, 2, 1, 1, 1);
-    AddItemToPool(RG_FIRE_ARROWS, 2, 1, 1, 1);
-    AddItemToPool(RG_ICE_ARROWS, 2, 1, 1, 1);
-    AddItemToPool(RG_LIGHT_ARROWS, 2, 1, 1, 1);
-    AddItemToPool(RG_DINS_FIRE, 2, 1, 1, 1);
-    AddItemToPool(RG_FARORES_WIND, 2, 1, 1, 0);
-    AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 1, 0);
+    if (!ctx->GetOption(RSK_STARTING_FIRE_ARROWS).Get()) {
+        AddItemToPool(RG_FIRE_ARROWS, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_ICE_ARROWS).Get()) {
+        AddItemToPool(RG_ICE_ARROWS, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_LIGHT_ARROWS).Get()) {
+        AddItemToPool(RG_LIGHT_ARROWS, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_DINS).Get()) {
+        AddItemToPool(RG_DINS_FIRE, 2, 1, 1, 1);
+    }
+    if (!ctx->GetOption(RSK_STARTING_FARORES).Get()) {
+        AddItemToPool(RG_FARORES_WIND, 2, 1, 1, 0);
+    }
+    if (!ctx->GetOption(RSK_STARTING_NAYRUS).Get()) {
+        AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 1, 0);
+    }
     AddItemToPool(RG_GREG_RUPEE, 1, 1, 1, 1);
-    AddItemToPool(RG_PROGRESSIVE_HOOKSHOT, 2, 2, 2, 2);
-    AddItemToPool(RG_HYLIAN_SHIELD, 1, 1, 1, 1);
+    if (!ctx->GetOption(RSK_STARTING_HYLIAN_SHIELD).Get()) {
+        AddItemToPool(RG_HYLIAN_SHIELD, 1, 1, 1, 1);
+    }
     AddItemToPool(RG_DOUBLE_DEFENSE, 2, 1, 0, 0);
-    AddItemToPool(RG_BIGGORON_SWORD, 2, 1, 1, 0);
+    if (!ctx->GetOption(RSK_STARTING_BGS_SWORD).Get()) {
+        AddItemToPool(RG_BIGGORON_SWORD, 2, 1, 1, 0);
+    }
     bool isScrubs = ctx->GetOption(RSK_SHUFFLE_SCRUBS).Is(RO_SCRUBS_ALL);
     AddFixedItemToPool(RG_DEKU_SHIELD, isScrubs ? 1 : 2);
     AddFixedItemToPool(RG_RECOVERY_HEART, isScrubs ? 6 : 11);
@@ -372,6 +403,11 @@ void GenerateItemPool() {
                 ctx->PlaceItemInLocation(RC_HF_OCARINA_OF_TIME_ITEM, RG_PROGRESSIVE_OCARINA, false, true);
             }
         }
+    }
+
+    if (ctx->GetOption(RSK_STARTING_HOOKSHOT).IsNot(RO_STARTING_HOOKSHOT_LONGSHOT)) {
+        int baseHookshots = ctx->GetOption(RSK_STARTING_HOOKSHOT).Is(RO_STARTING_HOOKSHOT_OFF) ? 2 : 1;
+        AddItemToPool(RG_PROGRESSIVE_HOOKSHOT, baseHookshots + 1, baseHookshots, baseHookshots, baseHookshots);
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_OCARINA_BUTTONS)) {

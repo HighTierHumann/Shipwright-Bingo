@@ -1310,11 +1310,46 @@ void EnItem00_CustomItemsParticles(Actor* Parent, PlayState* play, GetItemEntry 
         { 35, 35, 177 }    // Bottle with Blue Fire
     };
 
+    // Make flare particles match the color of the song model if the user changes it in the cosmetics editor
+    Color_RGBA8 customColors;
+    bool useCustom = false;
+
+    switch (giEntry.drawItemId) {
+        case RG_MINUET_OF_FOREST:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Minuet.Value"), (Color_RGBA8){ 34, 255, 76 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Minuet.Changed"), 0);
+            break;
+        case RG_BOLERO_OF_FIRE:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Bolero.Value"), (Color_RGBA8){ 177, 35, 35 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Bolero.Changed"), 0);
+            break;
+        case RG_SERENADE_OF_WATER:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Serenade.Value"), (Color_RGBA8){ 115, 251, 253 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Serenade.Changed"), 0);
+            break;
+        case RG_REQUIEM_OF_SPIRIT:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Requiem.Value"), (Color_RGBA8){ 177, 122, 35 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Requiem.Changed"), 0);
+            break;
+        case RG_NOCTURNE_OF_SHADOW:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Nocturne.Value"), (Color_RGBA8){ 177, 28, 212 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Nocturne.Changed"), 0);
+            break;
+        case RG_PRELUDE_OF_LIGHT:
+            customColors = CVarGetColor(CVAR_COSMETIC("WarpSong.Prelude.Value"), (Color_RGBA8){ 255, 255, 92 });
+            useCustom = CVarGetInteger(CVAR_COSMETIC("WarpSong.Prelude.Changed"), 0);
+            break;
+    };
+
     static Vec3f velocity = { 0.0f, 0.0f, 0.0f };
     static Vec3f accel = { 0.0f, 0.0f, 0.0f };
     Color_RGBA8 primColor;
     Color_RGBA8 envColor;
-    Color_RGBA8_Copy(&primColor, &mainColors[colorIndex]);
+    if (useCustom) {
+        Color_RGBA8_Copy(&primColor, &customColors);
+    } else {
+        Color_RGBA8_Copy(&primColor, &mainColors[colorIndex]);
+    }
     Color_RGBA8_Copy(&envColor, &flareColors[colorIndex]);
     Vec3f pos;
 

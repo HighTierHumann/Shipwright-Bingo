@@ -13,6 +13,8 @@ typedef enum {
     COSMETICS_GROUP_KEYRING,
     COSMETICS_GROUP_SMALL_KEYS,
     COSMETICS_GROUP_BOSS_KEYS,
+    COSMETICS_GROUP_SONGS,
+    COSMETICS_GROUP_WARP_SONGS,
     COSMETICS_GROUP_CONSUMABLE,
     COSMETICS_GROUP_HUD,
     COSMETICS_GROUP_KALEIDO,
@@ -68,6 +70,7 @@ class CosmeticsEditorWindow final : public Ship::GuiWindow {
     void InitElement() override;
     void DrawElement() override;
     void ApplyDungeonKeyColors();
+    void ApplySongColors();
     void UpdateElement() override{};
 };
 #endif //__cplusplus
