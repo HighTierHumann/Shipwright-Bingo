@@ -1320,6 +1320,15 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_ICE_TRAP_PERCENT, "Ice Trap Percent", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("IceTrapPercent"), mOptionDescriptions[RSK_ICE_TRAP_PERCENT], WIDGET_CVAR_SLIDER_INT, 0);
     // TODO: Remove Double Defense, Progressive Goron Sword
     OPT_U8(RSK_STARTING_OCARINA, "Start with Ocarina", {"Off", "Fairy Ocarina", "Ocarina of Time"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingOcarina"), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_OCARINA_OFF);
+    OPT_CALLBACK(RSK_STARTING_OCARINA, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingOcarina"), RO_STARTING_OCARINA_OFF) == RO_STARTING_OCARINA_TIME) {
+            mOptions[RSK_SHUFFLE_OCARINA].Disable("This option is disabled because \"Start with Ocarina of Time\" is enabled.");
+            mOptions[RSK_OCARINA_HINT].Disable("This option is disabled because \"Start with Ocarina of Time\" is enabled. There would be no Ocarina to hint!");
+        } else {
+            mOptions[RSK_SHUFFLE_OCARINA].Enable();
+            mOptions[RSK_OCARINA_HINT].Enable();
+        }
+    });
     OPT_U8(RSK_STARTING_HOOKSHOT, "Start with Hookshot or Longshot", {"Off", "Hookshot", "Longshot"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingHookshot")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_HOOKSHOT_OFF;
     // Custom Starting Items
     OPT_BOOL(RSK_STARTING_DINS, "Start with Din's Fire", CVAR_RANDOMIZER_SETTING("StartingDins"));
@@ -1328,35 +1337,99 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_STARTING_FIRE_ARROWS, "Start with Fire Arrows", CVAR_RANDOMIZER_SETTING("StartingFireArrows"));
     OPT_BOOL(RSK_STARTING_ICE_ARROWS, "Start with Ice Arrows", CVAR_RANDOMIZER_SETTING("StartingIceArrows"));
     OPT_BOOL(RSK_STARTING_LIGHT_ARROWS, "Start with Light Arrows", CVAR_RANDOMIZER_SETTING("StartingLightArrows"));
-    OPT_BOOL(RSK_STARTING_BOMB_BAG, "Start with a Bomb Bag", CVAR_RANDOMIZER_SETTING("StartingBombBag"));
-    OPT_BOOL(RSK_STARTING_FAIRY_BOW, "Start with a Fairy Bow", CVAR_RANDOMIZER_SETTING("StartingFairyBow"));
-    OPT_BOOL(RSK_STARTING_SLINGSHOT, "Start with a Slingshot", CVAR_RANDOMIZER_SETTING("StartingSlingshot"));
-    OPT_BOOL(RSK_STARTING_BOMBCHU_BAG, "Start with a Bombchu Bag", CVAR_RANDOMIZER_SETTING("StartingBombchuBag"));
+    OPT_U8(RSK_STARTING_NUTS, "Start with Deku Nuts", {"Off", "20 Nut Capacity", "30 Nut Capacity", "40 Nut Capacity", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingNuts")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_DEKU_NUTS_OFF;
+    OPT_U8(RSK_STARTING_STICKS, "Start with Deku Sticks", {"Off", "10 Stick Capacity", "20 Stick Capacity", "30 Stick Capacity", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSticks")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_DEKU_STICKS_OFF;
+    OPT_U8(RSK_STARTING_BOMB_BAG, "Start with a Bomb Bag", {"Off", "Bomb Bag 20", "Bomb Bag 30", "Bomb Bag 40", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBombBag")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_BOMB_BAG_OFF;
+    OPT_U8(RSK_STARTING_FAIRY_BOW, "Start with a Fairy Bow", {"Off", "Quiver 30", "Quiver 40", "Quiver 50", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingFairyBow")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_FAIRY_BOW_OFF;
+    OPT_U8(RSK_STARTING_SLINGSHOT, "Start with a Slingshot", {"Off", "Bullet Bag 30", "Bullet Bag 40", "Bullet Bag 50", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSlingshot")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_SLINGSHOT_OFF;
+    OPT_U8(RSK_STARTING_BOMBCHU_BAG, "Start with a Bombchu Bag", {"Off", "Bombchu Bag", "Infinite"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBombchuBag")), "", WIDGET_CVAR_COMBOBOX, RO_STARTING_BOMBCHU_BAG_OFF;
     OPT_BOOL(RSK_STARTING_BOOMERANG, "Start with Boomerang", CVAR_RANDOMIZER_SETTING("StartingBoomerang"));
+    OPT_CALLBACK(RSK_STARTING_BOOMERANG, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingBoomerang"), RO_GENERIC_OFF)) {
+            mOptions[RSK_BOOMERANG_HINT].Disable("This option is disabled because \"Start with Boomerang\" is enabled. There would be no Boomerang to hint!");
+        } else {
+            mOptions[RSK_BOOMERANG_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_LENS, "Start with Lens of Truth", CVAR_RANDOMIZER_SETTING("StartingLens"));
     OPT_BOOL(RSK_STARTING_HAMMER, "Start with the Megaton Hammer", CVAR_RANDOMIZER_SETTING("StartingHammer"));
+    OPT_CALLBACK(RSK_STARTING_HAMMER, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingHammer"), RO_GENERIC_OFF)) {
+            mOptions[RSK_HAMMER_HINT].Disable("This option is disabled because \"Start with Megaton Hammer\" is enabled. There would be no Megaton Hammer to hint!");
+        } else {
+            mOptions[RSK_HAMMER_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_BOTTLE, "Start with an Empty Bottle", CVAR_RANDOMIZER_SETTING("StartingBottle"));
     OPT_BOOL(RSK_STARTING_HYLIAN_SHIELD, "Start with the Hylian Shield", CVAR_RANDOMIZER_SETTING("StartingHylianShield"));
     OPT_BOOL(RSK_STARTING_MIRROR_SHIELD, "Start with the Mirror Shield", CVAR_RANDOMIZER_SETTING("StartingMirrorShield"));
+    OPT_CALLBACK(RSK_STARTING_MIRROR_SHIELD, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingMirrorShield"), RO_GENERIC_OFF)) {
+            mOptions[RSK_MIRROR_HINT].Disable("This option is disabled because \"Start with Mirror Shield\" is enabled. There would be no Mirror Shield to hint!");
+        } else {
+            mOptions[RSK_MIRROR_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_IRON_BOOTS, "Start with the Iron Boots", CVAR_RANDOMIZER_SETTING("StartingIronBoots"));
     OPT_BOOL(RSK_STARTING_HOVER_BOOTS, "Start with the Hover Boots", CVAR_RANDOMIZER_SETTING("StartingHoverBoots"));
+    OPT_CALLBACK(RSK_STARTING_HOVER_BOOTS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingHoverBoots"), RO_GENERIC_OFF)) {
+            mOptions[RSK_HOVERS_HINT].Disable("This option is disabled because \"Start with Hover Boots\" is enabled. There would be no Hover Boots to hint!");
+        } else {
+            mOptions[RSK_HOVERS_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_BGS_SWORD, "Start with the Biggoron Sword", CVAR_RANDOMIZER_SETTING("StartingBGS"));
     OPT_BOOL(RSK_STARTING_GORON_TUNIC, "Start with the Goron Tunic", CVAR_RANDOMIZER_SETTING("StartingGoronTunic"));
     OPT_BOOL(RSK_STARTING_ZORA_TUNIC, "Start with the Zora Tunic", CVAR_RANDOMIZER_SETTING("StartingZoraTunic"));
     // End
     OPT_BOOL(RSK_STARTING_DEKU_SHIELD, "Start with Deku Shield", CVAR_RANDOMIZER_SETTING("StartingDekuShield"));
     OPT_BOOL(RSK_STARTING_KOKIRI_SWORD, "Start with Kokiri Sword", CVAR_RANDOMIZER_SETTING("StartingKokiriSword"));
+    OPT_CALLBACK(RSK_STARTING_KOKIRI_SWORD, {
+        // I'm not sure why checking for it to be 'disabled' gives the desired effect, but whatever.
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingKokiriSword"), RO_GENERIC_OFF)) {
+            mOptions[RSK_SHUFFLE_KOKIRI_SWORD].Disable("This option is disabled because \"Start with Kokiri Sword\" is enabled.");
+        } else {
+            mOptions[RSK_SHUFFLE_KOKIRI_SWORD].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_MASTER_SWORD, "Start with Master Sword", CVAR_RANDOMIZER_SETTING("StartingMasterSword"));
-    OPT_BOOL(RSK_STARTING_STICKS, "Start with Stick Ammo", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSticks"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
-    OPT_BOOL(RSK_STARTING_NUTS, "Start with Nut Ammo", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingNuts"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
+    OPT_CALLBACK(RSK_STARTING_MASTER_SWORD, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingMasterSword"), RO_GENERIC_OFF)) {
+            mOptions[RSK_SHUFFLE_MASTER_SWORD].Disable("This option is disabled because \"Start with Master Sword\" is enabled.");
+        } else {
+            mOptions[RSK_SHUFFLE_MASTER_SWORD].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_BEANS, "Start with Magic Beans", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBeans"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_BOOL(RSK_FULL_WALLETS, "Full Wallets", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("FullWallets"), mOptionDescriptions[RSK_FULL_WALLETS], WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_BOOL(RSK_STARTING_ZELDAS_LULLABY, "Start with Zelda's Lullaby", CVAR_RANDOMIZER_SETTING("StartingZeldasLullaby"), "", IMFLAG_NONE);
+    OPT_CALLBACK(RSK_STARTING_ZELDAS_LULLABY, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingZeldasLullaby"), RO_GENERIC_OFF)) {
+            mOptions[RSK_LULLABY_HINT].Disable("This option is disabled because \"Start with Zelda's Lullaby\" is enabled. There would be no Zelda's Lullaby to hint!");
+        } else {
+            mOptions[RSK_LULLABY_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_EPONAS_SONG, "Start with Epona's Song", CVAR_RANDOMIZER_SETTING("StartingEponasSong"), "", IMFLAG_NONE);
+    OPT_CALLBACK(RSK_STARTING_EPONAS_SONG, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingEponasSong"), RO_GENERIC_OFF)) {
+            mOptions[RSK_EPONAS_HINT].Disable("This option is disabled because \"Start with Epona's Song\" is enabled. There would be no Epona's Song to hint!");
+        } else {
+            mOptions[RSK_EPONAS_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_SARIAS_SONG, "Start with Saria's Song", CVAR_RANDOMIZER_SETTING("StartingSariasSong"), "", IMFLAG_NONE);
     OPT_BOOL(RSK_STARTING_SUNS_SONG, "Start with Sun's Song", CVAR_RANDOMIZER_SETTING("StartingSunsSong"), "", IMFLAG_NONE);
     OPT_BOOL(RSK_STARTING_SONG_OF_TIME, "Start with Song of Time", CVAR_RANDOMIZER_SETTING("StartingSongOfTime"), "", IMFLAG_NONE);
     OPT_BOOL(RSK_STARTING_SONG_OF_STORMS, "Start with Song of Storms", CVAR_RANDOMIZER_SETTING("StartingSongOfStorms"), "", IMFLAG_NONE);
+    OPT_CALLBACK(RSK_STARTING_SONG_OF_STORMS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingSongOfStorms"), RO_GENERIC_OFF)) {
+            mOptions[RSK_STORMS_HINT].Disable("This option is disabled because \"Start with Song of Storms\" is enabled. There would be no Song of Storms to hint!");
+        } else {
+            mOptions[RSK_STORMS_HINT].Enable();
+        }
+    });
     OPT_BOOL(RSK_STARTING_MINUET_OF_FOREST, "Start with Minuet of Forest", CVAR_RANDOMIZER_SETTING("StartingMinuetOfForest"), "", IMFLAG_NONE);
     OPT_BOOL(RSK_STARTING_BOLERO_OF_FIRE, "Start with Bolero of Fire", CVAR_RANDOMIZER_SETTING("StartingBoleroOfFire"), "", IMFLAG_NONE);
     OPT_BOOL(RSK_STARTING_SERENADE_OF_WATER, "Start with Serenade of Water", CVAR_RANDOMIZER_SETTING("StartingSerenadeOfWater"), "", IMFLAG_NONE);
@@ -2927,6 +3000,46 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
 
     if (mOptions[RSK_FISHSANITY].IsNot(RO_FISHSANITY_HYRULE_LOACH)) {
         mOptions[RSK_LOACH_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_KOKIRI_SWORD]) {
+        mOptions[RSK_SHUFFLE_KOKIRI_SWORD].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_MASTER_SWORD]) {
+        mOptions[RSK_SHUFFLE_MASTER_SWORD].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_BOOMERANG]) {
+        mOptions[RSK_BOOMERANG_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_HAMMER]) {
+        mOptions[RSK_HAMMER_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_MIRROR_SHIELD]) {
+        mOptions[RSK_MIRROR_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_OCARINA].Is(RO_STARTING_OCARINA_TIME)) {
+        mOptions[RSK_OCARINA_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_HOVER_BOOTS]) {
+        mOptions[RSK_HOVERS_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_ZELDAS_LULLABY]) {
+        mOptions[RSK_LULLABY_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_EPONAS_SONG]) {
+        mOptions[RSK_EPONAS_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_SONG_OF_STORMS]) {
+        mOptions[RSK_STORMS_HINT].Set(RO_GENERIC_OFF);
     }
 }
 

@@ -74,10 +74,13 @@ void GiveLinkDekuSticks(int howManySticks) {
         Inventory_ChangeUpgrade(UPG_STICKS, 1);
         maxStickCount = 10;
     } else if (CUR_UPG_VALUE(UPG_STICKS) == 1) {
+        INV_CONTENT(ITEM_STICK) = ITEM_STICK;
         maxStickCount = 10;
     } else if (CUR_UPG_VALUE(UPG_STICKS) == 2) {
+        INV_CONTENT(ITEM_STICK) = ITEM_STICK;
         maxStickCount = 20;
     } else if (CUR_UPG_VALUE(UPG_STICKS) == 3) {
+        INV_CONTENT(ITEM_STICK) = ITEM_STICK;
         maxStickCount = 30;
     }
 
@@ -95,10 +98,13 @@ void GiveLinkDekuNuts(int howManyNuts) {
         Inventory_ChangeUpgrade(UPG_NUTS, 1);
         maxNutCount = 20;
     } else if (CUR_UPG_VALUE(UPG_NUTS) == 1) {
+        INV_CONTENT(ITEM_NUT) = ITEM_NUT;
         maxNutCount = 20;
     } else if (CUR_UPG_VALUE(UPG_NUTS) == 2) {
+        INV_CONTENT(ITEM_NUT) = ITEM_NUT;
         maxNutCount = 30;
     } else if (CUR_UPG_VALUE(UPG_NUTS) == 3) {
+        INV_CONTENT(ITEM_NUT) = ITEM_NUT;
         maxNutCount = 40;
     }
 
@@ -120,7 +126,6 @@ void GiveLinkBombchus(int howManyBombchus) {
     }
 }
 
-// For some reason ITEM_BOMB is handled uniquely, so Item_Give doesn't work. Instead, we use the below function, copied from sticks, to give Bomb Bag
 void GiveLinkBombs(int howManyBombs) {
     int maxBombCount = 0;
     if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 0) {
@@ -128,10 +133,13 @@ void GiveLinkBombs(int howManyBombs) {
         Inventory_ChangeUpgrade(UPG_BOMB_BAG, 1);
         maxBombCount = 20;
     } else if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 1) {
+        INV_CONTENT(ITEM_BOMB) = ITEM_BOMB;
         maxBombCount = 20;
     } else if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 2) {
+        INV_CONTENT(ITEM_BOMB) = ITEM_BOMB;
         maxBombCount = 30;
     } else if (CUR_UPG_VALUE(UPG_BOMB_BAG) == 3) {
+        INV_CONTENT(ITEM_BOMB) = ITEM_BOMB;
         maxBombCount = 40;
     }
 
@@ -149,10 +157,13 @@ void GiveLinkArrows(int howManyArrows) {
         Inventory_ChangeUpgrade(UPG_QUIVER, 1);
         maxArrowCount = 30;
     } else if (CUR_UPG_VALUE(UPG_QUIVER) == 1) {
+        INV_CONTENT(ITEM_BOW) = ITEM_BOW;
         maxArrowCount = 30;
     } else if (CUR_UPG_VALUE(UPG_QUIVER) == 2) {
+        INV_CONTENT(ITEM_BOW) = ITEM_BOW;
         maxArrowCount = 40;
     } else if (CUR_UPG_VALUE(UPG_QUIVER) == 3) {
+        INV_CONTENT(ITEM_BOW) = ITEM_BOW;
         maxArrowCount = 50;
     }
 
@@ -170,10 +181,13 @@ void GiveLinkSeeds(int howManySeeds) {
         Inventory_ChangeUpgrade(UPG_BULLET_BAG, 1);
         maxSeedCount = 30;
     } else if (CUR_UPG_VALUE(UPG_BULLET_BAG) == 1) {
+        INV_CONTENT(ITEM_SLINGSHOT) = ITEM_SLINGSHOT;
         maxSeedCount = 30;
     } else if (CUR_UPG_VALUE(UPG_BULLET_BAG) == 2) {
+        INV_CONTENT(ITEM_SLINGSHOT) = ITEM_SLINGSHOT;
         maxSeedCount = 40;
     } else if (CUR_UPG_VALUE(UPG_BULLET_BAG) == 3) {
+        INV_CONTENT(ITEM_SLINGSHOT) = ITEM_SLINGSHOT;
         maxSeedCount = 50;
     }
 
@@ -238,18 +252,90 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_ARROW_LIGHT);
 
     // Inventory Items
-    if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG)) {
-        GiveLinkBombs(20);
+    if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) != RO_STARTING_BOMB_BAG_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_20) {
+            GiveLinkBombs(20);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_30) {
+            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 2);
+            GiveLinkBombs(30);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_40) {
+            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 3);
+            GiveLinkBombs(40);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMB_BAG);
+            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 3);
+            GiveLinkBombs(40);
+        }
     }
-    if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW)) {
-        GiveLinkArrows(30);
+    if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) != RO_STARTING_FAIRY_BOW_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_30) {
+            GiveLinkArrows(30);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_40) {
+            Inventory_ChangeUpgrade(UPG_QUIVER, 2);
+            GiveLinkArrows(40);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_50) {
+            Inventory_ChangeUpgrade(UPG_QUIVER, 3);
+            GiveLinkArrows(50);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_QUIVER);
+            Inventory_ChangeUpgrade(UPG_QUIVER, 3);
+            GiveLinkArrows(50);
+        }
     }
-    if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT)) {
-        GiveLinkSeeds(30);
+    if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) != RO_STARTING_SLINGSHOT_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_30) {
+            GiveLinkSeeds(30);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_40) {
+            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 2);
+            GiveLinkSeeds(40);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_50) {
+            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 3);
+            GiveLinkSeeds(50);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BULLET_BAG);
+            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 3);
+            GiveLinkSeeds(50);
+        }
     }
-    if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG)) {
-        GiveLinkBombchus(50);
+    if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) != RO_STARTING_BOMBCHU_BAG_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) == RO_STARTING_BOMBCHU_BAG_ON) {
+            GiveLinkBombchus(50);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) == RO_STARTING_BOMBCHU_BAG_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMBCHUS);
+            GiveLinkBombchus(50);
+        }
     }
+    if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) != RO_STARTING_DEKU_STICKS_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_10) {
+            GiveLinkDekuSticks(10);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_20) {
+            Inventory_ChangeUpgrade(UPG_STICKS, 2);
+            GiveLinkDekuSticks(20);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_30) {
+            Inventory_ChangeUpgrade(UPG_STICKS, 3);
+            GiveLinkDekuSticks(30);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_STICK_UPGRADE);
+            Inventory_ChangeUpgrade(UPG_STICKS, 3);
+            GiveLinkDekuSticks(30);
+        }
+    }
+    if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) != RO_STARTING_DEKU_NUTS_OFF) {
+        if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_20) {
+            GiveLinkDekuNuts(20);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_30) {
+            Inventory_ChangeUpgrade(UPG_NUTS, 2);
+            GiveLinkDekuNuts(30);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_40) {
+            Inventory_ChangeUpgrade(UPG_NUTS, 3);
+            GiveLinkDekuNuts(40);
+        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_INF) {
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_NUT_UPGRADE);
+            Inventory_ChangeUpgrade(UPG_NUTS, 3);
+            GiveLinkDekuNuts(30);
+        }
+    }
+
     if (Randomizer_GetSettingValue(RSK_STARTING_BOOMERANG))
         Item_Give(NULL, ITEM_BOOMERANG);
     if (Randomizer_GetSettingValue(RSK_STARTING_LENS))
@@ -305,13 +391,6 @@ void SetStartingItems() {
         INV_CONTENT(ITEM_HOOKSHOT) = Randomizer_GetSettingValue(RSK_STARTING_HOOKSHOT) == RO_STARTING_HOOKSHOT_HOOKSHOT
                                               ? ITEM_HOOKSHOT
                                               : ITEM_LONGSHOT;
-    }
-
-    if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) && !Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_STICK_BAG)) {
-        GiveLinkDekuSticks(10);
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) && !Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_NUT_BAG)) {
-        GiveLinkDekuNuts(20);
     }
 
     if (Randomizer_GetSettingValue(RSK_FULL_WALLETS)) {
