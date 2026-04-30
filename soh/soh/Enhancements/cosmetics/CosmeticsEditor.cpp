@@ -86,6 +86,7 @@ std::map<CosmeticGroup, const char*> groupLabels = {
     { COSMETICS_GROUP_SMALL_KEYS, "Small Keys" },
     { COSMETICS_GROUP_BOSS_KEYS, "Boss Keys" },
     { COSMETICS_GROUP_SONGS, "Songs" },
+    { COSMETICS_GROUP_CSMC_PARTICLES, "CSMC Particles/Icicles" },
     { COSMETICS_GROUP_WARP_SONGS, "Warp Songs" },
     { COSMETICS_GROUP_CONSUMABLE, "Consumables" },
     { COSMETICS_GROUP_HUD, "HUD" },
@@ -318,6 +319,14 @@ static std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("WarpSong.Requiem",             "Requiem Model",            COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(255, 150, 0,  255), false, true, false),
     COSMETIC_OPTION("WarpSong.Nocturne",            "Nocturne Model",           COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(200,  50, 255, 255), false, true, false),
     COSMETIC_OPTION("WarpSong.Prelude",             "Prelude Model",            COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(200, 255, 0, 255), false, true, false),
+
+    COSMETIC_OPTION("CSMC.Junk",                    "Junk Particles",           COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(255, 255, 255, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.Lesser",                  "Lesser Particles",         COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(170, 50, 0, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.Major",                   "Major Particles",          COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(250, 185, 40, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.SmallKey",                "Small Key Particles",      COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(85, 220, 255, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.BossKey",                 "Boss Key Particles",       COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(255, 255, 0, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.Health",                  "Health Particles",         COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(250, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CSMC.Skulltula",               "Skulltula Particles",      COSMETICS_GROUP_CSMC_PARTICLES, ColorRGBA8(0, 0, 0, 255), false, true, false),
 
     COSMETIC_OPTION("Key.WellSmallBody",            "Well Small Key",           COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(255, 255, 255, 255), false, true, false),
     COSMETIC_OPTION("Key.WellSmallEmblem",          "Well Small Key Emblem",    COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(227, 110, 255, 255), false, true, false),
@@ -2484,6 +2493,51 @@ void CosmeticsEditorWindow::ApplySongColors() {
     ResetColor(cosmeticOptions.at("Song.SongOfStorms"));
 }
 
+// CSMC Particles
+void CosmeticsEditorWindow::ApplyCSMCParticleColors() {
+    // Junk Particles
+    CVarSetColor(cosmeticOptions["CSMC.Junk"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.Junk"].changedCvar, 1);
+    cosmeticOptions["CSMC.Junk"].currentColor = { 255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.Junk"));
+
+    // Lesser Particles
+    CVarSetColor(cosmeticOptions["CSMC.Lesser"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.Lesser"].changedCvar, 1);
+    cosmeticOptions["CSMC.Lesser"].currentColor = { 170 / 255.0f, 50 / 255.0f, 0 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.Lesser"));
+
+    // Major Particles
+    CVarSetColor(cosmeticOptions["CSMC.Major"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.Major"].changedCvar, 1);
+    cosmeticOptions["CSMC.Major"].currentColor = { 250 / 255.0f, 185 / 255.0f, 40 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.Major"));
+
+    // Small Key Particles
+    CVarSetColor(cosmeticOptions["CSMC.SmallKey"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.SmallKey"].changedCvar, 1);
+    cosmeticOptions["CSMC.SmallKey"].currentColor = { 85 / 255.0f, 220 / 255.0f, 255 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.SmallKey"));
+
+    // Boss Key Particles
+    CVarSetColor(cosmeticOptions["CSMC.BossKey"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.BossKey"].changedCvar, 1);
+    cosmeticOptions["CSMC.BossKey"].currentColor = { 255 / 255.0f, 255 / 255.0f, 0 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.BossKey"));
+
+    // Health Particles
+    CVarSetColor(cosmeticOptions["CSMC.Health"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.Health"].changedCvar, 1);
+    cosmeticOptions["CSMC.Health"].currentColor = { 250 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.Health"));
+
+    // Gold Skulltula Particles
+    CVarSetColor(cosmeticOptions["CSMC.Skulltula"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["CSMC.Skulltula"].changedCvar, 1);
+    cosmeticOptions["CSMC.Skulltula"].currentColor = { 0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CSMC.Skulltula"));
+}
+
 void CosmeticsEditorWindow::DrawElement() {
     UIWidgets::CVarCombobox("Color Scheme", CVAR_COSMETIC("DefaultColorScheme"), colorSchemes,
                             UIWidgets::ComboboxOptions()
@@ -2632,6 +2686,14 @@ void CosmeticsEditorWindow::DrawElement() {
 
             DrawCosmeticGroup(COSMETICS_GROUP_SONGS);
             DrawCosmeticGroup(COSMETICS_GROUP_WARP_SONGS);
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("CSMC Particles")) {
+
+            UIWidgets::Separator(true, true, 2.0f, 2.0f);
+
+            DrawCosmeticGroup(COSMETICS_GROUP_CSMC_PARTICLES);
             ImGui::EndTabItem();
         }
 

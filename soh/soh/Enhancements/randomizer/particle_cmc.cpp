@@ -1,4 +1,5 @@
 #include "particle_cmc.h"
+#include "soh/Enhancements/cosmetics/CosmeticsEditor.h"
 
 // Color of the circle for the particles
 static Color_RGBA8 mainColors[7] = {
@@ -33,14 +34,64 @@ static Color_RGBA8 flareColors[7] = {
     { 250, 220, 180, 255 }, // Major
 };
 
+static bool ColorEquals(const Color_RGBA8& a, const Color_RGBA8& b) {
+    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+}
+
+
 Color_RGBA8 Randomizer_GetParticleCMCColor(GetItemCategory colorIndex, ParticleCMCColorType colorType) {
+    Color_RGBA8 primary;
+    switch (colorIndex) {
+        case ITEM_CATEGORY_JUNK:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Junk.Value"), Color_RGBA8{ 255, 255, 255, 255 });
+            break;
+        case ITEM_CATEGORY_LESSER:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Lesser.Value"), Color_RGBA8{ 170, 50, 0, 255 });
+            break;
+        case ITEM_CATEGORY_HEALTH:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Health.Value"), Color_RGBA8{ 250, 0, 0, 255 });
+            break;
+        case ITEM_CATEGORY_BOSS_KEY:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.BossKey.Value"), Color_RGBA8{ 255, 255, 0, 255 });
+            break;
+        case ITEM_CATEGORY_SMALL_KEY:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.SmallKey.Value"), Color_RGBA8{ 85, 220, 255, 255 });
+            break;
+        case ITEM_CATEGORY_SKULLTULA_TOKEN:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Skulltula.Value"), Color_RGBA8{ 0, 0, 0, 255 });
+            break;
+        case ITEM_CATEGORY_MAJOR:
+            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Major.Value"), Color_RGBA8{ 250, 185, 40, 255 });
+            break;
+        default:
+            primary = { 255, 255, 255, 255 };
+            break;
+    }
+
     switch (colorType) {
         case COLOR_PRIMARY:
-            return mainColors[colorIndex];
-        case COLOR_SECONDARY:
-            return secColors[colorIndex];
-        case COLOR_FLARE:
-            return flareColors[colorIndex];
+            return primary;
+        case COLOR_SECONDARY: {
+            if (ColorEquals(primary, mainColors[colorIndex])) {
+                return secColors[colorIndex];
+            } else {
+                // Takes the value of 'primary' and darkens it by 30% to use as the secondary color
+                Color_RGBA8 secondary = { static_cast<uint8_t>(primary.r * 0.7f),
+                                          static_cast<uint8_t>(primary.g * 0.7f),
+                                          static_cast<uint8_t>(primary.b * 0.7f), primary.a };
+                return secondary;
+            }
+        }
+        case COLOR_FLARE: {
+            if (ColorEquals(primary, mainColors[colorIndex])) {
+                return flareColors[colorIndex];
+            } else {
+                Color_RGBA8 flare = { static_cast<uint8_t>(primary.r * 0.6f),
+                                      static_cast<uint8_t>(primary.g * 0.6f),
+                                      static_cast<uint8_t>(primary.b * 0.6f), primary.a };
+                return flare;
+            }
+        }
         default:
             return mainColors[colorIndex];
     }
