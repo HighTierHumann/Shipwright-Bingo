@@ -314,7 +314,7 @@ jobs:
         cd ..
         mv _packages/*.zip _packages/soh-windows.zip
     - name: Unzip package
-      run: Expand-Archive -Path _packages/soh-windows.zip -DestinationPath soh-windows
+      run: Expand-Archive -Path _packages/soh-windows.zip -DestinationPath soh-bingo-windows
     - name: Upload build
       uses: actions/upload-artifact@v7
       with:
