@@ -48,6 +48,7 @@ extern "C" {
 #include "textures/nintendo_rogo_static/nintendo_rogo_static.h"
 #include "objects/object_gi_rabit_mask/object_gi_rabit_mask.h"
 #include "overlays/ovl_Magic_Wind/ovl_Magic_Wind.h"
+#include "objects/object_gi_melody/object_gi_melody.h"
 
 extern SaveContext gSaveContext;
 extern PlayState* gPlayState;
@@ -84,6 +85,8 @@ std::map<CosmeticGroup, const char*> groupLabels = {
     { COSMETICS_GROUP_KEYRING, "Keyring" },
     { COSMETICS_GROUP_SMALL_KEYS, "Small Keys" },
     { COSMETICS_GROUP_BOSS_KEYS, "Boss Keys" },
+    { COSMETICS_GROUP_SONGS, "Songs" },
+    { COSMETICS_GROUP_WARP_SONGS, "Warp Songs" },
     { COSMETICS_GROUP_CONSUMABLE, "Consumables" },
     { COSMETICS_GROUP_HUD, "HUD" },
     { COSMETICS_GROUP_KALEIDO, "Pause Menu" },
@@ -301,6 +304,20 @@ static std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("Key.GanonsSmallEmblem",        "Ganons Small Key Emblem",  COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(80,  80,  80,  255), false, true, false),
     COSMETIC_OPTION("Key.GanonsBossBody",           "Ganons Boss Key Body",     COSMETICS_GROUP_BOSS_KEYS,    ColorRGBA8(255, 255, 0,   255), false, true, false),
     COSMETIC_OPTION("Key.GanonsBossGem",            "Ganons Boss Key Gem",      COSMETICS_GROUP_BOSS_KEYS,    ColorRGBA8(255, 0,   0,   255), false, true, false),
+
+    COSMETIC_OPTION("Song.ZeldasLullaby",           "Zelda's Lullaby Model",    COSMETICS_GROUP_SONGS,        ColorRGBA8(109, 73,  143, 255), false, true, false),
+    COSMETIC_OPTION("Song.EponasSong",              "Epona's Song Model",       COSMETICS_GROUP_SONGS,        ColorRGBA8(217, 110, 48,  255), false, true, false),
+    COSMETIC_OPTION("Song.SariasSong",              "Saria's Song Model",       COSMETICS_GROUP_SONGS,        ColorRGBA8(62,  109, 23,  255), false, true, false),
+    COSMETIC_OPTION("Song.SunsSong",                "Sun's Song Model",         COSMETICS_GROUP_SONGS,        ColorRGBA8(237, 231, 62,  255), false, true, false),
+    COSMETIC_OPTION("Song.SongOfTime",              "Song of Time Model",       COSMETICS_GROUP_SONGS,        ColorRGBA8(98,  177, 211, 255), false, true, false),
+    COSMETIC_OPTION("Song.SongOfStorms",            "Song of Storms Model",     COSMETICS_GROUP_SONGS,        ColorRGBA8(146, 146, 146, 255), false, true, false),
+
+    COSMETIC_OPTION("WarpSong.Minuet",              "Minuet Model",             COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(0, 200,  0, 255), false, true, false),
+    COSMETIC_OPTION("WarpSong.Bolero",              "Bolero Model",             COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(255, 50, 0,  255), false, true, false),
+    COSMETIC_OPTION("WarpSong.Serenade",            "Serenade Model",           COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(0,  150, 255,  255), false, true, false),
+    COSMETIC_OPTION("WarpSong.Requiem",             "Requiem Model",            COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(255, 150, 0,  255), false, true, false),
+    COSMETIC_OPTION("WarpSong.Nocturne",            "Nocturne Model",           COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(200,  50, 255, 255), false, true, false),
+    COSMETIC_OPTION("WarpSong.Prelude",             "Prelude Model",            COSMETICS_GROUP_WARP_SONGS,        ColorRGBA8(200, 255, 0, 255), false, true, false),
 
     COSMETIC_OPTION("Key.WellSmallBody",            "Well Small Key",           COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(255, 255, 255, 255), false, true, false),
     COSMETIC_OPTION("Key.WellSmallEmblem",          "Well Small Key Emblem",    COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(227, 110, 255, 255), false, true, false),
@@ -1414,6 +1431,49 @@ void ApplyOrResetCustomGfxPatches(bool manualChange) {
                   gsDPSetEnvColor(color.r / 2, color.g / 2, color.b / 2, 255));
     }
 
+    // Warp Songs
+    static CosmeticOption& songMinuet = cosmeticOptions.at("WarpSong.Minuet");
+    if (manualChange || CVarGetInteger(songMinuet.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songMinuet.valuesCvar, songMinuet.defaultColor);
+        PATCH_GFX(gGiMinuetColorDL, "Minuet", songMinuet.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& songBolero = cosmeticOptions.at("WarpSong.Bolero");
+    if (manualChange || CVarGetInteger(songBolero.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songBolero.valuesCvar, songBolero.defaultColor);
+        PATCH_GFX(gGiBoleroColorDL, "Bolero", songBolero.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& songSerenade = cosmeticOptions.at("WarpSong.Serenade");
+    if (manualChange || CVarGetInteger(songSerenade.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songSerenade.valuesCvar, songSerenade.defaultColor);
+        PATCH_GFX(gGiSerenadeColorDL, "Serenade", songSerenade.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& songRequiem = cosmeticOptions.at("WarpSong.Requiem");
+    if (manualChange || CVarGetInteger(songRequiem.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songRequiem.valuesCvar, songRequiem.defaultColor);
+        PATCH_GFX(gGiRequiemColorDL, "Requiem", songRequiem.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& songNocturne = cosmeticOptions.at("WarpSong.Nocturne");
+    if (manualChange || CVarGetInteger(songNocturne.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songNocturne.valuesCvar, songNocturne.defaultColor);
+        PATCH_GFX(gGiNocturneColorDL, "Nocturne", songNocturne.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& songPrelude = cosmeticOptions.at("WarpSong.Prelude");
+    if (manualChange || CVarGetInteger(songPrelude.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(songPrelude.valuesCvar, songPrelude.defaultColor);
+        PATCH_GFX(gGiPreludeColorDL, "Prelude", songPrelude.changedCvar, 2,
+                  gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
     static CosmeticOption& npcGoldenSkulltula = cosmeticOptions.at("NPC.GoldenSkulltula");
     if (manualChange || CVarGetInteger(npcGoldenSkulltula.rainbowCvar, 0)) {
         Color_RGBA8 color = CVarGetColor(npcGoldenSkulltula.valuesCvar, npcGoldenSkulltula.defaultColor);
@@ -2386,6 +2446,44 @@ void CosmeticsEditorWindow::ApplyDungeonKeyColors() {
     ResetColor(cosmeticOptions.at("Key.FortSmallEmblem"));
 }
 
+void CosmeticsEditorWindow::ApplySongColors() {
+    // Zelda's Lullaby
+    CVarSetColor(cosmeticOptions["Song.ZeldasLullaby"].valuesCvar, { 109, 73, 143, 255 });
+    CVarSetInteger(cosmeticOptions["Song.ZeldasLullaby"].changedCvar, 1);
+    cosmeticOptions["Song.ZeldasLullaby"].currentColor = { 109 / 255.0f, 73 / 255.0f, 143 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.ZeldasLullaby"));
+
+    // Epona's Song
+    CVarSetColor(cosmeticOptions["Song.EponasSong"].valuesCvar, { 217, 110, 48, 255 });
+    CVarSetInteger(cosmeticOptions["Song.EponasSong"].changedCvar, 1);
+    cosmeticOptions["Song.EponasSong"].currentColor = { 217 / 255.0f, 110 / 255.0f, 48 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.EponasSong"));
+
+    // Saria's Song
+    CVarSetColor(cosmeticOptions["Song.SariasSong"].valuesCvar, { 62, 109, 23, 255 });
+    CVarSetInteger(cosmeticOptions["Song.SariasSong"].changedCvar, 1);
+    cosmeticOptions["Song.SariasSong"].currentColor = { 62 / 255.0f, 109 / 255.0f, 23 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.SariasSong"));
+
+    // Sun's Song
+    CVarSetColor(cosmeticOptions["Song.SunsSong"].valuesCvar, { 237, 231, 62, 255 });
+    CVarSetInteger(cosmeticOptions["Song.SunsSong"].changedCvar, 1);
+    cosmeticOptions["Song.SunsSong"].currentColor = { 237 / 255.0f, 231 / 255.0f, 62 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.SunsSong"));
+
+    // Song of Time
+    CVarSetColor(cosmeticOptions["Song.SongOfTime"].valuesCvar, { 98, 177, 211, 255 });
+    CVarSetInteger(cosmeticOptions["Song.SongOfTime"].changedCvar, 1);
+    cosmeticOptions["Song.SongOfTime"].currentColor = { 98 / 255.0f, 177 / 255.0f, 211 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.SongOfTime"));
+
+    // Song of Storms
+    CVarSetColor(cosmeticOptions["Song.SongOfStorms"].valuesCvar, { 146, 146, 146, 255 });
+    CVarSetInteger(cosmeticOptions["Song.SongOfStorms"].changedCvar, 1);
+    cosmeticOptions["Song.SongOfStorms"].currentColor = { 146 / 255.0f, 146 / 255.0f, 146 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("Song.SongOfStorms"));
+}
+
 void CosmeticsEditorWindow::DrawElement() {
     UIWidgets::CVarCombobox("Color Scheme", CVAR_COSMETIC("DefaultColorScheme"), colorSchemes,
                             UIWidgets::ComboboxOptions()
@@ -2525,6 +2623,15 @@ void CosmeticsEditorWindow::DrawElement() {
             DrawCosmeticGroup(COSMETICS_GROUP_BOSS_KEYS);
 
             ImGui::EndDisabled();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Songs")) {
+
+            UIWidgets::Separator(true, true, 2.0f, 2.0f);
+
+            DrawCosmeticGroup(COSMETICS_GROUP_SONGS);
+            DrawCosmeticGroup(COSMETICS_GROUP_WARP_SONGS);
             ImGui::EndTabItem();
         }
 
