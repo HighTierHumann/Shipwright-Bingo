@@ -119,7 +119,7 @@ extern "C" void CustomLogoTitle_Draw(TitleContext* titleContext, uint8_t logoToD
 }
 
 #define CVAR_BOOTSEQUENCE_NAME CVAR_SETTING("BootSequence")
-#define CVAR_BOOTSEQUENCE_DEFAULT BOOTSEQUENCE_DEFAULT
+#define CVAR_BOOTSEQUENCE_DEFAULT BOOTSEQUENCE_FILESELECT
 #define CVAR_BOOTSEQUENCE_VALUE CVarGetInteger(CVAR_BOOTSEQUENCE_NAME, CVAR_BOOTSEQUENCE_DEFAULT)
 
 extern "C" void CustomLogoTitle_Main(TitleContext* titleContext) {
