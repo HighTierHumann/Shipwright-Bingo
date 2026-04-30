@@ -231,18 +231,51 @@ void GenerateItemPool() {
     }
 
     int infiniteProgressive = ctx->GetOption(RSK_INFINITE_UPGRADES).Is(RO_INF_UPGRADES_PROGRESSIVE) ? 1 : 0;
+    if (!ctx->GetOption(RSK_STARTING_FAIRY_BOW).Get()) {
     AddItemToPool(RG_PROGRESSIVE_BOW, 4 + infiniteProgressive, 
                                       3 + infiniteProgressive, 
                                       2 + infiniteProgressive,
                                       1 + infiniteProgressive);
+    } else if (ctx->GetOption(RSK_STARTING_FAIRY_BOW).Is(RO_STARTING_FAIRY_BOW_30)) {
+        AddItemToPool(RG_PROGRESSIVE_BOW, 3 + infiniteProgressive , 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_FAIRY_BOW).Is(RO_STARTING_FAIRY_BOW_40)) {
+        AddItemToPool(RG_PROGRESSIVE_BOW, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_FAIRY_BOW).Is(RO_STARTING_FAIRY_BOW_50)) {
+        AddItemToPool(RG_PROGRESSIVE_BOW, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_FAIRY_BOW).Is(RO_STARTING_FAIRY_BOW_INF)) {
+        
+    }
+
+    if (!ctx->GetOption(RSK_STARTING_SLINGSHOT).Get()) {
     AddItemToPool(RG_PROGRESSIVE_SLINGSHOT, 4 + infiniteProgressive, 
                                             3 + infiniteProgressive, 
                                             2 + infiniteProgressive,
                                             1 + infiniteProgressive);
+    } else if (ctx->GetOption(RSK_STARTING_SLINGSHOT).Is(RO_STARTING_SLINGSHOT_30)) {
+        AddItemToPool(RG_PROGRESSIVE_SLINGSHOT, 3 + infiniteProgressive , 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_SLINGSHOT).Is(RO_STARTING_SLINGSHOT_40)) {
+        AddItemToPool(RG_PROGRESSIVE_SLINGSHOT, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_SLINGSHOT).Is(RO_STARTING_SLINGSHOT_50)) {
+        AddItemToPool(RG_PROGRESSIVE_SLINGSHOT, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_SLINGSHOT).Is(RO_STARTING_SLINGSHOT_INF)) {
+        
+    }
+
+    if (!ctx->GetOption(RSK_STARTING_BOMB_BAG).Get()) {
     AddItemToPool(RG_PROGRESSIVE_BOMB_BAG,  4 + infiniteProgressive, 
                                             3 + infiniteProgressive, 
                                             2 + infiniteProgressive,
                                             1 + infiniteProgressive);
+    } else if (ctx->GetOption(RSK_STARTING_BOMB_BAG).Is(RO_STARTING_BOMB_BAG_20)) {
+        AddItemToPool(RG_PROGRESSIVE_BOMB_BAG, 3 + infiniteProgressive , 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_BOMB_BAG).Is(RO_STARTING_BOMB_BAG_30)) {
+        AddItemToPool(RG_PROGRESSIVE_BOMB_BAG, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_BOMB_BAG).Is(RO_STARTING_BOMB_BAG_40)) {
+        AddItemToPool(RG_PROGRESSIVE_BOMB_BAG, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_BOMB_BAG).Is(RO_STARTING_BOMB_BAG_INF)) {
+        
+    }
+
     AddItemToPool(RG_PROGRESSIVE_MAGIC_METER, 3 + infiniteProgressive, 
                                               2 + infiniteProgressive, 
                                               1 + infiniteProgressive,
@@ -256,16 +289,36 @@ void GenerateItemPool() {
                                          2 + infiniteProgressive + extraWallets);
 
     int stickShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_STICK_BAG) ? 1 : 0;
+    if (!ctx->GetOption(RSK_STARTING_STICKS).Get()) {
     AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 3 + infiniteProgressive + stickShuffle,
                                                 2 + infiniteProgressive + stickShuffle,
                                                 1 + infiniteProgressive + stickShuffle,
                                                 0 + infiniteProgressive + stickShuffle);
+    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_10)) {
+        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_20)) {
+        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_30)) {
+        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_INF)) {
+        
+    }
 
     int nutShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_NUT_BAG) ? 1 : 0;
+    if (!ctx->GetOption(RSK_STARTING_NUTS).Get()) {
     AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE, 3 + infiniteProgressive + nutShuffle,
                                               2 + infiniteProgressive + nutShuffle,
                                               1 + infiniteProgressive + nutShuffle,
                                               0 + infiniteProgressive + nutShuffle);
+    } else if (ctx->GetOption(RSK_STARTING_NUTS).Is(RO_STARTING_DEKU_NUTS_20)) {
+        AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_NUTS).Is(RO_STARTING_DEKU_NUTS_30)) {
+        AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_NUTS).Is(RO_STARTING_DEKU_NUTS_40)) {
+        AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE, 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
+    } else if (ctx->GetOption(RSK_STARTING_NUTS).Is(RO_STARTING_DEKU_NUTS_INF)) {
+        
+    }
 
     if (ctx->GetOption(RSK_BOMBCHU_BAG).Is(RO_BOMBCHU_BAG_SINGLE)) {
         AddItemToPool(RG_PROGRESSIVE_BOMBCHU_BAG, 6, 5, 3, 1);
