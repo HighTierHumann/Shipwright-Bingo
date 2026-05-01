@@ -1301,7 +1301,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_HAMMER_HINT, "Megaton Hammer Hint", CVAR_RANDOMIZER_SETTING("HammerHint"), mOptionDescriptions[RSK_HAMMER_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_MIRROR_HINT, "Mirror Shield Hint", CVAR_RANDOMIZER_SETTING("MirrorHint"), mOptionDescriptions[RSK_MIRROR_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_HOVERS_HINT, "Hover Boots Hint", CVAR_RANDOMIZER_SETTING("HoversHint"), mOptionDescriptions[RSK_HOVERS_HINT], IMFLAG_NONE);
-    OPT_BOOL(RSK_STRENGTH_HINT, "Darunia Hint", CVAR_RANDOMIZER_SETTING("DaruniaHint"), mOptionDescriptions[RSK_STRENGTH_HINT], IMFLAG_NONE);
+    OPT_BOOL(RSK_STRENGTH_HINT, "Strength Hint", CVAR_RANDOMIZER_SETTING("StrengthHint"), mOptionDescriptions[RSK_STRENGTH_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_OCARINA_HINT, "Ocarina Hint", CVAR_RANDOMIZER_SETTING("OcarinaHint"), mOptionDescriptions[RSK_OCARINA_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_SCALE_HINT, "Scale Hint", CVAR_RANDOMIZER_SETTING("ScaleHint"), mOptionDescriptions[RSK_SCALE_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_LULLABY_HINT, "Zelda's Lullaby Hint", CVAR_RANDOMIZER_SETTING("LullabyHint"), mOptionDescriptions[RSK_LULLABY_HINT], IMFLAG_NONE);

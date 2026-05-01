@@ -98,7 +98,7 @@ std::unordered_map<uint32_t, CustomMessage> StaticData::hintNames = {
     { RH_MIRROR_HINT, CustomMessage("Mirror Shield Hint") },
     { RH_HAMMER_HINT, CustomMessage("Megaton Hammer Hint") },
     { RH_BOOMERANG_HINT, CustomMessage("Boomerang Hint") },
-    { RH_STRENGTH_HINT, CustomMessage("Darunia Hint") },
+    { RH_STRENGTH_HINT, CustomMessage("Strength Hint") },
     { RH_OCARINA_HINT, CustomMessage("LW Gossip Stone Ocarina Hint") },
     { RH_SCALE_HINT, CustomMessage("Zora Scale Hint") },
     { RH_LULLABY_HINT, CustomMessage("Child Zelda Hint") },

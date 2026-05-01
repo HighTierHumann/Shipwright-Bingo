@@ -2276,7 +2276,7 @@ void StaticData::HintTable_Init() {
 													    /*french*/ "Si je me souviens bien, il me&semble que je l'ai perdue&quelque part dans&#[[1]]#...^Fais-moi signe si jamais&tu la trouves!",
                                                                    {QM_RED}));
     // Custom Hints
-    hintTextTable[RHT_STRENGTH_HINT] = HintText(CustomMessage("Brother! Have ya gotten the %gProgressive Strength Upgrade %win %r[[1]] %wyet?",
+    hintTextTable[RHT_STRENGTH_HINT] = HintText(CustomMessage("%rDANGER! HANDLE WITH CARE!^%wYou must obtain the %gProgressive Strength Upgrade %wfrom %r[[1]] %wto transport this Bomb Flower!",
                                                               TODO_TRANSLATE,
                                                               TODO_TRANSLATE));
     hintTextTable[RHT_HOVERS_HINT] = HintText(CustomMessage("Only one who has acquired the %gHover Boots %wfrom %r[[1]] %wcan cross the valley of the dead.",

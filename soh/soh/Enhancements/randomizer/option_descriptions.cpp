@@ -801,7 +801,7 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_MIRROR_HINT] =
         "Navi will tell you where to find the Mirror Shield when prompted from targeting either Koume or Kotake.";
     mOptionDescriptions[RSK_STRENGTH_HINT] =
-        "Talking to Darunia as Child Link will reveal the location of a Progressive Strength upgrade.";
+        "Reading the sign above the entrance to Dodongo's Cavern as Child Link will reveal the location of a Progressive Strength upgrade.";
     mOptionDescriptions[RSK_OCARINA_HINT] =
         "Talking to the Lost Woods Gossip Stone will reveal the location of a Progressive Ocarina.";
     mOptionDescriptions[RSK_SCALE_HINT] =

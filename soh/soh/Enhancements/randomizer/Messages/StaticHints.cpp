@@ -179,8 +179,8 @@ void BuildGregHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 // Custom Static Hints
-void BuildDaruniaHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (gPlayState->sceneNum == SCENE_GORON_CITY) {
+void BuildStrengthHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    if (gPlayState->sceneNum == SCENE_DEATH_MOUNTAIN_TRAIL) {
         CustomMessage msg = RAND_GET_HINT(RH_STRENGTH_HINT)->GetHintMessage(MF_AUTO_FORMAT);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
@@ -580,10 +580,7 @@ void RegisterStaticHints() {
     // Boss Key Hints
     COND_ID_HOOK(OnOpenText, TEXT_NEED_SPECIAL_KEY, RAND_GET_OPTION(RSK_BOSS_KEY_HINT), BuildBossKeyHintMessage);
     // Darunia
-    COND_ID_HOOK(OnOpenText, TEXT_DARUNIA_WHAT_THE_HECK, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildDaruniaHintMessage);
-    COND_ID_HOOK(OnOpenText, TEXT_DARUNIA_GORON_PROBLEM, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildDaruniaHintMessage);
-    COND_ID_HOOK(OnOpenText, TEXT_DARUNIA_DESTROY_MONSTERS, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildDaruniaHintMessage);
-    COND_ID_HOOK(OnOpenText, TEXT_DARUNIA_PLAY_THAT_TUNE, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildDaruniaHintMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_DMT_BOMBFLOWER_SIGN, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildStrengthHintMessage);
     // Shadow Temple Pit Sign
     COND_ID_HOOK(OnOpenText, TEXT_SHADOW_TEMPLE_TRUTHSPINNER_SIGN, RAND_GET_OPTION(RSK_HOVERS_HINT), BuildShadowSignMessage);
     // Diving Minigame Zora
