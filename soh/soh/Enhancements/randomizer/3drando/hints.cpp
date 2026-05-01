@@ -203,10 +203,10 @@ const std::array<HintSetting, 4> hintSettingTable{{
       {"WotH",       HINT_TYPE_WOTH,      15, 0, 2, FilterWotHLocations},
       {"Foolish",    HINT_TYPE_FOOLISH,   15, 0, 1, FilterFoolishLocations},
       //{"Entrance",   HINT_TYPE_ENTRANCE,     10, 0, 1}, //not yet implemented
-      {"Song",       HINT_TYPE_ITEM,      2,  0, 1, FilterSongLocations},
-      {"Overworld",  HINT_TYPE_ITEM,      7,  0, 1, FilterOverworldLocations},
-      {"Dungeon",    HINT_TYPE_ITEM,      7,  0, 1, FilterDungeonLocations},
-      {"Named Item", HINT_TYPE_ITEM_AREA, 15,  0, 1, FilterGoodItems},
+      //{"Song",       HINT_TYPE_ITEM,      2,  0, 1, FilterSongLocations},
+      {"Overworld",  HINT_TYPE_ITEM,      4,  0, 1, FilterOverworldLocations},
+      {"Dungeon",    HINT_TYPE_ITEM,      4,  0, 1, FilterDungeonLocations},
+      {"Named Item", HINT_TYPE_ITEM_AREA, 10,  0, 1, FilterGoodItems},
     },
   },
 }};
