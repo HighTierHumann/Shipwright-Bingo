@@ -1269,6 +1269,14 @@ void Settings::CreateOptions() {
     });
     OPT_U8(RSK_HINT_CLARITY, "Hint Clarity", {"Obscure", "Ambiguous", "Clear"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("HintClarity"), mOptionDescriptions[RSK_HINT_CLARITY], WIDGET_CVAR_COMBOBOX, RO_HINT_CLARITY_CLEAR, true, nullptr, IMFLAG_INDENT);
     OPT_U8(RSK_HINT_DISTRIBUTION, "Hint Distribution", {"Useless", "Balanced", "Strong", "Very Strong"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("HintDistribution"), mOptionDescriptions[RSK_HINT_DISTRIBUTION], WIDGET_CVAR_COMBOBOX, RO_HINT_DIST_BALANCED, true, nullptr, IMFLAG_UNINDENT);
+    OPT_U8(RSK_JUNK_HINT_WEIGHT, "Joke Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("JunkHintWeight"), mOptionDescriptions[RSK_JUNK_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_TRIAL_HINT_WEIGHT, "Trial Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TrialHintWeight"), mOptionDescriptions[RSK_TRIAL_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_WOTH_HINT_WEIGHT, "WotH Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("WotHHintWeight"), mOptionDescriptions[RSK_WOTH_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_FOOLISH_HINT_WEIGHT, "Foolish Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("FoolishHintWeight"), mOptionDescriptions[RSK_FOOLISH_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_SONG_HINT_WEIGHT, "Song Checks Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("SongHintWeight"), mOptionDescriptions[RSK_SONG_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_OVERWORLD_HINT_WEIGHT, "Overworld Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("OverworldHintWeight"), mOptionDescriptions[RSK_OVERWORLD_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_DUNGEON_HINT_WEIGHT, "Dungeon Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("DungeonHintWeight"), mOptionDescriptions[RSK_DUNGEON_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_NAMED_ITEM_HINT_WEIGHT, "Named Item Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("NamedItemHintWeight"), mOptionDescriptions[RSK_NAMED_ITEM_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
     OPT_BOOL(RSK_TOT_ALTAR_HINT, "ToT Altar Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AltarHint"), mOptionDescriptions[RSK_TOT_ALTAR_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_INDENT);
     OPT_BOOL(RSK_GANONDORF_HINT, "Ganondorf Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("GanondorfHint"), mOptionDescriptions[RSK_GANONDORF_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_NONE);
     OPT_BOOL(RSK_SHEIK_LA_HINT, "Sheik Light Arrow Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("SheikLAHint"), mOptionDescriptions[RSK_SHEIK_LA_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_NONE);
@@ -1442,6 +1450,12 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_LOGIC_RULES, "Logic", {"Glitchless", "No Logic"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("LogicRules"), mOptionDescriptions[RSK_LOGIC_RULES], WIDGET_CVAR_COMBOBOX, RO_LOGIC_GLITCHLESS, false, nullptr, IMFLAG_LABEL_INLINE);
     OPT_CALLBACK(RSK_LOGIC_RULES, {
         HandleStartingAgeUI();
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("LogicRules"), RO_LOGIC_GLITCHLESS) ==
+            RO_LOGIC_NO_LOGIC) {
+            mOptions[RSK_WOTH_HINT_WEIGHT].Hide();
+        } else {
+            mOptions[RSK_WOTH_HINT_WEIGHT].Unhide();
+        }
     });
     OPT_BOOL(RSK_ALL_LOCATIONS_REACHABLE, "All Locations Reachable", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AllLocationsReachable"), mOptionDescriptions[RSK_ALL_LOCATIONS_REACHABLE], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_SAME_LINE);
     OPT_BOOL(RSK_SKULLS_SUNS_SONG, "Night Skulltula's Expect Sun's Song", CVAR_RANDOMIZER_SETTING("GsExpectSunsSong"), mOptionDescriptions[RSK_SKULLS_SUNS_SONG]);
@@ -2072,7 +2086,15 @@ void Settings::CreateOptions() {
                                                                   {
                                                                       &mOptions[RSK_GOSSIP_STONE_HINTS],
                                                                       &mOptions[RSK_HINT_CLARITY],
-                                                                      &mOptions[RSK_HINT_DISTRIBUTION],
+                                                                      //&mOptions[RSK_HINT_DISTRIBUTION],
+                                                                      &mOptions[RSK_JUNK_HINT_WEIGHT],
+                                                                      &mOptions[RSK_TRIAL_HINT_WEIGHT],
+                                                                      &mOptions[RSK_WOTH_HINT_WEIGHT],
+                                                                      &mOptions[RSK_FOOLISH_HINT_WEIGHT],
+                                                                      &mOptions[RSK_SONG_HINT_WEIGHT],
+                                                                      &mOptions[RSK_OVERWORLD_HINT_WEIGHT],
+                                                                      &mOptions[RSK_DUNGEON_HINT_WEIGHT],
+                                                                      &mOptions[RSK_NAMED_ITEM_HINT_WEIGHT],
                                                                   },
                                                                   WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_SECTION_TRAPS] = OptionGroup::SubGroup("Traps",

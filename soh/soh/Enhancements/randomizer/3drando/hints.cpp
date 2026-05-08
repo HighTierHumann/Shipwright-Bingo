@@ -151,65 +151,28 @@ bool NoFilter(RandomizerCheck loc) {
     return true;
 }
 
-const std::array<HintSetting, 4> hintSettingTable{{
-  // Useless hints
-  {
-    .alwaysCopies = 0,
-    .trialCopies = 0,
-    .junkWeight = 1, //RANDOTODO when the hint pool is not implicitly an itemLocations, handle junk like other hint types
-    .distTable = {} /*RANDOTODO Instead of loading a function into this,
-    apply this filter on all possible hintables in advance and then filter by what is acually in the seed at the start of generation.
-    This allows the distTable to hold the current status in hint generation (reducing potential doubled work) and
-    will make handling custom hint pools easier later*/
-  },
-  // Balanced hints
-  {
-    .alwaysCopies = 1,
-    .trialCopies = 1,
-    .junkWeight = 6,
-    .distTable = {
-      {"WotH",       HINT_TYPE_WOTH,      7,   0, 1, FilterWotHLocations,      2},
-      {"Foolish",    HINT_TYPE_FOOLISH,   4,   0, 1, FilterFoolishLocations,   1},
-      //("Entrance",   HINT_TYPE_ENTRANCE,      6,  0, 1), //not yet implemented
-      {"Song",       HINT_TYPE_ITEM,      2,   0, 1, FilterSongLocations},
-      {"Overworld",  HINT_TYPE_ITEM,      4,   0, 1, FilterOverworldLocations},
-      {"Dungeon",    HINT_TYPE_ITEM,      3,   0, 1, FilterDungeonLocations},
-      {"Named Item", HINT_TYPE_ITEM_AREA, 10,  0, 1, FilterGoodItems},
-      {"Random"    , HINT_TYPE_ITEM_AREA, 12,  0, 1, NoFilter}
-    }
-  },
-  // Strong hints
-  {
-    .alwaysCopies = 2,
-    .trialCopies = 1,
-    .junkWeight = 0,
-    .distTable = {
-      {"WotH",       HINT_TYPE_WOTH,      12, 0, 2, FilterWotHLocations,      2},
-      {"Foolish",    HINT_TYPE_FOOLISH,   12, 0, 1, FilterFoolishLocations,   1},
-      //{"Entrance",   HINT_TYPE_ENTRANCE,      4, 0, 1}, //not yet implemented
-      {"Song",       HINT_TYPE_ITEM,      4,  0, 1, FilterSongLocations},
-      {"Overworld",  HINT_TYPE_ITEM,      6,  0, 1, FilterOverworldLocations},
-      {"Dungeon",    HINT_TYPE_ITEM,      6,  0, 1, FilterDungeonLocations},
-      {"Named Item", HINT_TYPE_ITEM_AREA, 8,  0, 1, FilterGoodItems},
-      {"Random"    , HINT_TYPE_ITEM_AREA, 8,  0, 1, NoFilter},
-    },
-  },
-  // Very strong hints
-  {
-    .alwaysCopies = 1,
-    .trialCopies = 0,
-    .junkWeight = 0,
-    .distTable = {
-      {"WotH",       HINT_TYPE_WOTH,      15, 0, 2, FilterWotHLocations},
-      {"Foolish",    HINT_TYPE_FOOLISH,   15, 0, 1, FilterFoolishLocations},
-      //{"Entrance",   HINT_TYPE_ENTRANCE,     10, 0, 1}, //not yet implemented
-      //{"Song",       HINT_TYPE_ITEM,      2,  0, 1, FilterSongLocations},
-      {"Overworld",  HINT_TYPE_ITEM,      4,  0, 1, FilterOverworldLocations},
-      {"Dungeon",    HINT_TYPE_ITEM,      4,  0, 1, FilterDungeonLocations},
-      {"Named Item", HINT_TYPE_ITEM_AREA, 10,  0, 1, FilterGoodItems},
-    },
-  },
-}};
+HintSetting BuildHintSettingTable() {
+    auto ctx = Rando::Context::GetInstance();
+    uint32_t wothWeight = ctx->GetOption(RSK_WOTH_HINT_WEIGHT).Get();
+    uint32_t foolishWeight = ctx->GetOption(RSK_FOOLISH_HINT_WEIGHT).Get();
+    uint32_t songWeight = ctx->GetOption(RSK_SONG_HINT_WEIGHT).Get();
+    uint32_t overworldWeight = ctx->GetOption(RSK_OVERWORLD_HINT_WEIGHT).Get();
+    uint32_t dungeonWeight = ctx->GetOption(RSK_DUNGEON_HINT_WEIGHT).Get();
+    uint32_t namedItemWeight = ctx->GetOption(RSK_NAMED_ITEM_HINT_WEIGHT).Get();
+
+    return HintSetting{ .alwaysCopies = 1,
+                        .trialCopies = ctx->GetOption(RSK_TRIAL_HINT_WEIGHT).Get(),
+                        .junkWeight = ctx->GetOption(RSK_JUNK_HINT_WEIGHT).Get(),
+                        .distTable = {
+                            { "WotH", HINT_TYPE_WOTH, wothWeight, 0, 2, FilterWotHLocations },
+                            { "Foolish", HINT_TYPE_FOOLISH, foolishWeight, 0, 1, FilterFoolishLocations },
+                            { "Song", HINT_TYPE_ITEM, songWeight, 0, 1, FilterSongLocations },
+                            { "Overworld", HINT_TYPE_ITEM, overworldWeight, 0, 1, FilterOverworldLocations },
+                            { "Dungeon", HINT_TYPE_ITEM, dungeonWeight, 0, 1, FilterDungeonLocations },
+                            { "Named Item", HINT_TYPE_ITEM_AREA, namedItemWeight, 0, 1, FilterGoodItems },
+                        } };
+}
+
 
 uint8_t StonesRequiredBySettings() {
     auto ctx = Rando::Context::GetInstance();
@@ -634,7 +597,7 @@ uint8_t PlaceHints(std::vector<uint8_t>& selectedHints, std::vector<HintDistribu
 void CreateStoneHints() {
     auto ctx = Rando::Context::GetInstance();
     SPDLOG_DEBUG("NOW CREATING HINTS");
-    const HintSetting& hintSetting = hintSettingTable[ctx->GetOption(RSK_HINT_DISTRIBUTION).Get()];
+    const HintSetting hintSetting = BuildHintSettingTable(); // hintSettingTable[ctx->GetOption(RSK_HINT_DISTRIBUTION).Get()];
     std::vector<HintDistributionSetting> distTable = hintSetting.distTable;
 
     // Apply impa's song exclusions when zelda is skipped
@@ -648,11 +611,9 @@ void CreateStoneHints() {
     // Add 'always' location hints
     std::vector<RandomizerCheck> alwaysHintLocations = {};
     if (hintSetting.alwaysCopies > 0) {
-        // Ship guy is definitely correct, why the Hell are we adding Greg hints to the pool with the static hint?
-        // 
         // if (ctx->GetOption(RSK_RAINBOW_BRIDGE).Is(RO_BRIDGE_GREG)) {
             // If we have Rainbow Bridge set to Greg and the greg hint isn't useful, add a hint for where Greg is
-            // Do we really need this with the greg hint?
+            // Do we really need this with the greg hint? No, we don't.
         //     auto gregLocations = FilterFromPool(ctx->allLocations, [ctx](const RandomizerCheck loc) {
         //         return ((ctx->GetItemLocation(loc)->GetPlacedRandomizerGet() == RG_GREG_RUPEE)) &&
         //                ctx->GetItemLocation(loc)->IsHintable() &&
@@ -674,12 +635,10 @@ void CreateStoneHints() {
             CreateHint(location, hintSetting.alwaysCopies, HINT_TYPE_ITEM, "Always");
         }
     }
-    // We do not want trial hints, so keep below commented
-    // 
     // Add 'trial' location hints
-    // if (ctx->GetOption(RSK_GANONS_TRIALS).IsNot(RO_GANONS_TRIALS_SKIP)) {
-    //     CreateTrialHints(hintSetting.trialCopies);
-    // }
+    if (ctx->GetOption(RSK_GANONS_TRIALS).IsNot(RO_GANONS_TRIALS_SKIP)) {
+        CreateTrialHints(hintSetting.trialCopies);
+    }
 
     size_t totalStones = GetEmptyGossipStones().size();
     std::vector<uint8_t> selectedHints;

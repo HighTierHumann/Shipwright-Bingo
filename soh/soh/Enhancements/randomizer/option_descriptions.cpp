@@ -732,6 +732,14 @@ void Settings::CreateOptionDescriptions() {
                                                  "Strong - More useful hints.\n"
                                                  "\n"
                                                  "Very Strong - Many powerful hints.";
+    mOptionDescriptions[RSK_JUNK_HINT_WEIGHT] = "Controls how often useless hints are placed on Gossip Stones.";
+    mOptionDescriptions[RSK_TRIAL_HINT_WEIGHT] = "Controls how often Ganon's Castle Trial hints are placed on Gossip Stones. (e.g. 'Sheik dispelled the Light Trial')";
+    mOptionDescriptions[RSK_WOTH_HINT_WEIGHT] = "Controls how often Way of the Hero hints are placed on Gossip Stones. Only applicable to logic seeds.";
+    mOptionDescriptions[RSK_FOOLISH_HINT_WEIGHT] = "Controls how often '[X] area is foolish' hints are placed on Gossip Stones, if applicable.";
+    mOptionDescriptions[RSK_SONG_HINT_WEIGHT] = "Controls how often hints about song location checks are placed on Gossip Stones. (e.g. [X] item from the Bolero of Fire check in DMC, Requiem of Spirit check in Colossus, etc.)";
+    mOptionDescriptions[RSK_OVERWORLD_HINT_WEIGHT] = "Controls how often hints from random overworld checks are placed on Gossip Stones.";
+    mOptionDescriptions[RSK_DUNGEON_HINT_WEIGHT] = "Controls how often hints from random dungeon checks are placed on Gossip Stones.";
+    mOptionDescriptions[RSK_NAMED_ITEM_HINT_WEIGHT] = "Controls how often Major & Lesser Item hints are placed on Gossip Stones.";
     mOptionDescriptions[RSK_TOT_ALTAR_HINT] =
         "Reading the Temple of Time altar as child will tell you the locations of the Spiritual Stones.\n"
         "Reading the Temple of Time altar as adult will tell you the locations of the medallions, as well as the "
