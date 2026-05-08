@@ -723,15 +723,6 @@ void Settings::CreateOptionDescriptions() {
         "\n"
         "Clear - Hints are clearly written and are unique for each item.\n"
         "Ex: Kokiri Sword > the Kokiri Sword";
-    mOptionDescriptions[RSK_HINT_DISTRIBUTION] = "Sets how many hints will be useful.\n"
-                                                 "\n"
-                                                 "Useless - Only junk hints.\n"
-                                                 "\n"
-                                                 "Balanced - Recommended hint spread.\n"
-                                                 "\n"
-                                                 "Strong - More useful hints.\n"
-                                                 "\n"
-                                                 "Very Strong - Many powerful hints.";
     mOptionDescriptions[RSK_JUNK_HINT_WEIGHT] = "Controls how often useless hints are placed on Gossip Stones.";
     mOptionDescriptions[RSK_TRIAL_HINT_WEIGHT] = "Controls how often Ganon's Castle Trial hints are placed on Gossip Stones. (e.g. 'Sheik dispelled the Light Trial')";
     mOptionDescriptions[RSK_WOTH_HINT_WEIGHT] = "Controls how often Way of the Hero hints are placed on Gossip Stones. Only applicable to logic seeds.";

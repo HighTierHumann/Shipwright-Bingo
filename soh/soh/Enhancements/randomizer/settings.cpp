@@ -1261,14 +1261,29 @@ void Settings::CreateOptions() {
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("GossipStoneHints"), RO_GOSSIP_STONES_NEED_NOTHING) ==
             RO_GOSSIP_STONES_NONE) {
             mOptions[RSK_HINT_CLARITY].Hide();
-            mOptions[RSK_HINT_DISTRIBUTION].Hide();
+            mOptions[RSK_JUNK_HINT_WEIGHT].Hide();
+            mOptions[RSK_TRIAL_HINT_WEIGHT].Hide();
+            mOptions[RSK_WOTH_HINT_WEIGHT].Hide();
+            mOptions[RSK_FOOLISH_HINT_WEIGHT].Hide();
+            mOptions[RSK_SONG_HINT_WEIGHT].Hide();
+            mOptions[RSK_OVERWORLD_HINT_WEIGHT].Hide();
+            mOptions[RSK_DUNGEON_HINT_WEIGHT].Hide();
+            mOptions[RSK_NAMED_ITEM_HINT_WEIGHT].Hide();
         } else {
             mOptions[RSK_HINT_CLARITY].Unhide();
-            mOptions[RSK_HINT_DISTRIBUTION].Unhide();
+            mOptions[RSK_JUNK_HINT_WEIGHT].Unhide();
+            mOptions[RSK_TRIAL_HINT_WEIGHT].Unhide();
+            if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("LogicRules"), RO_LOGIC_GLITCHLESS) == RO_LOGIC_GLITCHLESS) {
+                mOptions[RSK_WOTH_HINT_WEIGHT].Unhide();
+            }
+            mOptions[RSK_FOOLISH_HINT_WEIGHT].Unhide();
+            mOptions[RSK_SONG_HINT_WEIGHT].Unhide();
+            mOptions[RSK_OVERWORLD_HINT_WEIGHT].Unhide();
+            mOptions[RSK_DUNGEON_HINT_WEIGHT].Unhide();
+            mOptions[RSK_NAMED_ITEM_HINT_WEIGHT].Unhide();
         }
     });
     OPT_U8(RSK_HINT_CLARITY, "Hint Clarity", {"Obscure", "Ambiguous", "Clear"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("HintClarity"), mOptionDescriptions[RSK_HINT_CLARITY], WIDGET_CVAR_COMBOBOX, RO_HINT_CLARITY_CLEAR, true, nullptr, IMFLAG_INDENT);
-    OPT_U8(RSK_HINT_DISTRIBUTION, "Hint Distribution", {"Useless", "Balanced", "Strong", "Very Strong"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("HintDistribution"), mOptionDescriptions[RSK_HINT_DISTRIBUTION], WIDGET_CVAR_COMBOBOX, RO_HINT_DIST_BALANCED, true, nullptr, IMFLAG_UNINDENT);
     OPT_U8(RSK_JUNK_HINT_WEIGHT, "Joke Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("JunkHintWeight"), mOptionDescriptions[RSK_JUNK_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
     OPT_U8(RSK_TRIAL_HINT_WEIGHT, "Trial Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TrialHintWeight"), mOptionDescriptions[RSK_TRIAL_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
     OPT_U8(RSK_WOTH_HINT_WEIGHT, "WotH Hint Weight", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("WotHHintWeight"), mOptionDescriptions[RSK_WOTH_HINT_WEIGHT], WIDGET_CVAR_SLIDER_INT, 0);
@@ -2432,7 +2447,6 @@ void Settings::CreateOptions() {
                                           {
                                               &mOptions[RSK_GOSSIP_STONE_HINTS],
                                               &mOptions[RSK_HINT_CLARITY],
-                                              &mOptions[RSK_HINT_DISTRIBUTION],
                                               &mOptions[RSK_TOT_ALTAR_HINT],
                                               &mOptions[RSK_GANONDORF_HINT],
                                               &mOptions[RSK_SHEIK_LA_HINT],

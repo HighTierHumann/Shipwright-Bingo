@@ -597,7 +597,7 @@ uint8_t PlaceHints(std::vector<uint8_t>& selectedHints, std::vector<HintDistribu
 void CreateStoneHints() {
     auto ctx = Rando::Context::GetInstance();
     SPDLOG_DEBUG("NOW CREATING HINTS");
-    const HintSetting hintSetting = BuildHintSettingTable(); // hintSettingTable[ctx->GetOption(RSK_HINT_DISTRIBUTION).Get()];
+    const HintSetting hintSetting = BuildHintSettingTable();
     std::vector<HintDistributionSetting> distTable = hintSetting.distTable;
 
     // Apply impa's song exclusions when zelda is skipped
