@@ -4550,6 +4550,7 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             gSaveContext.magicFillTarget = MAGIC_DOUBLE_METER;
             gSaveContext.magicLevel = 0;
             Magic_Fill(play);
+            gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_DOUBLE_MAGIC] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
             break;
         case RG_MAGIC_BEAN_PACK:
             if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
@@ -4573,15 +4574,16 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             if (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_FULL_WALLETS)) {
                 Rupees_ChangeBy(99);
             }
+            gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_CHILD_WALLET] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
+            break;
+        case RG_BRONZE_SCALE:
+            gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_BRONZE_SCALE] =
+                static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
             break;
         case RG_GREG_RUPEE:
             Rupees_ChangeBy(1);
             Flags_SetRandomizerInf(RAND_INF_GREG_FOUND);
             gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_GREG] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
-            break;
-        case RG_TREASURE_GAME_HEART:
-            Flags_SetRandomizerInf(RAND_INF_WINNER_FOUND);
-            gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_WINNER] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
             break;
         case RG_TRIFORCE_PIECE:
             gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected++;

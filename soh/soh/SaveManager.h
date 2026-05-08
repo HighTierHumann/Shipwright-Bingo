@@ -31,7 +31,6 @@ typedef struct {
     u8 isDoubleDefenseAcquired;
     s32 filenameLanguage;
     bool gregFound;
-    bool winnerFound;
     bool hasWallet;
     u8 triforcePieces;
     u8 maxTriforcePieces;

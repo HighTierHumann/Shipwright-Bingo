@@ -737,9 +737,13 @@ void SetupDisplayNames() {
 
     // clang-format off
     strcpy(itemTimestampDisplayName[ITEM_BOW],              "Fairy Bow:          ");
+    strcpy(itemTimestampDisplayName[ITEM_QUIVER_40],        "40 Quiver:          ");
+    strcpy(itemTimestampDisplayName[ITEM_QUIVER_50],        "50 Quiver:          ");
     strcpy(itemTimestampDisplayName[ITEM_ARROW_FIRE],       "Fire Arrows:        ");
     strcpy(itemTimestampDisplayName[ITEM_DINS_FIRE],        "Din's Fire:         ");
     strcpy(itemTimestampDisplayName[ITEM_SLINGSHOT],        "Slingshot:          ");
+    strcpy(itemTimestampDisplayName[ITEM_BULLET_BAG_40],    "40 Bullet Bag:      ");
+    strcpy(itemTimestampDisplayName[ITEM_BULLET_BAG_50],    "50 Bullet Bag:      ");
     strcpy(itemTimestampDisplayName[ITEM_OCARINA_FAIRY],    "Fairy Ocarina:      ");
     strcpy(itemTimestampDisplayName[ITEM_OCARINA_TIME],     "Ocarina of Time:    ");
     strcpy(itemTimestampDisplayName[ITEM_BOMBCHU],          "Bombchus:           ");
@@ -751,6 +755,7 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[ITEM_LENS],             "Lens of Truth:      ");
     strcpy(itemTimestampDisplayName[ITEM_HAMMER],           "Megaton Hammer:     ");
     strcpy(itemTimestampDisplayName[ITEM_ARROW_LIGHT],      "Light Arrows:       ");
+    strcpy(itemTimestampDisplayName[ITEM_NAYRUS_LOVE],      "Nayru's Love:       ");
     strcpy(itemTimestampDisplayName[ITEM_BOTTLE],           "Bottle:             ");
     strcpy(itemTimestampDisplayName[ITEM_LETTER_ZELDA],     "Zelda's Letter:     ");
     strcpy(itemTimestampDisplayName[ITEM_SWORD_KOKIRI],     "Kokiri Sword:       ");
@@ -764,6 +769,8 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[ITEM_BOOTS_IRON],       "Iron Boots:         ");
     strcpy(itemTimestampDisplayName[ITEM_BOOTS_HOVER],      "Hover Boots:        ");
     strcpy(itemTimestampDisplayName[ITEM_BOMB_BAG_20],      "Bomb Bag:           ");
+    strcpy(itemTimestampDisplayName[ITEM_BOMB_BAG_30],      "30 Bomb Bag:        ");
+    strcpy(itemTimestampDisplayName[ITEM_BOMB_BAG_40],      "40 Bomb Bag:        ");
     strcpy(itemTimestampDisplayName[ITEM_BRACELET],         "Goron's Bracelet:   ");
     strcpy(itemTimestampDisplayName[ITEM_GAUNTLETS_SILVER], "Silver Gauntlets:   ");
     strcpy(itemTimestampDisplayName[ITEM_GAUNTLETS_GOLD],   "Gold Gauntlets:     ");
@@ -773,6 +780,7 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[ITEM_WALLET_GIANT],     "Giant's Wallet:     ");
     strcpy(itemTimestampDisplayName[ITEM_WEIRD_EGG],        "Weird Egg:          ");
     strcpy(itemTimestampDisplayName[ITEM_GERUDO_CARD],      "Gerudo's Card:      ");
+    strcpy(itemTimestampDisplayName[ITEM_STONE_OF_AGONY],   "Stone of Agony:     ");
     strcpy(itemTimestampDisplayName[ITEM_COJIRO],           "Cojiro:             ");
     strcpy(itemTimestampDisplayName[ITEM_POCKET_EGG],       "Pocket Egg:         ");
     strcpy(itemTimestampDisplayName[ITEM_MASK_SKULL],       "Skull Mask:         ");
@@ -825,7 +833,9 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GANON],         "Ganon Defeated:     ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_BOSSRUSH_FINISH],      "Boss Rush Finished: ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_GREG],           "Greg Found:         ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_WINNER],         "WINNER Found:       ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_CHILD_WALLET],         "Child Wallet Found: ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_BRONZE_SCALE],   "Bronze Scale Found: ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_DOUBLE_MAGIC],         "Double Magic:       ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_TRIFORCE_COMPLETED],   "Triforce Completed: ");
     // clang-format on
 }
@@ -841,9 +851,6 @@ void SetupDisplayColors() {
             case TIMESTAMP_DEFEAT_PHANTOM_GANON:
             case TIMESTAMP_FOUND_GREG:
                 itemTimestampDisplayColor[i] = COLOR_GREEN;
-                break;
-            case TIMESTAMP_FOUND_WINNER:
-                itemTimestampDisplayColor[i] = COLOR_RED;
                 break;
             case ITEM_SONG_BOLERO:
             case ITEM_GORON_RUBY:
