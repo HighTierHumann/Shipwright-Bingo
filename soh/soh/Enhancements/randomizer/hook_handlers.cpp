@@ -382,16 +382,7 @@ void RandomizerOnPlayerUpdateForRCQueueHandler() {
         SPDLOG_INFO("Queuing Item mod {} item {} from RC {}", getItemEntry.modIndex, getItemEntry.itemId,
                     static_cast<uint32_t>(rc));
 
-        // Skip map GI if the maps are set to be in their own dungeon; the hint isn't valuable at that point
-        bool skipMapGetItemAnim =
-            (Rando::Context::GetInstance()->GetOption(RSK_SHUFFLE_MAPANDCOMPASS).Get() ==
-             RO_DUNGEON_ITEM_LOC_OWN_DUNGEON ||
-             Rando::Context::GetInstance()->GetOption(RSK_SHUFFLE_MAPANDCOMPASS).Get() ==
-             RO_DUNGEON_ITEM_LOC_VANILLA) &&
-            (getItemEntry.getItemId >= RG_DEKU_TREE_MAP && getItemEntry.getItemId <= RG_ICE_CAVERN_MAP &&
-             getItemEntry.modIndex == MOD_RANDOMIZER);
-
-
+        // World's longest if statement
         if (
             // Skipping ItemGet animation incompatible with checks that require closing a text box to finish
             rc != RC_HF_OCARINA_OF_TIME_ITEM && rc != RC_SPIRIT_TEMPLE_SILVER_GAUNTLETS_CHEST &&
@@ -402,10 +393,20 @@ void RandomizerOnPlayerUpdateForRCQueueHandler() {
             IS_RANDO &&
             (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("TimeSavers.SkipGetItemAnimation"), SGIA_JUNK) == SGIA_ALL ||
             (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("TimeSavers.SkipGetItemAnimation"), SGIA_JUNK) == SGIA_JUNK &&
-            skipMapGetItemAnim &&
-            (
-                  (getItemCategory == ITEM_CATEGORY_JUNK || getItemCategory == ITEM_CATEGORY_SKULLTULA_TOKEN ||
-                   getItemCategory == ITEM_CATEGORY_HEALTH || getItemCategory == ITEM_CATEGORY_LESSER))))) {
+                 (
+                  // Check if the item received is a Map. If so, only skip the ItemGet animation if maps are set to be
+                  // in their own dungeon or vanilla locations, as the hint you'd get from them is not useful in those cases.
+                     ((getItemEntry.getItemId >= RG_DEKU_TREE_MAP && getItemEntry.getItemId <= RG_ICE_CAVERN_MAP &&
+                       getItemEntry.modIndex == MOD_RANDOMIZER)
+                          ? (Rando::Context::GetInstance()->GetOption(RSK_SHUFFLE_MAPANDCOMPASS).Get() ==
+                                 RO_DUNGEON_ITEM_LOC_OWN_DUNGEON ||
+                             Rando::Context::GetInstance()->GetOption(RSK_SHUFFLE_MAPANDCOMPASS).Get() ==
+                                 RO_DUNGEON_ITEM_LOC_VANILLA)
+                          :
+
+                          // If it's NOT a Map, check if it fits the general item categories.
+                          (getItemCategory == ITEM_CATEGORY_JUNK || getItemCategory == ITEM_CATEGORY_SKULLTULA_TOKEN ||
+                           getItemCategory == ITEM_CATEGORY_HEALTH || getItemCategory == ITEM_CATEGORY_LESSER)))))) {
             Item_DropCollectible(gPlayState, &spawnPos, static_cast<int16_t>(ITEM00_SOH_GIVE_ITEM_ENTRY | 0x8000));
         }
     }
