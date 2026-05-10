@@ -7,7 +7,7 @@ concurrency:
 jobs:
 
   generate-soh-otr:
-    runs-on: self-hosted, Linux
+    runs-on: [self-hosted, Linux]
     steps:
     - name: Git Checkout
       uses: actions/checkout@v6
@@ -151,7 +151,7 @@ jobs:
 
   build-linux:
     needs: generate-soh-otr
-    runs-on: self-hosted, Linux
+    runs-on: [self-hosted, Linux]
     steps:
     - name: Git Checkout
       uses: actions/checkout@v6
