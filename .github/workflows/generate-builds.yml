@@ -265,7 +265,7 @@ jobs:
 
   build-windows:
     needs: generate-soh-otr
-    runs-on: self-hosted, Windows
+    runs-on: [self-hosted, Windows]
     steps:
     - name: Install dependencies
       run: |
