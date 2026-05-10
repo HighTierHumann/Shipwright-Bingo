@@ -7,7 +7,7 @@ concurrency:
 jobs:
 
   generate-soh-otr:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted, Linux
     steps:
     - name: Git Checkout
       uses: actions/checkout@v6
@@ -151,7 +151,7 @@ jobs:
 
   build-linux:
     needs: generate-soh-otr
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted, Linux
     steps:
     - name: Git Checkout
       uses: actions/checkout@v6
@@ -265,7 +265,7 @@ jobs:
 
   build-windows:
     needs: generate-soh-otr
-    runs-on: windows-latest
+    runs-on: self-hosted, Windows
     steps:
     - name: Install dependencies
       run: |
