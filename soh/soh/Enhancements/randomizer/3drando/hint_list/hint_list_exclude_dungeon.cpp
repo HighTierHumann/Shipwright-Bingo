@@ -134,6 +134,9 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_WONDER_ITEM_DEKU_TREE] = HintText(CustomMessage("They say that a #wonder item in the Deku Tree# hides #[[1]]#.",
                                                      /*german*/ "Man erzählt sich, daß sich ein #Wunder-Gegenstand im Deku-Baum# #[[1]]# verstecke.",
                                                      /*french*/ "Selon moi, un #objet merveilleux dans l'Arbre Mojo# cache #[[1]]#.", {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GOHMA_GRASS] = HintText(CustomMessage("They say that #grass in Gohma's Boss Room# hides #[[1]]#.",
+                                                     /*german*/ TODO_TRANSLATE,
+                                                     /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |     DODONGOS CAVERN      |
@@ -491,6 +494,9 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_WONDER_ITEM_JABU_JABU] = HintText(CustomMessage("They say that a #wonder item in Jabu Jabu's Belly# hides #[[1]]#.",
                                                      /*german*/ "Man erzählt sich, daß sich ein #Wunder-Gegenstand in Jabu-Jabus Bauch# #[[1]]# verstecke.",
                                                      /*french*/ "Selon moi, un #objet merveilleux dans le Ventre de Jabu-Jabu# cache #[[1]]#.", {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_BARINADE_POTS] = HintText(CustomMessage("They say that a #pot in Barinade's Boss Room# hides #[[1]]#.",
+                                                     /*german*/ TODO_TRANSLATE,
+                                                     /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      FOREST TEMPLE       |
