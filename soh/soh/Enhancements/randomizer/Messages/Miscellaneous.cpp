@@ -21,6 +21,8 @@ void BuildWaterSwitchMessage(uint16_t* textId, bool* loadFromMessageTable) {
                             "Leitungssystem im %bWassertempel%c nicht stimmen.",
                             "%cCet interrupteur est très rouillé.^%cIl doit y avoir un problème avec la tuyauterie du "
                             "%bTemple de l'Eau%c.");
+    } else if (*textId == TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0))) {
+        return; // Message will instead be set in EntranceHints.cpp
     } else if (*textId == TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN) {
         msg = CustomMessage("Water level control system.&Keep away!", "Wasserstand Kontrollsystem&Finger weg!",
                             "Système de contrôle du niveau&d'eau.&Ne pas toucher!");

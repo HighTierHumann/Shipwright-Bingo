@@ -674,6 +674,28 @@ void SohMenu::AddMenuRandomizer() {
     AddWidget(path, "Signs Hint Entrances", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"))
         .Options(CheckboxOptions().Tooltip("If enabled, signs near loading zones will tell you where they lead to."));
+    AddWidget(path, "Inverted Sign Entrance Hints", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"))
+        .Options(CheckboxOptions().Tooltip("If enabled, signs near dungeons will tell you the location of the dungeon "
+                                           "they're associated with instead. (e.g. the DMT sign outside of Dodongo's "
+                                           "Cavern will instead reveal the location of Dodongo's Cavern) \n\n'Signs Hint Entrances' MUST be Enabled first."))
+        .PreFunc([](WidgetInfo& info) {
+            bool entrancesOnSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabled = !entrancesOnSigns;
+            if (!entrancesOnSigns) {
+                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
+            }
+        });
+    AddWidget(path, "Extra Dungeon Entrance Signs", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"))
+        .Options(CheckboxOptions().Tooltip("Adds signs outside of every dungeon, and changes the Rusty Switch sign in Lake Hylia to hint what dungeon is in Water Temple. \n\n'Signs Hint Entrances' MUST be Enabled first."))
+        .PreFunc([](WidgetInfo& info) {
+            bool entrancesOnSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabled = !entrancesOnSigns;
+            if (!entrancesOnSigns) {
+                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0); // A little sloppy forcing these to 0, but it prevents crashes when reading the Lake Hylia sign in particular
+            }
+        });
 
     auto randoSettings = Rando::Settings::GetInstance();
     randoSettings->CreateOptions();

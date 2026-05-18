@@ -48,17 +48,35 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_GRAVEYARD_ENTRANCE;
             break;
         case TEXT_KAK_WELL_SIGN:
-            entrance = ENTR_BOTTOM_OF_THE_WELL_ENTRANCE;
-            break;
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_KAKARIKO_VILLAGE_OUTSIDE_BOTTOM_OF_THE_WELL;
+                break;
+            } else {
+                entrance = ENTR_BOTTOM_OF_THE_WELL_ENTRANCE;
+                break;
+            }
         case TEXT_KAK_DMT_SIGN:
             entrance = ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT;
             break;
+        case TEXT_GRAVEYARD_SHADOW_TEMPLE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_GRAVEYARD_OUTSIDE_TEMPLE;
+                break;
+            } else {
+                entrance = ENTR_SHADOW_TEMPLE_ENTRANCE;
+                break;
+            }
         case TEXT_DMT_SIGN:
             entrance = ENTR_GROTTOS_13;
             break;
         case TEXT_DMT_DC_SIGN:
-            entrance = ENTR_DODONGOS_CAVERN_ENTRANCE;
-            break;
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN;
+                break;
+            } else {
+                entrance = ENTR_DODONGOS_CAVERN_ENTRANCE;
+                break;
+            }
         case TEXT_DMT_GC_SIGN:
             entrance = ENTR_GORON_CITY_UPPER_EXIT;
             break;
@@ -79,8 +97,13 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_ZORAS_RIVER_WEST_EXIT;
             break;
         case TEXT_GF_GTG_SIGN:
-            entrance = ENTR_GERUDO_TRAINING_GROUND_ENTRANCE;
-            break;
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_GERUDOS_FORTRESS_OUTSIDE_GERUDO_TRAINING_GROUND;
+                break;
+            } else {
+                entrance = ENTR_GERUDO_TRAINING_GROUND_ENTRANCE;
+                break;
+            }
         case TEXT_KF_SHOP_SIGN:
             entrance = ENTR_KOKIRI_SHOP_0;
             break;
@@ -98,11 +121,40 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
         case TEXT_ZF_JABU_SIGN:
-            entrance = ENTR_JABU_JABU_ENTRANCE;
-            break;
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU;
+                break;
+            } else {
+                entrance = ENTR_JABU_JABU_ENTRANCE;
+                break;
+            }
+        case TEXT_ZF_ICE_CAVERN_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_ZORAS_FOUNTAIN_OUTSIDE_ICE_CAVERN;
+                break;
+            } else {
+                entrance = ENTR_ICE_CAVERN_ENTRANCE;
+                break;
+            }
         case TEXT_KF_LW_SIGN:
             entrance = ENTR_LOST_WOODS_SOUTH_EXIT;
             break;
+        case TEXT_KF_DEKU_TREE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE;
+                break;
+            } else {
+                entrance = ENTR_DEKU_TREE_ENTRANCE;
+                break;
+            }
+        case TEXT_SFM_FOREST_TEMPLE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE;
+                break;
+            } else {
+                entrance = ENTR_FOREST_TEMPLE_ENTRANCE;
+                break;
+            }
         case TEXT_HF_LON_LON_SIGN:
             entrance = ENTR_LON_LON_RANCH_ENTRANCE;
             break;
@@ -119,6 +171,22 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
                 entrance = ENTR_GERUDO_VALLEY_WEST_EXIT;
             }
             break;
+        case TEXT_COLOSSUS_SPIRIT_TEMPLE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE;
+                break;
+            } else {
+                entrance = ENTR_SPIRIT_TEMPLE_ENTRANCE;
+                break;
+            }
+        case TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0) && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0)) {
+                entrance = ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE;
+                break;
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0)) {
+                entrance = ENTR_WATER_TEMPLE_ENTRANCE;
+                break;
+            }
         case TEXT_ZD_SHOP_SIGN:
             entrance = ENTR_ZORA_SHOP_0;
             break;

@@ -579,7 +579,7 @@ void RegisterStaticHints() {
     COND_ID_HOOK(OnOpenText, TEXT_MASK_SHOP_SIGN, RAND_GET_OPTION(RSK_MASK_SHOP_HINT), BuildMaskShopSignMessage);
     // Boss Key Hints
     COND_ID_HOOK(OnOpenText, TEXT_NEED_SPECIAL_KEY, RAND_GET_OPTION(RSK_BOSS_KEY_HINT), BuildBossKeyHintMessage);
-    // Darunia
+    // DMT Bombflower Sign
     COND_ID_HOOK(OnOpenText, TEXT_DMT_BOMBFLOWER_SIGN, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildStrengthHintMessage);
     // Shadow Temple Pit Sign
     COND_ID_HOOK(OnOpenText, TEXT_SHADOW_TEMPLE_TRUTHSPINNER_SIGN, RAND_GET_OPTION(RSK_HOVERS_HINT), BuildShadowSignMessage);
