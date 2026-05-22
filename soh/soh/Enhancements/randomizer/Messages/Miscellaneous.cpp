@@ -54,6 +54,18 @@ void BuildFixedMallonAtCastleMessage(uint16_t* textId, bool* loadFromMessageTabl
     }
 }
 
+void BuildRockySignMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    CustomMessage msg;
+    if (*textId == TEXT_GV_ROCKY_SIGN) {
+        msg = CustomMessage("%rRocky %w- Pet of %gAFriendlyPhantom^%wDO NOT BREAK!",
+                            TODO_TRANSLATE,
+                            TODO_TRANSLATE);
+    }
+    msg.AutoFormat();
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
 void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_LAKE_HYLIA_WATER_SWITCH_NAVI, IS_RANDO, BuildWaterSwitchMessage);
     COND_ID_HOOK(OnOpenText, TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN, IS_RANDO, BuildWaterSwitchMessage);
@@ -61,6 +73,7 @@ void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_MALON_MEET_EPONA, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_IS_AFRAID, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_MALON_LETS_SING_THIS_SONG, IS_RANDO, BuildFixedMallonAtCastleMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_GV_ROCKY_SIGN, IS_RANDO, BuildRockySignMessage);
 }
 
 static RegisterShipInitFunc initFunc(RegisterMiscellaneousMessages, { "IS_RANDO" });

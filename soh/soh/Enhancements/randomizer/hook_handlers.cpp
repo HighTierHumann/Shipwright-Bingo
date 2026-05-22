@@ -2679,6 +2679,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
                 break;
         }
     }
+
     if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0))) {
         switch (gPlayState->sceneNum) {
             case SCENE_ZORAS_FOUNTAIN:
@@ -2717,6 +2718,19 @@ void RandomizerOnSceneSpawnActorsHandler() {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 2500, 100, 150, 0,
                                 static_cast<int16_t>(0xffffc000), 0,
                                 static_cast<int16_t>(0x031D));
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (LINK_IS_ADULT) {
+        switch (gPlayState->sceneNum) {
+            case SCENE_GERUDO_VALLEY:
+                if (gPlayState->roomCtx.curRoom.num == 0) {
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1625, 60, -346, 0,
+                                static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x0347));
                 }
                 break;
             default:

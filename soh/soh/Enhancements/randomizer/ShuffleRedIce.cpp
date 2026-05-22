@@ -45,7 +45,7 @@ static void BgIceShelter_RandomizerDraw(Actor* actor, Color_RGBA8* primColor, Co
     f32 zOffset = (type == RED_ICE_KING_ZORA) ? 50.0f : 0.0f;
 
     pos.x = Rand_CenteredFloat(xzScale) + actor->world.pos.x;
-    pos.y = (Rand_ZeroOne() * 15.0f) + actor->world.pos.y + yOffset;
+    pos.y = (Rand_ZeroOne() * 60.0f) + actor->world.pos.y + yOffset;
     pos.z = Rand_CenteredFloat(xzScale) + actor->world.pos.z + zOffset;
     EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 2000, 100);
     EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 2000, 100);
