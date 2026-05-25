@@ -2661,6 +2661,8 @@ void RandomizerOnPlayerUpdateHandler() {
 }
 
 void RandomizerOnSceneSpawnActorsHandler() {
+    auto ctx = Rando::Context::GetInstance();
+
     if (LINK_IS_ADULT && RAND_GET_OPTION(RSK_SHEIK_LA_HINT)) {
         switch (gPlayState->sceneNum) {
             case SCENE_TEMPLE_OF_TIME:
@@ -2686,6 +2688,12 @@ void RandomizerOnSceneSpawnActorsHandler() {
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -164, 100, -1735, 0, 0, 0,
                             static_cast<int16_t>(0x0310));
                 break;
+            case SCENE_OUTSIDE_GANONS_CASTLE:
+                if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -433, 1623, 687, 0, 0, 0,
+                                static_cast<int16_t>(0x0349));
+                }
+                break;
             default:
                 break;
         }
@@ -2705,8 +2713,10 @@ void RandomizerOnSceneSpawnActorsHandler() {
                             static_cast<int16_t>(0x0311));
                 break;
             case SCENE_DEATH_MOUNTAIN_CRATER:
-                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 13, 535, -1916, 0, 0, 0,
-                            static_cast<int16_t>(0x0324));
+                if (gPlayState->roomCtx.curRoom.num == 1) {
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -59, 495, -1079, 0, 0, 0,
+                                static_cast<int16_t>(0x0348));
+                }
                 break;
             case SCENE_DESERT_COLOSSUS:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1461, 48, -118, 0,

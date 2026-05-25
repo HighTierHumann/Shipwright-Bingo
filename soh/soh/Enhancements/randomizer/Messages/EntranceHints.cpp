@@ -80,6 +80,14 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
         case TEXT_DMT_GC_SIGN:
             entrance = ENTR_GORON_CITY_UPPER_EXIT;
             break;
+        case TEXT_DMC_FIRE_TEMPLE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE;
+                break;
+            } else {
+                entrance = ENTR_FIRE_TEMPLE_ENTRANCE;
+                break;
+            }
         case TEXT_GC_SIGN:
             if (gPlayState->sceneNum == SCENE_DEATH_MOUNTAIN_TRAIL) {
                 entrance = ENTR_GORON_CITY_UPPER_EXIT;
@@ -185,6 +193,14 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
                 break;
             } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0)) {
                 entrance = ENTR_WATER_TEMPLE_ENTRANCE;
+                break;
+            }
+        case TEXT_OGC_GANONS_CASTLE_SIGN:
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
+                entrance = ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT;
+                break;
+            } else {
+                entrance = ENTR_INSIDE_GANONS_CASTLE_ENTRANCE;
                 break;
             }
         case TEXT_ZD_SHOP_SIGN:
