@@ -18,6 +18,11 @@ uint8_t BgIceShelter_RandomizerHoldsItem(Actor* actor) {
         return false;
     }
 
+    // If King Zora is thawed, but the red ice item wasn't collected, force collect the item
+    if (Flags_GetInfTable(0x138) && !Flags_GetRandomizerInf(RAND_INF_ZD_KING_ZORA_RED_ICE)) {
+        Flags_SetRandomizerInf(RAND_INF_ZD_KING_ZORA_RED_ICE);
+    }
+
     RandomizerCheck rc = redIceIdentity->randomizerCheck;
 
     // Don't pull randomized item if icicle isn't randomized or is already checked
