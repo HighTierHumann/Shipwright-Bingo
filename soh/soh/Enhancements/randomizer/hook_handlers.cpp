@@ -2686,12 +2686,12 @@ void RandomizerOnSceneSpawnActorsHandler() {
         switch (gPlayState->sceneNum) {
             case SCENE_ZORAS_FOUNTAIN:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -164, 100, -1735, 0, 0, 0,
-                            static_cast<int16_t>(0x0310));
+                            static_cast<int16_t>(0x034B));
                 break;
             case SCENE_OUTSIDE_GANONS_CASTLE:
                 if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -433, 1623, 687, 0, 0, 0,
-                                static_cast<int16_t>(0x0349));
+                                static_cast<int16_t>(0x034E));
                 }
                 break;
             default:
@@ -2705,29 +2705,29 @@ void RandomizerOnSceneSpawnActorsHandler() {
                 if (gPlayState->roomCtx.curRoom.num == 1) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 3850, -161, -1030, 0,
                                 static_cast<int16_t>(0xffffdc76), 0,
-                                static_cast<int16_t>(0x0312));
+                                static_cast<int16_t>(0x0348));
                 }
                 break;
             case SCENE_SACRED_FOREST_MEADOW:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -90, 480, -2902, 0, 0, 0,
-                            static_cast<int16_t>(0x0311));
+                            static_cast<int16_t>(0x0349));
                 break;
             case SCENE_DEATH_MOUNTAIN_CRATER:
                 if (gPlayState->roomCtx.curRoom.num == 1) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -59, 495, -1079, 0, 0, 0,
-                                static_cast<int16_t>(0x0348));
+                                static_cast<int16_t>(0x034A));
                 }
                 break;
             case SCENE_DESERT_COLOSSUS:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1461, 48, -118, 0,
                             static_cast<int16_t>(0x4000), 0,
-                            static_cast<int16_t>(0x031C));
+                            static_cast<int16_t>(0x034C));
                 break;
             case SCENE_GRAVEYARD:
                 if (gPlayState->roomCtx.curRoom.num == 0) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 2500, 100, 150, 0,
                                 static_cast<int16_t>(0xffffc000), 0,
-                                static_cast<int16_t>(0x031D));
+                                static_cast<int16_t>(0x034D));
                 }
                 break;
             default:
