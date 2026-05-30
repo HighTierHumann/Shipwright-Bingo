@@ -635,8 +635,8 @@ void func_80A0329C(EnElf* this, PlayState* play) {
         heightDiff = this->actor.world.pos.y - refActor->actor.world.pos.y;
 
         if ((heightDiff > 0.0f) && (heightDiff < 60.0f)) {
-            // This controls how close Link should be to collect the item. Default 10.0f, changed to 30.0f
-            if (!func_80A01F90(&this->actor.world.pos, &refActor->actor.world.pos, 30.0f)) {
+            // This controls how close Link should be to collect the item. Default 10.0f, changed to 30.0f if randomizer
+            if (!func_80A01F90(&this->actor.world.pos, &refActor->actor.world.pos, IS_RANDO ? 30.0f : 10.0f)) {
                 if (GameInteractor_Should(VB_FAIRY_HEAL, true, this)) {
                     Health_ChangeBy(play, 128);
                 }

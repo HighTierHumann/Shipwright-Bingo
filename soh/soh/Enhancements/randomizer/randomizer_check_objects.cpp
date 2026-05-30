@@ -111,6 +111,8 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
         auto itemLoc = ctx->GetItemLocation(location.GetRandomizerCheck());
         itemLoc->SetVisible(
             (location.GetRandomizerCheck() != RC_UNKNOWN_CHECK) &&
+            (location.GetRandomizerCheck() != RC_KAK_100_GOLD_SKULLTULA_REWARD ||
+                CVarGetInteger(CVAR_RANDOMIZER_SETTING("Shuffle100GSReward"), 0) != 0) &&
             (location.GetQuest() == RCQUEST_BOTH ||
              location.GetQuest() == RCQUEST_MQ &&
                  ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeons"), RO_MQ_DUNGEONS_NONE) ==
@@ -185,24 +187,75 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBeehives"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_COW ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCows"), RO_GENERIC_NO)) &&
+            //(location.GetRCType() != RCTYPE_POT ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_POT ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO) ==
+              RO_SHUFFLE_POTS_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_POTS_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_POTS_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            //(location.GetRCType() != RCTYPE_GRASS ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleGrass"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_GRASS ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleGrass"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleGrass"), RO_GENERIC_NO) == RO_SHUFFLE_GRASS_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleGrass"), RO_GENERIC_NO) == RO_SHUFFLE_GRASS_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShufflePots"), RO_GENERIC_NO) == RO_SHUFFLE_GRASS_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            //(location.GetRCType() != RCTYPE_CRATE ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_CRATE ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            //(location.GetRCType() != RCTYPE_NLCRATE ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_NLCRATE ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_CRATES_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            //(location.GetRCType() != RCTYPE_SMALL_CRATE ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_SMALL_CRATE ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_CRATES_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCrates"), RO_GENERIC_NO) == RO_SHUFFLE_CRATES_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
             (location.GetRCType() != RCTYPE_TREE ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleTrees"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_NLTREE ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleTrees"), RO_GENERIC_NO)) &&
+            (location.GetRCType() != RCTYPE_BUSH ||
+             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBushes"), RO_GENERIC_NO)) &&
+            //(location.GetRCType() != RCTYPE_SIGN ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSigns"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_SIGN ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSigns"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSigns"), RO_GENERIC_NO) == RO_SHUFFLE_SIGNS_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSigns"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_SIGNS_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSigns"), RO_GENERIC_NO) == RO_SHUFFLE_SIGNS_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            //(location.GetRCType() != RCTYPE_WONDER_ITEM ||
+            // CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_WONDER_ITEM ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), RO_GENERIC_NO)) &&
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), RO_GENERIC_NO) == RO_SHUFFLE_WONDER_ITEMS_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), RO_GENERIC_NO) ==
+               RO_SHUFFLE_WONDER_ITEMS_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), RO_GENERIC_NO) == RO_SHUFFLE_WONDER_ITEMS_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
             (location.GetRCType() != RCTYPE_ICICLE ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleIcicles"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_RED_ICE ||

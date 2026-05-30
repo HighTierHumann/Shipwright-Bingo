@@ -205,7 +205,7 @@ void SohMenu::AddMenuSettings() {
         .CVar(CVAR_SETTING("BootSequence"))
         .RaceDisable(false)
         .Options(ComboboxOptions()
-                     .DefaultIndex(BOOTSEQUENCE_DEFAULT)
+                     .DefaultIndex(BOOTSEQUENCE_FILESELECT)
                      .LabelPosition(LabelPositions::Far)
                      .ComponentAlignment(ComponentAlignments::Right)
                      .ComboMap(bootSequenceLabels)

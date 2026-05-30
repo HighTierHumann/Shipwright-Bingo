@@ -61,6 +61,18 @@ void DrawLocationsMenu(WidgetInfo& info) {
         RandomizerCheckObjects::UpdateImGuiVisibility();
     }
 
+    int includedCount = 0;
+    static ImGuiTextFilter locationSearch;
+    for (auto& [rcArea, locations] : RandomizerCheckObjects::GetAllRCObjectsByArea()) {
+        for (RandomizerCheck rc : locations) {
+            if (ctx->GetItemLocation(rc)->IsVisible() && !excludedLocations.count(rc) &&
+                locationSearch.PassFilter(Rando::StaticData::GetLocation(rc)->GetName().c_str())) {
+                includedCount++;
+            }
+        }
+    }
+    ImGui::Text("Total Checks: %d", includedCount + 9);
+
     if (ImGui::BeginTable("tableRandoLocations", 2, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersV)) {
         ImGui::TableSetupColumn("Included", ImGuiTableColumnFlags_WidthStretch, 200.0f);
         ImGui::TableSetupColumn("Excluded", ImGuiTableColumnFlags_WidthStretch, 200.0f);
@@ -91,8 +103,17 @@ void DrawLocationsMenu(WidgetInfo& info) {
             }
 
             if (hasItems) {
+                int areaIncludedCount = 0;
+                for (RandomizerCheck rc : locations) {
+                    if (ctx->GetItemLocation(rc)->IsVisible() && !excludedLocations.count(rc) &&
+                        locationSearch.PassFilter(Rando::StaticData::GetLocation(rc)->GetName().c_str())) {
+                        areaIncludedCount++;
+                    }
+                }
+                std::string areaLabel =
+                    RandomizerCheckObjects::GetRCAreaName(rcArea) + " (" + std::to_string(areaIncludedCount) + ")";
                 ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-                if (ImGui::TreeNode(RandomizerCheckObjects::GetRCAreaName(rcArea).c_str())) {
+                if (ImGui::TreeNode(areaLabel.c_str())) {
                     for (auto& location : locations) {
                         if (ctx->GetItemLocation(location)->IsVisible() && !excludedLocations.count(location) &&
                             locationSearch.PassFilter(Rando::StaticData::GetLocation(location)->GetName().c_str())) {
@@ -138,8 +159,16 @@ void DrawLocationsMenu(WidgetInfo& info) {
             }
 
             if (hasItems) {
+                int areaExcludedCount = 0;
+                for (RandomizerCheck rc : locations) {
+                    if (ctx->GetItemLocation(rc)->IsVisible() && excludedLocations.count(rc)) {
+                        areaExcludedCount++;
+                    }
+                }
+                std::string areaLabel =
+                    RandomizerCheckObjects::GetRCAreaName(rcArea) + " (" + std::to_string(areaExcludedCount) + ")";
                 ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-                if (ImGui::TreeNode(RandomizerCheckObjects::GetRCAreaName(rcArea).c_str())) {
+                if (ImGui::TreeNode(areaLabel.c_str())) {
                     for (auto& location : locations) {
                         auto elfound = excludedLocations.find(location);
                         if (ctx->GetItemLocation(location)->IsVisible() && elfound != excludedLocations.end()) {
