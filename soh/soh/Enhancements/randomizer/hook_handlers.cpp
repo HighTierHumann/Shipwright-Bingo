@@ -2741,6 +2741,8 @@ void RandomizerOnSceneSpawnActorsHandler() {
                 if (gPlayState->roomCtx.curRoom.num == 0) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1625, 60, -346, 0,
                                 static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x0347));
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_ISHI, -1695, 70, -350, 0,
+                                static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x0700));
                 }
                 break;
             default:

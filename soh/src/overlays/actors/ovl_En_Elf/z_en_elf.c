@@ -603,6 +603,7 @@ void func_80A03148(EnElf* this, Vec3f* arg1, f32 arg2, f32 arg3, f32 arg4) {
     Actor_UpdatePos(&this->actor);
 }
 
+// Controls Fairy Fountain fairies
 void func_80A0329C(EnElf* this, PlayState* play) {
     Player* refActor = GET_PLAYER(play);
     s32 pad;
@@ -634,7 +635,8 @@ void func_80A0329C(EnElf* this, PlayState* play) {
         heightDiff = this->actor.world.pos.y - refActor->actor.world.pos.y;
 
         if ((heightDiff > 0.0f) && (heightDiff < 60.0f)) {
-            if (!func_80A01F90(&this->actor.world.pos, &refActor->actor.world.pos, 10.0f)) {
+            // This controls how close Link should be to collect the item. Default 10.0f, changed to 30.0f
+            if (!func_80A01F90(&this->actor.world.pos, &refActor->actor.world.pos, 30.0f)) {
                 if (GameInteractor_Should(VB_FAIRY_HEAL, true, this)) {
                     Health_ChangeBy(play, 128);
                 }
