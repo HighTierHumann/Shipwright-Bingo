@@ -431,19 +431,23 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_BOMBCHU_BAG, "Bombchu Bag", {"None", "Single Bag", "Progressive Bags"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("BombchuBag"), mOptionDescriptions[RSK_BOMBCHU_BAG], WIDGET_CVAR_COMBOBOX, RO_BOMBCHU_BAG_NONE);
     OPT_U8(RSK_ENABLE_BOMBCHU_DROPS, "Bombchu Drops", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("EnableBombchuDrops"), mOptionDescriptions[RSK_ENABLE_BOMBCHU_DROPS], WIDGET_CVAR_COMBOBOX, RO_AMMO_DROPS_ON);
     // TODO: AmmoDrops and/or HeartDropRefill, combine with/separate Ammo Drops from Bombchu Drops?
-    OPT_U8(RSK_TRIFORCE_HUNT, "Triforce Hunt", {"Off", "Win", "Ganon's Boss Key"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforceHunt"), mOptionDescriptions[RSK_TRIFORCE_HUNT]);
+    OPT_U8(RSK_TRIFORCE_HUNT, "Triforce Hunt", {"Off", "Win", "Ganon's Boss Key", "Hunt with GBK shuffled into pool"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforceHunt"), mOptionDescriptions[RSK_TRIFORCE_HUNT]);
     OPT_CALLBACK(RSK_TRIFORCE_HUNT, {
         // Remove the pieces required/total sliders and add a separator after Triforce Hunt if Triforce Hunt is off
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHunt"), RO_TRIFORCE_HUNT_OFF) == RO_TRIFORCE_HUNT_OFF) {
             mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Hide();
             mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Hide();
             mOptions[RSK_GANONS_BOSS_KEY].Enable();
+        } else if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHunt"), RO_TRIFORCE_HUNT_OFF) == RO_TRIFORCE_HUNT_GBK_SHUFFLED) {
+            mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Unhide();
+            mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Unhide();
+            mOptions[RSK_GANONS_BOSS_KEY].Enable();
         } else {
             mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Unhide();
             mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Unhide();
             mOptions[RSK_GANONS_BOSS_KEY].Disable(
-                "This option is disabled because Triforce Hunt is enabled."
-                "Ganon's Boss key\nwill instead be given to you after Triforce Hunt completion.");
+                "This option is disabled because Triforce Hunt is enabled without Ganon Boss Key shuffled.\n"
+                "Ganon's Boss key will instead be given to you after Triforce Hunt completion.");
         }
     });
     OPT_U8(RSK_TRIFORCE_HUNT_PIECES_TOTAL, "Triforce Hunt Total Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforceHuntTotalPieces"), mOptionDescriptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL], WIDGET_CVAR_SLIDER_INT, 29, false, nullptr, IMFLAG_NONE);
