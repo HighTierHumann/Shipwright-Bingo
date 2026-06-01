@@ -2690,7 +2690,8 @@ void RandomizerOnSceneSpawnActorsHandler() {
                 break;
             case SCENE_OUTSIDE_GANONS_CASTLE:
                 if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {
-                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -433, 1623, 687, 0, 0, 0,
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -433, 1623, 687, 0,
+                                static_cast<int16_t>(0x1d4b), 0,
                                 static_cast<int16_t>(0x034E));
                 }
                 break;

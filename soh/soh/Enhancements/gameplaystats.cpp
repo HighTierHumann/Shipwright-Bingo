@@ -736,6 +736,10 @@ void SetupDisplayNames() {
     // it has a corresponding entry in the enum (see gameplaystats.h)
 
     // clang-format off
+    strcpy(itemTimestampDisplayName[ITEM_STICK_UPGRADE_20], "20 Stick Bag:       ");
+    strcpy(itemTimestampDisplayName[ITEM_STICK_UPGRADE_30], "30 Stick Bag:       ");
+    strcpy(itemTimestampDisplayName[ITEM_NUT_UPGRADE_30],   "30 Nut Bag :        ");
+    strcpy(itemTimestampDisplayName[ITEM_NUT_UPGRADE_40],   "40 Nut Bag:         ");
     strcpy(itemTimestampDisplayName[ITEM_BOW],              "Fairy Bow:          ");
     strcpy(itemTimestampDisplayName[ITEM_QUIVER_40],        "40 Quiver:          ");
     strcpy(itemTimestampDisplayName[ITEM_QUIVER_50],        "50 Quiver:          ");
@@ -833,8 +837,10 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GANON],         "Ganon Defeated:     ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_BOSSRUSH_FINISH],      "Boss Rush Finished: ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_GREG],           "Greg Found:         ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_CHILD_WALLET],         "Child Wallet Found: ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_BRONZE_SCALE],   "Bronze Scale Found: ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_STICK_BAG],      "Deku Stick Bag:     ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_NUT_BAG],        "Deku Nut Bag:       ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_CHILD_WALLET],         "Child Wallet:       ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_BRONZE_SCALE],   "Bronze Scale:       ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_DOUBLE_MAGIC],         "Double Magic:       ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_TRIFORCE_COMPLETED],   "Triforce Completed: ");
     // clang-format on
