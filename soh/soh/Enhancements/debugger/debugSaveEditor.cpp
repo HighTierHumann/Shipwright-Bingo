@@ -1155,6 +1155,9 @@ void DrawFlagsTab() {
                                 case RANDOMIZER_INF:
                                     DrawFlagTableArray16(flagTable, j, gSaveContext.ship.randomizerInf[j]);
                                     break;
+                                case BINGO_INF:
+                                    DrawFlagTableArray16(flagTable, j, gSaveContext.ship.bingoInf[j]);
+                                    break;
                             }
                         },
                         flagTable.name);
