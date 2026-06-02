@@ -26,6 +26,7 @@ ImVec4 textColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 #define COLOR_LIGHT_BLUE ImVec4(0, 0.88f, 1.0f, 1.0f)
 #define COLOR_LIGHT_GREEN ImVec4(0.52f, 1.0f, 0.23f, 1.0f)
 #define COLOR_GREY ImVec4(0.78f, 0.78f, 0.78f, 1.0f)
+#define COLOR_YELLOW ImVec4(1.0f, 1.0f, 0.0f, 1.0f)
 
 const static std::vector<std::pair<std::string, const char*>> digitList = {
     { "DIGIT_0_TEXTURE", gCounterDigit0Tex }, { "DIGIT_1_TEXTURE", gCounterDigit1Tex },
@@ -87,6 +88,11 @@ static void TimeDisplayGetTimer(uint32_t timeID) {
         case DISPLAY_IN_GAME_TIMER:
             textureDisplay = Ship::Context::GetInstance()->GetWindow()->GetGui()->GetTextureByName("GAMEPLAY_TIMER");
             timeDisplayTime = formatTimeDisplay(GAMEPLAYSTAT_TOTAL_TIME).c_str();
+            if (gSaveContext.ship.stats.rtaTiming && gSaveContext.ship.stats.rtaPaused) {
+                textColor = COLOR_YELLOW;
+            } else {
+                textColor = COLOR_WHITE;
+            }
             break;
         case DISPLAY_TIME_OF_DAY:
             if (gSaveContext.dayTime >= DAY_BEGINS && gSaveContext.dayTime < NIGHT_BEGINS) {

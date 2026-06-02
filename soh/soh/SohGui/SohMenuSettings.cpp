@@ -192,6 +192,9 @@ void SohMenu::AddMenuSettings() {
     AddWidget(path, "Reset Button Combination:", WIDGET_CVAR_BTN_SELECTOR)
         .CVar("gSettings.ResetBtn")
         .Options(BtnSelectorOptions().DefaultValue(BTN_CUSTOM_MODIFIER2));
+    AddWidget(path, "Pause RTA Timer Button Combination:", WIDGET_CVAR_BTN_SELECTOR)
+        .CVar(CVAR_GAMEPLAY_STATS("RTAPauseBtn"))
+        .Options(BtnSelectorOptions().DefaultValue(BTN_L | BTN_DDOWN));
     AddWidget(path, "Open App Files Folder", WIDGET_BUTTON)
         .RaceDisable(false)
         .Callback([](WidgetInfo& info) {

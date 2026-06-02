@@ -449,6 +449,10 @@ void SaveManager::Init() {
                 LoadData("audioSetting", gSaveContext.audioSetting);
                 LoadData("zTargetSetting", gSaveContext.zTargetSetting);
                 LoadData("language", gSaveContext.language);
+
+                CVarSetInteger(CVAR_SETTING("AudioBackend"), gSaveContext.audioSetting);
+                CVarSetInteger(CVAR_SETTING("Controls.ZTarget"), gSaveContext.zTargetSetting);
+                Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
                 break;
             default:
                 SPDLOG_WARN("Global save has a unrecognized version. We are reconstructing it.");
@@ -1244,6 +1248,10 @@ void SaveManager::SaveGlobal() {
 
     std::ofstream output(sGlobalPath);
     output << std::setw(1) << globalBlock << std::endl;
+
+    CVarSetInteger(CVAR_SETTING("AudioBackend"), gSaveContext.audioSetting);
+    CVarSetInteger(CVAR_SETTING("Controls.ZTarget"), gSaveContext.zTargetSetting);
+    Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
 }
 
 void SaveManager::LoadFile(int fileNum) {
@@ -1400,8 +1408,8 @@ int SaveManager::GetSaveSectionID(std::string& sectionName) {
 }
 
 void SaveManager::CreateDefaultGlobal() {
-    gSaveContext.audioSetting = 0;
-    gSaveContext.zTargetSetting = 0;
+    gSaveContext.audioSetting = CVarGetInteger(CVAR_SETTING("AudioBackend"), 0);
+    gSaveContext.zTargetSetting = CVarGetInteger(CVAR_SETTING("Controls.ZTarget"), 0);
     gSaveContext.language = CVarGetInteger(CVAR_SETTING("Languages"), LANGUAGE_ENG);
 
     SaveGlobal();

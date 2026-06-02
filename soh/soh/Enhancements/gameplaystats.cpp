@@ -299,6 +299,9 @@ void LoadStatsVersion1() {
         SaveManager::Instance->LoadData("", gSaveContext.ship.stats.dungeonKeys[i]);
     });
     SaveManager::Instance->LoadData("rtaTiming", gSaveContext.ship.stats.rtaTiming);
+    SaveManager::Instance->LoadData("rtaPaused", gSaveContext.ship.stats.rtaPaused);
+    SaveManager::Instance->LoadData("rtaPauseStart", gSaveContext.ship.stats.rtaPauseStart);
+    SaveManager::Instance->LoadData("rtaPausedTime", gSaveContext.ship.stats.rtaPausedTime);
     SaveManager::Instance->LoadData("firstInput", gSaveContext.ship.stats.firstInput);
     SaveManager::Instance->LoadData("fileCreatedAt", gSaveContext.ship.stats.fileCreatedAt);
     SaveManager::Instance->LoadData("playTimer", gSaveContext.ship.stats.playTimer);
@@ -349,6 +352,9 @@ void SaveStats(SaveContext* saveContext, int sectionID, bool fullSave) {
         SaveManager::Instance->SaveData("", saveContext->ship.stats.dungeonKeys[i]);
     });
     SaveManager::Instance->SaveData("rtaTiming", saveContext->ship.stats.rtaTiming);
+    SaveManager::Instance->SaveData("rtaPaused", saveContext->ship.stats.rtaPaused);
+    SaveManager::Instance->SaveData("rtaPauseStart", saveContext->ship.stats.rtaPauseStart);
+    SaveManager::Instance->SaveData("rtaPausedTime", saveContext->ship.stats.rtaPausedTime);
     SaveManager::Instance->SaveData("firstInput", saveContext->ship.stats.firstInput);
     SaveManager::Instance->SaveData("fileCreatedAt", saveContext->ship.stats.fileCreatedAt);
     SaveManager::Instance->SaveData("playTimer", saveContext->ship.stats.playTimer);
@@ -698,6 +704,9 @@ void InitStats(bool isDebug) {
     gSaveContext.ship.stats.rtaTiming = CVarGetInteger(CVAR_GAMEPLAY_STATS("RTATiming"), 0);
     gSaveContext.ship.stats.fileCreatedAt = GetUnixTimestamp();
     gSaveContext.ship.stats.firstInput = 0;
+    gSaveContext.ship.stats.rtaPaused = false;
+    gSaveContext.ship.stats.rtaPauseStart = 0;
+    gSaveContext.ship.stats.rtaPausedTime = 0;
     gSaveContext.ship.stats.playTimer = 0;
     gSaveContext.ship.stats.pauseTimer = 0;
     for (int timestamp = 0; timestamp < ARRAY_COUNT(gSaveContext.ship.stats.itemTimestamp); timestamp++) {
@@ -738,7 +747,7 @@ void SetupDisplayNames() {
     // clang-format off
     strcpy(itemTimestampDisplayName[ITEM_STICK_UPGRADE_20], "20 Stick Bag:       ");
     strcpy(itemTimestampDisplayName[ITEM_STICK_UPGRADE_30], "30 Stick Bag:       ");
-    strcpy(itemTimestampDisplayName[ITEM_NUT_UPGRADE_30],   "30 Nut Bag :        ");
+    strcpy(itemTimestampDisplayName[ITEM_NUT_UPGRADE_30],   "30 Nut Bag:         ");
     strcpy(itemTimestampDisplayName[ITEM_NUT_UPGRADE_40],   "40 Nut Bag:         ");
     strcpy(itemTimestampDisplayName[ITEM_BOW],              "Fairy Bow:          ");
     strcpy(itemTimestampDisplayName[ITEM_QUIVER_40],        "40 Quiver:          ");
