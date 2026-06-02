@@ -413,7 +413,7 @@ void GenerateItemPool() {
                 ctx->PlaceItemInLocation(RC_GANON, RG_TRIFORCE); // Win condition
                 break;
             case RO_TRIFORCE_HUNT_GBK_SHUFFLED:
-                ctx->PlaceItemInLocation(RC_TRIFORCE_COMPLETED, RG_GANONS_CASTLE_BOSS_KEY);
+                ctx->PlaceItemInLocation(RC_TRIFORCE_COMPLETED, RG_TRIFORCE); // Win condition
                 ctx->PlaceItemInLocation(RC_GANON, RG_TRIFORCE); // Win condition
                 break;
         }

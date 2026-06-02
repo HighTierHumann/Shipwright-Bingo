@@ -4597,7 +4597,7 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
                 Flags_SetRandomizerInf(RAND_INF_GRANT_GANONS_BOSSKEY);
 
                 if (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_HUNT) ==
-                    RO_TRIFORCE_HUNT_WIN) {
+                    RO_TRIFORCE_HUNT_WIN || RO_TRIFORCE_HUNT_GBK_SHUFFLED) {
                     gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_TRIFORCE_COMPLETED] =
                         static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
                     gSaveContext.ship.stats.gameComplete = 1;

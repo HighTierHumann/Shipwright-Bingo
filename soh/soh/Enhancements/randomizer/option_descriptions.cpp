@@ -131,8 +131,8 @@ void Settings::CreateOptionDescriptions() {
         "If set to Win: the game is saved and the credits roll, though you can load back in to receive Ganon's "
         "Castle Boss Key. Keep in mind that Ganon might not be logically reachable when \"All Locations Reachable\" "
         "is disabled.\n\n"
-        "If set to GBK shuffled into pool: Ganon's Boss Key will still be placed in the item pool, but you may also "
-        "obtain Ganon's Boss Key from completing the Triforce.";
+        "If set to GBK shuffled into pool: Ganon's Boss Key will still be placed in the item pool, allowing you to "
+        "win by defeating Ganon or completing the Triforce";
     mOptionDescriptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL] =
         "The amount of Triforce pieces that will be placed in the world. "
         "Keep in mind seed generation can fail if more pieces are placed than there are junk items in the item pool.";
