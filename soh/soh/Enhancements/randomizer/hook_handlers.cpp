@@ -2094,6 +2094,16 @@ void EnDns_RandomizerPurchase(EnDns* enDns) {
 void RandomizerOnActorInitHandler(void* actorRef) {
     Actor* actor = static_cast<Actor*>(actorRef);
 
+    if (IS_RANDO && RAND_GET_OPTION(RSK_STORMS_HINT)) {
+        switch (gPlayState->sceneNum) {
+            case SCENE_DESERT_COLOSSUS:
+                if (actor->id == ACTOR_EN_WONDER_TALK2 && actor->params == -1) {
+                    Actor_Delete(&gPlayState->actorCtx, actor, gPlayState);
+                }
+                break;
+        }
+    }
+
     if (actor->id == ACTOR_PLAYER) {
         auto dungeonInfo = Rando::Context::GetInstance()->GetDungeons()->GetDungeonFromScene(gPlayState->sceneNum);
         bool isVanilla = dungeonInfo == nullptr || dungeonInfo->IsVanilla();
@@ -2745,6 +2755,17 @@ void RandomizerOnSceneSpawnActorsHandler() {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_ISHI, -1695, 70, -350, 0,
                                 static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x0700));
                 }
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (IS_RANDO && RAND_GET_OPTION(RSK_STORMS_HINT)) {
+        switch (gPlayState->sceneNum) {
+            case SCENE_DESERT_COLOSSUS:
+                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_ELF_MSG2, 1176, 83, 1959, 0, 0, 1,
+                            static_cast<int16_t>(0x01B4));
                 break;
             default:
                 break;

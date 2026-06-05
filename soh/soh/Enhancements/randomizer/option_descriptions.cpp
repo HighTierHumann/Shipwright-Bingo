@@ -810,7 +810,7 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_LULLABY_HINT] =
         "Talking to Zelda as a child will tell you the location of Zelda's Lullaby.";
     mOptionDescriptions[RSK_STORMS_HINT] =
-        "Talking to the man in the Windmill as an adult will tell you the location of the Song of Storms.";
+        "Navi will tell you the location of the Song of Storms when standing on the rock near the Oasis in Desert Colossus.";
     mOptionDescriptions[RSK_EPONAS_HINT] =
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
     // end

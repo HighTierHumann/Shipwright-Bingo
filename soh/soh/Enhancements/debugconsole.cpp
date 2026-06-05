@@ -1509,6 +1509,41 @@ static bool AvailableChecksRecalculateHandler(std::shared_ptr<Ship::Console> Con
     return 0;
 }
 
+static bool PauseTimerHandler(std::shared_ptr<Ship::Console> Console, const std::vector<std::string>& args,
+                              std::string* output) {
+
+    if (args.size() != 2) {
+        ERROR_MESSAGE("[SOH] Unexpected arguments passed. Usage: pause_timer <0|1>");
+        return 1;
+    }
+
+    int value = -1;
+    try {
+        size_t idx = 0;
+        value = std::stoi(args[1], &idx, 10);
+
+        if (idx != args[1].size()) {
+            ERROR_MESSAGE("[SOH] Pause Timer value must be either '0' or '1'.");
+            return 1;
+        }
+    } catch (const std::invalid_argument&) {
+        ERROR_MESSAGE("[SOH] Pause Timer value must be a number (0 or 1).");
+        return 1;
+    } catch (const std::out_of_range&) {
+        ERROR_MESSAGE("[SOH] Pause Timer value out of range. Use 0 or 1.");
+        return 1;
+    }
+
+    if (value != 0 && value != 1) {
+        ERROR_MESSAGE("[SOH] Invalid value. Pause Timer only accepts 0 (unpause) or 1 (pause).");
+        return 1;
+    }
+
+    RtaSetPaused(static_cast<uint8_t>(value));
+    INFO_MESSAGE("[SOH] Pause Timer %s", value ? "paused" : "resumed");
+    return 0;
+}
+
 void DebugConsole_Init(void) {
     // Console
     CMD_REGISTER("file_select", { FileSelectHandler, "Returns to the file select." });
@@ -1770,6 +1805,12 @@ void DebugConsole_Init(void) {
     CMD_REGISTER("acpue", { AvailableChecksProcessUndiscoveredExitsHandler,
                             "Available Checks - Process Undiscovered Exits",
                             { { "enable", Ship::ArgumentType::NUMBER, true } } });
+
+    CMD_REGISTER("pause_timer", { PauseTimerHandler,
+                                "Pauses or unpauses the in-game timer.",
+                                {
+                                    { "value", Ship::ArgumentType::NUMBER },
+                                } });
 
     Ship::Context::GetInstance()->GetConsole()->AddCommand(
         "acr", { AvailableChecksRecalculateHandler,

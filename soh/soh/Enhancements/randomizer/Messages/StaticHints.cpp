@@ -211,8 +211,8 @@ void BuildZeldaHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     }
 }
 
-void BuildWindmillGuyMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (gPlayState->sceneNum == SCENE_WINDMILL_AND_DAMPES_GRAVE) {
+void BuildStormsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    if (gPlayState->sceneNum == SCENE_DESERT_COLOSSUS) {
         CustomMessage msg = RAND_GET_HINT(RH_STORMS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
@@ -589,8 +589,10 @@ void RegisterStaticHints() {
     COND_ID_HOOK(OnOpenText, TEXT_ZELDA_ATTENDANT, RAND_GET_OPTION(RSK_LULLABY_HINT), BuildZeldaHintMessage);
     COND_ID_HOOK(OnOpenText, TEXT_ZELDA_FOUND_IT, RAND_GET_OPTION(RSK_LULLABY_HINT), BuildZeldaHintMessage);
     // Windmill Guy
-    COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
-    COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR_2, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
+    // COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
+    // COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR_2, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
+    // Oasis Song of Storms Hint
+    COND_ID_HOOK(OnOpenText, TEXT_COLOSSUS_OASIS_NAVI, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
     // Child Malon
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_FOND, RAND_GET_OPTION(RSK_EPONAS_HINT), BuildChildMalonMessage);
     // Boss C-Up Text

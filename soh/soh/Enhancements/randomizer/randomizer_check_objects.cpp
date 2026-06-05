@@ -113,6 +113,7 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
             (location.GetRandomizerCheck() != RC_UNKNOWN_CHECK) &&
             (location.GetRandomizerCheck() != RC_KAK_100_GOLD_SKULLTULA_REWARD ||
                 CVarGetInteger(CVAR_RANDOMIZER_SETTING("Shuffle100GSReward"), 0) != 0) &&
+            (location.GetRandomizerCheck() != RC_GANON) && // Keep hidden to prevent player from junking, therefore preventing seed creation
             (location.GetQuest() == RCQUEST_BOTH ||
              location.GetQuest() == RCQUEST_MQ &&
                  ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeons"), RO_MQ_DUNGEONS_NONE) ==
@@ -155,8 +156,8 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSongs"), RO_SONG_SHUFFLE_SONG_LOCATIONS) !=
                  RO_SONG_SHUFFLE_DUNGEON_REWARDS) && // song dungeon rewards
             (location.GetRCType() != RCTYPE_DUNGEON_REWARD ||
-             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), RO_DUNGEON_REWARDS_END_OF_DUNGEON) !=
-                 RO_DUNGEON_REWARDS_END_OF_DUNGEON) && // dungeon rewards end of dungeons
+             !(CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), 0) == RO_DUNGEON_REWARDS_VANILLA ||
+             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), 0) == RO_DUNGEON_REWARDS_END_OF_DUNGEON)) && // don't show dungeon rewards at vanilla or end of dungeons
             (location.GetRCType() != RCTYPE_OCARINA ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleOcarinas"), RO_GENERIC_NO)) && // ocarina locations
             (location.GetRandomizerCheck() != RC_HC_ZELDAS_LETTER) && // don't show until we support shuffling letter

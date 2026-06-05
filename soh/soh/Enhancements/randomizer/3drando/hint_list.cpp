@@ -2300,7 +2300,7 @@ void StaticData::HintTable_Init() {
     hintTextTable[RHT_LULLABY_HINT] = HintText(CustomMessage("Hiya @! Have you learned %gmy Lullaby %wfrom %r[[1]] %wyet?",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
-    hintTextTable[RHT_STORMS_HINT] = HintText(CustomMessage("I'm mad and also angry for some reason!!! You can learn the %gSong of Storms %wat %r[[1]]%w! GRRR!!",
+    hintTextTable[RHT_STORMS_HINT] = HintText(CustomMessage("%c@! You need to get the %gSong of Storms%c from %w[[1]]%c and play it here!",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
     hintTextTable[RHT_EPONAS_HINT] = HintText(CustomMessage("Epona is really fond of you! She might let you ride her around if you learn %gher song %win %r[[1]]%w!",

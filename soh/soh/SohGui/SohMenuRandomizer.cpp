@@ -71,7 +71,13 @@ void DrawLocationsMenu(WidgetInfo& info) {
             }
         }
     }
-    ImGui::Text("Total Checks: %d", includedCount + 9);
+
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), 0) == RO_DUNGEON_REWARDS_END_OF_DUNGEON ||
+        CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), 0) == RO_DUNGEON_REWARDS_VANILLA) {
+        ImGui::Text("Total Checks: %d", includedCount + 9); // Link's Pocket, 5 Medallions, 3 Stones
+    } else {
+        ImGui::Text("Total Checks: %d", includedCount);
+    }
 
     if (ImGui::BeginTable("tableRandoLocations", 2, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersV)) {
         ImGui::TableSetupColumn("Included", ImGuiTableColumnFlags_WidthStretch, 200.0f);

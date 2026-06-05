@@ -103,7 +103,7 @@ std::unordered_map<uint32_t, CustomMessage> StaticData::hintNames = {
     { RH_SCALE_HINT, CustomMessage("Zora Scale Hint") },
     { RH_LULLABY_HINT, CustomMessage("Child Zelda Hint") },
     { RH_HOVERS_HINT, CustomMessage("Truthspinner Sign Hint") },
-    { RH_STORMS_HINT, CustomMessage("Windmill Guy Hint") },
+    { RH_STORMS_HINT, CustomMessage("Song of Storms Hint") },
     { RH_EPONAS_HINT, CustomMessage("Child Malon Hint") },
 };
 
