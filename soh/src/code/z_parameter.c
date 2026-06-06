@@ -6475,6 +6475,9 @@ void Interface_DrawTotalGameplayTimer(PlayState* play) {
             } else if (IS_BOSS_RUSH && gSaveContext.ship.quest.data.bossRush.isPaused &&
                        !gSaveContext.ship.stats.rtaTiming) {
                 gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 150, 150, 150, 255);
+            } else if (IS_ARCADE_MODE && gSaveContext.ship.quest.data.arcade.isPaused &&
+                       !gSaveContext.ship.stats.rtaTiming) {
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 150, 150, 150, 255);
             } else if (gSaveContext.ship.stats.rtaPaused) {
                 gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 0, 255);
             } else {

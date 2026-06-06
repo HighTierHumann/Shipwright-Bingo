@@ -1172,7 +1172,7 @@ void Play_Update(PlayState* play) {
 
                 // Gameplay stat tracking
                 if (!gSaveContext.ship.stats.gameComplete &&
-                    (!IS_BOSS_RUSH || !gSaveContext.ship.quest.data.bossRush.isPaused)) {
+                    (!IS_BOSS_RUSH || !gSaveContext.ship.quest.data.bossRush.isPaused || !IS_ARCADE_MODE || !gSaveContext.ship.quest.data.arcade.isPaused)) {
                     gSaveContext.ship.stats.playTimer++;
                     gSaveContext.ship.stats.sceneTimer++;
                     gSaveContext.ship.stats.roomTimer++;

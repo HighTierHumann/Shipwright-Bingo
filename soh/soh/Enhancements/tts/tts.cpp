@@ -11,6 +11,7 @@
 #include "message_data_static.h"
 #include "overlays/gamestates/ovl_file_choose/file_choose.h"
 #include "soh/Enhancements/boss-rush/BossRush.h"
+#include "soh/Enhancements/Arcade Mode/Arcade.h"
 #include "soh/Enhancements/FileSelectEnhancements.h"
 
 extern "C" {
@@ -816,6 +817,11 @@ void RegisterOnUpdateMainMenuSelection() {
                 SpeechSynthesizer::Instance->Speak(translation.c_str(), GetLanguageCode());
                 break;
             }
+            case QUEST_ARCADE: {
+                auto translation = GetParameritizedText("quest_sel_arcade", TEXT_BANK_FILECHOOSE, nullptr);
+                SpeechSynthesizer::Instance->Speak(translation.c_str(), GetLanguageCode());
+                break;
+            }
             default:
                 break;
         }
@@ -829,6 +835,18 @@ void RegisterOnUpdateMainMenuSelection() {
 
             auto optionName = BossRush_GetSettingName(optionIndex, language);
             auto optionValueName = BossRush_GetSettingChoiceName(optionIndex, optionValue, language);
+            auto translation = optionName + std::string(" - ") + optionValueName;
+            SpeechSynthesizer::Instance->Speak(translation.c_str(), GetLanguageCode());
+        });
+
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnUpdateFileArcadeOptionSelection>(
+        [](uint8_t optionIndex, uint8_t optionValue) {
+            if (!CVarGetInteger(CVAR_SETTING("A11yTTS"), 0))
+                return;
+            uint8_t language = (gSaveContext.language == LANGUAGE_JPN) ? LANGUAGE_ENG : gSaveContext.language;
+
+            auto optionName = Arcade_GetSettingName(optionIndex, language);
+            auto optionValueName = Arcade_GetSettingChoiceName(optionIndex, optionValue, language);
             auto translation = optionName + std::string(" - ") + optionValueName;
             SpeechSynthesizer::Instance->Speak(translation.c_str(), GetLanguageCode());
         });

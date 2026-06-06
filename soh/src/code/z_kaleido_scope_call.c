@@ -59,7 +59,7 @@ void KaleidoScopeCall_Update(PlayState* play) {
 
     GameInteractor_ExecuteOnKaleidoUpdate();
 
-    if (!gSaveContext.ship.stats.gameComplete && (!IS_BOSS_RUSH || !gSaveContext.ship.quest.data.bossRush.isPaused)) {
+    if (!gSaveContext.ship.stats.gameComplete && (!IS_BOSS_RUSH || !gSaveContext.ship.quest.data.bossRush.isPaused || !IS_ARCADE_MODE || !gSaveContext.ship.quest.data.arcade.isPaused)) {
         gSaveContext.ship.stats.pauseTimer++;
     }
 

@@ -353,6 +353,11 @@ void GameInteractor_ExecuteOnUpdateFileBossRushOptionSelection(uint8_t optionInd
                                                                                                 optionValue);
 }
 
+void GameInteractor_ExecuteOnUpdateFileArcadeOptionSelection(uint8_t optionIndex, uint8_t optionValue) {
+    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnUpdateFileArcadeOptionSelection>(optionIndex,
+                                                                                                optionValue);
+}
+
 void GameInteractor_ExecuteOnUpdateFileRandomizerOptionSelection(uint8_t optionIndex) {
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnUpdateFileRandomizerOptionSelection>(optionIndex);
 }

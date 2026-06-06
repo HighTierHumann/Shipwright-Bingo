@@ -845,6 +845,7 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GANONDORF],     "Ganondorf Defeated: ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GANON],         "Ganon Defeated:     ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_BOSSRUSH_FINISH],      "Boss Rush Finished: ");
+    strcpy(itemTimestampDisplayName[TIMESTAMP_ARCADE_FINISH],        "Arcade Run Ended:   ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_GREG],           "Greg Found:         ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_STICK_BAG],      "Deku Stick Bag:     ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_NUT_BAG],        "Deku Nut Bag:       ");
@@ -872,6 +873,7 @@ void SetupDisplayColors() {
             case ITEM_MEDALLION_FIRE:
             case TIMESTAMP_DEFEAT_KING_DODONGO:
             case TIMESTAMP_DEFEAT_VOLVAGIA:
+            case TIMESTAMP_ARCADE_FINISH:
                 itemTimestampDisplayColor[i] = COLOR_RED;
                 break;
             case ITEM_SONG_SERENADE:

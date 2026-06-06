@@ -16,6 +16,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh_assets.h"
 #include "soh/Enhancements/boss-rush/BossRush.h"
+#include "soh/Enhancements/Arcade Mode/Arcade.h"
 #include "soh/Enhancements/FileSelectEnhancements.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
@@ -26,10 +27,11 @@
 #include "soh/ShipUtils.h"
 
 #define MIN_QUEST (ResourceMgr_GameHasOriginal() ? QUEST_NORMAL : QUEST_MASTER)
-#define MAX_QUEST QUEST_BOSSRUSH
+#define MAX_QUEST QUEST_ARCADE
 
 void Sram_InitDebugSave(void);
 void Sram_InitBossRushSave();
+void Sram_InitArcadeSave();
 
 void FileChoose_DrawTextureI8(GraphicsContext* gfxCtx, const void* texture, s16 texWidth, s16 texHeight, s16 rectLeft,
                               s16 rectTop, s16 rectWidth, s16 rectHeight, s16 dsdx, s16 dtdy) {
@@ -612,6 +614,19 @@ void FileChoose_StartBossRushMenu(GameState* thisx) {
     }
 }
 
+void FileChoose_StartArcadeMenu(GameState* thisx) {
+    FileChooseContext* this = (FileChooseContext*)thisx;
+
+    this->logoAlpha -= 25;
+    this->arcadeUIAlpha = 0;
+    this->arcadeArrowOffset = 0;
+
+    if (this->logoAlpha <= 0) {
+        this->logoAlpha = 0;
+        this->configMode = CM_ARCADE_MENU;
+    }
+}
+
 void FileChoose_StartRandomizerMenu(GameState* thisx) {
     FileChooseContext* this = (FileChooseContext*)thisx;
 
@@ -676,6 +691,12 @@ void FileChoose_UpdateQuestMenu(GameState* thisx) {
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
             this->prevConfigMode = this->configMode;
             this->configMode = CM_ROTATE_TO_BOSS_RUSH_MENU;
+            return;
+        } else if (this->questType[this->buttonIndex] == QUEST_ARCADE) {
+            Audio_PlaySoundGeneral(NA_SE_SY_FSEL_DECIDE_L, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            this->prevConfigMode = this->configMode;
+            this->configMode = CM_ROTATE_TO_ARCADE_MENU;
             return;
         } else if (this->questType[this->buttonIndex] == QUEST_RANDOMIZER) {
             Audio_PlaySoundGeneral(NA_SE_SY_FSEL_DECIDE_L, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -915,8 +936,9 @@ void FileChoose_RotateToMain(GameState* thisx) {
 void FileChoose_RotateToQuest(GameState* thisx) {
     FileChooseContext* this = (FileChooseContext*)thisx;
 
-    if (this->configMode == CM_NAME_ENTRY_TO_QUEST_MENU || this->configMode == CM_BOSS_RUSH_TO_QUEST ||
-        this->configMode == CM_RANDOMIZER_SETTINGS_MENU_TO_QUEST) {
+    if (this->configMode == CM_NAME_ENTRY_TO_QUEST_MENU || this->configMode == CM_BOSS_RUSH_TO_ARCADE ||
+        this->configMode == CM_ARCADE_TO_QUEST || this->configMode ==
+            CM_RANDOMIZER_SETTINGS_MENU_TO_QUEST) {
         this->windowRot -= VREG(16);
 
         if (this->windowRot <= 314.0f) {
@@ -941,6 +963,17 @@ void FileChoose_RotateToBossRush(GameState* thisx) {
     if (this->windowRot >= 628.0f) {
         this->windowRot = 628.0f;
         this->configMode = CM_START_BOSS_RUSH_MENU;
+    }
+}
+
+void FileChoose_RotateToArcade(GameState* thisx) {
+    FileChooseContext* this = (FileChooseContext*)thisx;
+
+    this->windowRot += VREG(16);
+
+    if (this->windowRot >= 628.0f) {
+        this->windowRot = 628.0f;
+        this->configMode = CM_START_ARCADE_MENU;
     }
 }
 
@@ -990,6 +1023,8 @@ static void (*gConfigModeUpdateFuncs[])(GameState*) = {
     FileChoose_RotateToMain,        FileChoose_RotateToQuest,
     FileChoose_RotateToBossRush,    FileChoose_UpdateBossRushMenu,
     FileChoose_StartBossRushMenu,   FileChoose_RotateToQuest,
+    FileChoose_RotateToArcade,      FileChoose_UpdateArcadeMenu,
+    FileChoose_StartArcadeMenu,     FileChoose_RotateToQuest,
     FileChoose_RotateToRandomizer,  FileChoose_UpdateRandomizerMenu,
     FileChoose_StartRandomizerMenu, FileChoose_RotateToQuest,
     FileChoose_RotateToRandomizer,
@@ -1021,6 +1056,8 @@ static void (*gConfigModeUpdateFuncsNES[])(GameState*) = {
     FileChoose_RotateToMain,        FileChoose_RotateToQuest,
     FileChoose_RotateToBossRush,    FileChoose_UpdateBossRushMenu,
     FileChoose_StartBossRushMenu,   FileChoose_RotateToQuest,
+    FileChoose_RotateToArcade,      FileChoose_UpdateArcadeMenu,
+    FileChoose_StartArcadeMenu,     FileChoose_RotateToQuest,
     FileChoose_RotateToRandomizer,  FileChoose_UpdateRandomizerMenu,
     FileChoose_StartRandomizerMenu, FileChoose_RotateToQuest,
     FileChoose_RotateToRandomizer,
@@ -1683,12 +1720,16 @@ void FileChoose_DrawWindowContents(GameState* thisx) {
         case CM_QUEST_TO_MAIN:
         case CM_NAME_ENTRY_TO_QUEST_MENU:
         case CM_ROTATE_TO_BOSS_RUSH_MENU:
+        case CM_ROTATE_TO_ARCADE_MENU:
         case CM_ROTATE_TO_RANDOMIZER_SETTINGS_MENU:
             tex = FileChoose_GetQuestChooseTitleTexName(gSaveContext.language);
             break;
         case CM_BOSS_RUSH_MENU:
         case CM_START_BOSS_RUSH_MENU:
-        case CM_BOSS_RUSH_TO_QUEST:
+        case CM_BOSS_RUSH_TO_ARCADE:
+        case CM_ARCADE_MENU:
+        case CM_START_ARCADE_MENU:
+        case CM_ARCADE_TO_QUEST:
         case CM_RANDOMIZER_SETTINGS_MENU:
         case CM_START_RANDOMIZER_SETTINGS_MENU:
         case CM_RANDOMIZER_SETTINGS_MENU_TO_QUEST:
@@ -1809,9 +1850,22 @@ void FileChoose_DrawWindowContents(GameState* thisx) {
                     ResourceMgr_GameHasOriginal() ? gTitleZeldaShieldLogoTex : gTitleZeldaShieldLogoMQTex, 160, 160);
                 FileChoose_DrawImageRGBA32(this->state.gfxCtx, 182, 180, gTitleBossRushSubtitleTex, 128, 32);
                 break;
+            case QUEST_ARCADE:
+                gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 255, this->logoAlpha);
+                FileChoose_DrawTextureI8(this->state.gfxCtx, gTitleTheLegendOfTextTex, 72, 8, 156, 108, 72, 8, 1024,
+                                         1024);
+                FileChoose_DrawTextureI8(this->state.gfxCtx, gTitleOcarinaOfTimeTMTextTex, 96, 8, 154, 163, 96, 8, 1024,
+                                         1024);
+                FileChoose_DrawImageRGBA32(
+                    this->state.gfxCtx, 160, 135,
+                    ResourceMgr_GameHasOriginal() ? gTitleZeldaShieldLogoTex : gTitleZeldaShieldLogoMQTex, 160, 160);
+                FileChoose_DrawImageRGBA32(this->state.gfxCtx, 182, 180, gTitleBossRushSubtitleTex, 128, 32);
+                break;
         }
     } else if (this->configMode == CM_BOSS_RUSH_MENU) {
         FileChoose_DrawBossRushMenuWindowContents(this);
+    } else if (this->configMode == CM_ARCADE_MENU) {
+        FileChoose_DrawArcadeMenuWindowContents(this);
     } else if (this->configMode == CM_RANDOMIZER_SETTINGS_MENU) {
         uint8_t language = (gSaveContext.language == LANGUAGE_JPN) ? LANGUAGE_ENG : gSaveContext.language;
         uint8_t textAlpha = this->randomizerUIAlpha;
@@ -1863,7 +1917,9 @@ void FileChoose_DrawWindowContents(GameState* thisx) {
                                (85 + textOffset), 0.42f, 0, 0, 1.0f, 1.0f);
 
     } else if (this->configMode != CM_ROTATE_TO_NAME_ENTRY && this->configMode != CM_START_BOSS_RUSH_MENU &&
-               this->configMode != CM_ROTATE_TO_BOSS_RUSH_MENU && this->configMode != CM_BOSS_RUSH_TO_QUEST &&
+               this->configMode != CM_ROTATE_TO_BOSS_RUSH_MENU && this->configMode != CM_BOSS_RUSH_TO_ARCADE &&
+               this->configMode != CM_ROTATE_TO_NAME_ENTRY && this->configMode != CM_START_ARCADE_MENU &&
+               this->configMode != CM_ROTATE_TO_ARCADE_MENU && this->configMode != CM_ARCADE_TO_QUEST &&
                this->configMode != CM_START_RANDOMIZER_SETTINGS_MENU &&
                this->configMode != CM_ROTATE_TO_RANDOMIZER_SETTINGS_MENU &&
                this->configMode != CM_RANDOMIZER_SETTINGS_MENU_TO_QUEST &&
@@ -2217,6 +2273,7 @@ void FileChoose_ConfigModeDraw(GameState* thisx) {
     if (this->configMode == CM_QUEST_MENU || (this->configMode == CM_ROTATE_TO_QUEST_MENU) ||
         this->configMode == CM_ROTATE_TO_NAME_ENTRY || this->configMode == CM_QUEST_TO_MAIN ||
         this->configMode == CM_NAME_ENTRY_TO_QUEST_MENU || this->configMode == CM_ROTATE_TO_BOSS_RUSH_MENU ||
+        this->configMode == CM_ROTATE_TO_ARCADE_MENU ||
         this->configMode == CM_ROTATE_TO_RANDOMIZER_SETTINGS_MENU ||
         this->configMode == CM_NAME_ENTRY_TO_RANDOMIZER_SETTINGS_MENU) {
         // window
@@ -2248,7 +2305,9 @@ void FileChoose_ConfigModeDraw(GameState* thisx) {
 
     // Draw Boss Rush / Randomizer Options Menu
     if (this->configMode == CM_BOSS_RUSH_MENU || this->configMode == CM_ROTATE_TO_BOSS_RUSH_MENU ||
-        this->configMode == CM_START_BOSS_RUSH_MENU || this->configMode == CM_BOSS_RUSH_TO_QUEST ||
+        this->configMode == CM_START_BOSS_RUSH_MENU || this->configMode == CM_BOSS_RUSH_TO_ARCADE ||
+        this->configMode == CM_ARCADE_MENU || this->configMode == CM_ROTATE_TO_ARCADE_MENU ||
+        this->configMode == CM_START_ARCADE_MENU || this->configMode == CM_ARCADE_TO_QUEST ||
         this->configMode == CM_RANDOMIZER_SETTINGS_MENU || this->configMode == CM_ROTATE_TO_RANDOMIZER_SETTINGS_MENU ||
         this->configMode == CM_START_RANDOMIZER_SETTINGS_MENU ||
         this->configMode == CM_RANDOMIZER_SETTINGS_MENU_TO_QUEST) {
@@ -3060,6 +3119,8 @@ void FileChoose_InitContext(GameState* thisx) {
 
     this->bossRushIndex = 0;
     this->bossRushOffset = 0;
+    this->arcadeIndex = 0;
+    this->arcadeOffset = 0;
     this->randomizerIndex = 0;
 
     ShrinkWindow_SetVal(0);

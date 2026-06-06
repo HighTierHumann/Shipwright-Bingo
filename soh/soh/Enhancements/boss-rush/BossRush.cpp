@@ -281,7 +281,7 @@ void FileChoose_UpdateBossRushMenu(GameState* gameState) {
     }
 
     if (CHECK_BTN_ALL(input->press.button, BTN_B)) {
-        fileChooseContext->configMode = CM_BOSS_RUSH_TO_QUEST;
+        fileChooseContext->configMode = CM_BOSS_RUSH_TO_ARCADE;
         return;
     }
 

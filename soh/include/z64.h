@@ -1604,6 +1604,10 @@ typedef struct FileChooseContext {
     uint8_t bossRushOffset;
     int16_t bossRushUIAlpha;
     uint16_t bossRushArrowOffset;
+    uint8_t arcadeIndex;
+    uint8_t arcadeOffset;
+    int16_t arcadeUIAlpha;
+    uint16_t arcadeArrowOffset;
     uint8_t randomizerIndex;
     int16_t randomizerUIAlpha;
     uint16_t randomizerArrowOffset;

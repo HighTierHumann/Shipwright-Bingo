@@ -15,6 +15,7 @@
 void Save_LoadFile(void);
 
 void BossRush_InitSave(void);
+void Arcade_InitSave(void);
 
 /**
  *  Initialize new save.
@@ -40,6 +41,11 @@ void Sram_InitDebugSave(void) {
 void Sram_InitBossRushSave(void) {
     Save_InitFile(false);
     BossRush_InitSave();
+}
+
+void Sram_InitArcadeSave(void) {
+    Save_InitFile(false);
+    Arcade_InitSave();
 }
 
 static s16 sDungeonEntrances[] = {

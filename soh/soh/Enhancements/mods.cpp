@@ -2,6 +2,7 @@
 #include <libultraship/bridge.h>
 #include "game-interactor/GameInteractor.h"
 #include "soh/Enhancements/boss-rush/BossRush.h"
+#include "soh/Enhancements/Arcade Mode/Arcade.h"
 #include "soh/Enhancements/enhancementTypes.h"
 #include <soh/Enhancements/item-tables/ItemTableManager.h>
 
@@ -113,7 +114,9 @@ void RegisterOcarinaTimeTravel() {
 bool IsHyperBossesActive() {
     return CVarGetInteger(CVAR_ENHANCEMENT("HyperBosses"), 0) ||
            (IS_BOSS_RUSH &&
-            gSaveContext.ship.quest.data.bossRush.options[BR_OPTIONS_HYPERBOSSES] == BR_CHOICE_HYPERBOSSES_YES);
+            gSaveContext.ship.quest.data.bossRush.options[BR_OPTIONS_HYPERBOSSES] == BR_CHOICE_HYPERBOSSES_YES) ||
+           (IS_ARCADE_MODE &&
+            gSaveContext.ship.quest.data.arcade.options[AM_OPTIONS_HYPERBOSSES] == AM_CHOICE_HYPERBOSSES_YES);
 }
 
 void UpdateHyperBossesState() {
