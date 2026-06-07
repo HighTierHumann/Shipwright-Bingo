@@ -752,14 +752,14 @@ void Settings::CreateOptionDescriptions() {
         "Talking to the chest game owner after buying a key will tell you the location of Greg the Green Rupee.";
     mOptionDescriptions[RSK_LOACH_HINT] = "Talking to the fishing pond owner and asking to talk about something will "
                                           "tell you what's the reward for the Hyrule Loach.";
-    mOptionDescriptions[RSK_BOSS_KEY_HINT] = "Navi will tell where boss key can be found when prompted at boss door.";
+    mOptionDescriptions[RSK_BOSS_KEY_HINT] = "Navi will tell you where the boss key can be found when prompted at boss door.";
     mOptionDescriptions[RSK_SARIA_HINT] = "Talking to Saria either in person or through Saria's Song will tell you the "
                                           "location of a progressive magic meter.";
     mOptionDescriptions[RSK_MIDO_HINT] = "Talking to Mido as child will tell you the location of the Kokiri Sword.";
     mOptionDescriptions[RSK_FISHING_POLE_HINT] =
         "Talking to the fishing pond owner without the fishing pole will tell you its location.";
     mOptionDescriptions[RSK_OOT_HINT] =
-        "Sheik in the Temple of Time will tell you the item and song on the Ocarina of Time.";
+        "Sheik in the Temple of Time will tell you the item and song on the Ocarina of Time check.";
     mOptionDescriptions[RSK_FROGS_HINT] = "Standing near the pedestal for the frogs in Zora's River will tell you the "
                                           "reward for the frogs' Ocarina game.";
     mOptionDescriptions[RSK_BIGGORON_HINT] =
@@ -810,7 +810,7 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_LULLABY_HINT] =
         "Talking to Zelda as a child will tell you the location of Zelda's Lullaby.";
     mOptionDescriptions[RSK_STORMS_HINT] =
-        "Navi will tell you the location of the Song of Storms when standing on the rock near the Oasis in Desert Colossus.";
+        "Navi will tell you the location of the Song of Storms when targetting the rock near the Oasis in Desert Colossus and speaking to her.";
     mOptionDescriptions[RSK_EPONAS_HINT] =
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
     // end

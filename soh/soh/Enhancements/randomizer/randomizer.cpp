@@ -522,19 +522,54 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
             return Inventory_HasEmptyBottle() ? CAN_OBTAIN : CANT_OBTAIN_NEED_EMPTY_BOTTLE;
 
         // Trade Items
-        // TODO: Do we want to be strict about any of this?
-        // case RG_WEIRD_EGG:
-        // case RG_ZELDAS_LETTER:
-        // case RG_POCKET_EGG:
-        // case RG_COJIRO:
-        // case RG_ODD_MUSHROOM:
-        // case RG_ODD_POTION:
-        // case RG_POACHERS_SAW:
-        // case RG_BROKEN_SWORD:
-        // case RG_PRESCRIPTION:
-        // case RG_EYEBALL_FROG:
-        // case RG_EYEDROPS:
-        // case RG_CLAIM_CHECK:
+        case RG_WEIRD_EGG:
+            return !Flags_GetRandomizerInf(RAND_INF_CHILD_TRADES_HAS_WEIRD_EGG)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_ZELDAS_LETTER:
+            return !Flags_GetRandomizerInf(RAND_INF_CHILD_TRADES_HAS_LETTER_ZELDA)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_POCKET_EGG:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_EGG)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_COJIRO:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_COJIRO)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_ODD_MUSHROOM:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_ODD_MUSHROOM)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_ODD_POTION:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_ODD_POTION)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_POACHERS_SAW:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_SAW)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_BROKEN_SWORD:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_SWORD_BROKEN)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_PRESCRIPTION:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_PRESCRIPTION)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_EYEBALL_FROG:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_FROG)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_EYEDROPS:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_EYEDROPS)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_CLAIM_CHECK:
+            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_CLAIM_CHECK)
+                       ? CAN_OBTAIN
+                       : CANT_OBTAIN_ALREADY_HAVE;
         // case RG_PROGRESSIVE_GORONSWORD:
         // case RG_GIANTS_KNIFE:
 
