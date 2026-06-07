@@ -1681,6 +1681,7 @@ Play_Draw_skip:
     CLOSE_DISPS(gfxCtx);
 
     Interface_DrawTotalGameplayTimer(play);
+    Arcade_DrawCurrentScore(play);
 }
 
 time_t Play_GetRealTime() {

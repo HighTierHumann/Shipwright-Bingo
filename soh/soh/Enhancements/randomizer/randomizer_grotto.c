@@ -145,7 +145,8 @@ s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex) {
     // Don't change anything unless grotto shuffle has been enabled
     if (!Randomizer_GetSettingValue(RSK_SHUFFLE_GROTTO_ENTRANCES) &&
         !Randomizer_GetSettingValue(RSK_SHUFFLE_OVERWORLD_SPAWNS) &&
-        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS)) {
+        !Randomizer_GetSettingValue(RSK_SHUFFLE_WARP_SONGS) &&
+        !IS_ARCADE_MODE) {
         return nextEntranceIndex;
     }
 

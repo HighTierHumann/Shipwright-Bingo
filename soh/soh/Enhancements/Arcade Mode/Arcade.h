@@ -12,6 +12,7 @@ void FileChoose_UpdateArcadeMenu(struct GameState* gameState);
 void FileChoose_DrawArcadeMenuWindowContents(struct FileChooseContext* fileChooseContext);
 const char* Arcade_GetSettingName(u8 optionIndex, u8 language);
 const char* Arcade_GetSettingChoiceName(u8 optionIndex, u8 choiceIndex, u8 language);
+void Arcade_DrawCurrentScore(struct PlayState* play);
 u8 Arcade_GetSettingOptionsAmount(u8 optionIndex);
 #ifdef __cplusplus
 };

@@ -1859,7 +1859,7 @@ void FileChoose_DrawWindowContents(GameState* thisx) {
                 FileChoose_DrawImageRGBA32(
                     this->state.gfxCtx, 160, 135,
                     ResourceMgr_GameHasOriginal() ? gTitleZeldaShieldLogoTex : gTitleZeldaShieldLogoMQTex, 160, 160);
-                FileChoose_DrawImageRGBA32(this->state.gfxCtx, 182, 180, gTitleBossRushSubtitleTex, 128, 32);
+                FileChoose_DrawImageRGBA32(this->state.gfxCtx, 182, 180, gTitleZeldaShieldLogoTex, 128, 32);
                 break;
         }
     } else if (this->configMode == CM_BOSS_RUSH_MENU) {
@@ -2579,6 +2579,8 @@ void FileChoose_LoadGame(GameState* thisx) {
     } else {
         if (this->buttonIndex == 0xFE) {
             Sram_InitBossRushSave();
+        } else if (this->buttonIndex == 0xFD) {
+            Sram_InitArcadeSave();
         } else {
             Sram_OpenSave();
         }

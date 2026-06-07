@@ -2,12 +2,15 @@
 #include "soh/ShipInit.hpp"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/cosmetics/cosmeticsTypes.h"
 #include "soh_assets.h"
 #include "soh/frame_interpolation.h"
+#include "soh/OTRGlobals.h"
 
 #include <array>
 #include <string>
 #include <vector>
+#include <random>
 
 extern "C" {
 #include "functions.h"
@@ -28,6 +31,22 @@ Gfx* KaleidoScope_QuadTextureIA8(Gfx* gfx, void* texture, s16 width, s16 height,
 void FileChoose_UpdateStickDirectionPromptAnim(GameState* thisx);
 void FileChoose_DrawTextRec(GraphicsContext* gfxCtx, s32 r, s32 g, s32 b, s32 a, f32 x, f32 y, f32 z, s32 s, s32 t,
                             f32 dx, f32 dy);
+}
+
+static s32 sArcadeScore = -1;
+static s16 sArcadeOverrideEntrance = -1;
+
+// Use the existing UI variables from z_parameter.c
+extern "C" {
+    extern const char* digitTextures[];
+    extern s16 Top_HUD_Margin;
+    extern s16 Left_HUD_Margin;
+    extern s16 Right_HUD_Margin;
+    extern s16 Bottom_HUD_Margin;
+
+    float OTRGetRectDimensionFromLeftEdge(float v);
+    float OTRGetRectDimensionFromRightEdge(float v);
+    s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex);
 }
 
 typedef enum {
@@ -289,7 +308,7 @@ void FileChoose_UpdateArcadeMenu(GameState* gameState) {
     if (CHECK_BTN_ALL(input->press.button, BTN_START) || CHECK_BTN_ALL(input->press.button, BTN_A)) {
         Audio_PlaySoundGeneral(NA_SE_SY_FSEL_DECIDE_L, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
-        fileChooseContext->buttonIndex = 0xFE;
+        fileChooseContext->buttonIndex = 0xFD;
         fileChooseContext->menuMode = FS_MENU_MODE_SELECT;
         fileChooseContext->selectMode = SM_FADE_OUT;
         fileChooseContext->prevConfigMode = fileChooseContext->configMode;
@@ -565,6 +584,388 @@ void Arcade_HandleCompleteBoss(PlayState* play) {
     }
 }
 
+int Arcade_GetRandomEntrance() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    static const std::vector<s16> validEntrances = {
+        // clang-format off
+        // Index
+        ENTR_DEKU_TREE_ENTRANCE,
+        ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE,
+        ENTR_DODONGOS_CAVERN_ENTRANCE,
+        ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN,
+        ENTR_JABU_JABU_ENTRANCE,
+        ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU,
+        ENTR_FOREST_TEMPLE_ENTRANCE,
+        ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE,
+        ENTR_FIRE_TEMPLE_ENTRANCE,
+        ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE,
+        ENTR_WATER_TEMPLE_ENTRANCE,
+        ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,
+        ENTR_SPIRIT_TEMPLE_ENTRANCE,
+        ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE,
+        ENTR_SHADOW_TEMPLE_ENTRANCE,
+        ENTR_GRAVEYARD_OUTSIDE_TEMPLE,
+        ENTR_BOTTOM_OF_THE_WELL_ENTRANCE,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_BOTTOM_OF_THE_WELL,
+        ENTR_ICE_CAVERN_ENTRANCE,
+        ENTR_ZORAS_FOUNTAIN_OUTSIDE_ICE_CAVERN,
+        ENTR_GERUDO_TRAINING_GROUND_ENTRANCE,
+        ENTR_GERUDOS_FORTRESS_OUTSIDE_GERUDO_TRAINING_GROUND,
+        ENTR_INSIDE_GANONS_CASTLE_ENTRANCE,
+        ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT,
+        
+        ENTR_MIDOS_HOUSE_0,
+        ENTR_KOKIRI_FOREST_OUTSIDE_MIDOS_HOUSE,
+        ENTR_SARIAS_HOUSE_0,
+        ENTR_KOKIRI_FOREST_OUTSIDE_SARIAS_HOUSE,
+        ENTR_TWINS_HOUSE_0,
+        ENTR_KOKIRI_FOREST_OUTSIDE_TWINS_HOUSE,
+        ENTR_KNOW_IT_ALL_BROS_HOUSE_0,
+        ENTR_KOKIRI_FOREST_OUTSIDE_KNOW_IT_ALL_HOUSE,
+        ENTR_KOKIRI_SHOP_0,
+        ENTR_KOKIRI_FOREST_OUTSIDE_SHOP,
+        ENTR_LAKESIDE_LABORATORY_0,
+        ENTR_LAKE_HYLIA_OUTSIDE_LAB,
+        ENTR_FISHING_POND_0,
+        ENTR_LAKE_HYLIA_OUTSIDE_FISHING_POND,
+        ENTR_CARPENTERS_TENT_0,
+        ENTR_GERUDO_VALLEY_OUTSIDE_TENT,
+        ENTR_MARKET_GUARD_HOUSE_0,
+        ENTR_MARKET_ENTRANCE_OUTSIDE_GUARD_HOUSE,
+        ENTR_HAPPY_MASK_SHOP_0,
+        ENTR_MARKET_DAY_OUTSIDE_HAPPY_MASK_SHOP,
+        ENTR_BOMBCHU_BOWLING_ALLEY_0,
+        ENTR_MARKET_DAY_OUTSIDE_BOMBCHU_BOWLING,
+        ENTR_POTION_SHOP_MARKET_0,
+        ENTR_MARKET_DAY_OUTSIDE_POTION_SHOP,
+        ENTR_TREASURE_BOX_SHOP_0,
+        ENTR_MARKET_DAY_OUTSIDE_TREASURE_BOX_SHOP,
+        ENTR_BOMBCHU_SHOP_1,
+        ENTR_BACK_ALLEY_DAY_OUTSIDE_BOMBCHU_SHOP,
+        ENTR_BACK_ALLEY_MAN_IN_GREEN_HOUSE,
+        ENTR_BACK_ALLEY_DAY_OUTSIDE_MAN_IN_GREEN_HOUSE,
+        ENTR_KAKARIKO_CENTER_GUEST_HOUSE_0,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_CENTER_GUEST_HOUSE,
+        ENTR_HOUSE_OF_SKULLTULA_0,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SKULKLTULA_HOUSE,
+        ENTR_IMPAS_HOUSE_FRONT,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_FRONT,
+        ENTR_IMPAS_HOUSE_BACK,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_BACK,
+        ENTR_POTION_SHOP_GRANNY_0,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOP_GRANNY,
+        ENTR_GRAVEKEEPERS_HUT_0,
+        ENTR_GRAVEYARD_OUTSIDE_DAMPES_HUT,
+        ENTR_GORON_SHOP_0,
+        ENTR_GORON_CITY_OUTSIDE_SHOP,
+        ENTR_ZORA_SHOP_0,
+        ENTR_ZORAS_DOMAIN_OUTSIDE_SHOP,
+        ENTR_LON_LON_BUILDINGS_TALONS_HOUSE,
+        ENTR_LON_LON_RANCH_OUTSIDE_TALONS_HOUSE,
+        ENTR_STABLE_0,
+        ENTR_LON_LON_RANCH_OUTSIDE_STABLES,
+        ENTR_LON_LON_BUILDINGS_TOWER,
+        ENTR_LON_LON_RANCH_OUTSIDE_TOWER,
+        ENTR_BAZAAR_1,
+        ENTR_MARKET_DAY_OUTSIDE_BAZAAR,
+        ENTR_SHOOTING_GALLERY_1,
+        ENTR_MARKET_DAY_OUTSIDE_SHOOTING_GALLERY,
+        ENTR_BAZAAR_0,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_BAZAAR,
+        ENTR_SHOOTING_GALLERY_0,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOOTING_GALLERY,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_NAYRUS_COLOSSUS,
+        ENTR_DESERT_COLOSSUS_GREAT_FAIRY_EXIT,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_DINS_HC,
+        ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_OGC_DD,
+        // ENTR_POTION_SHOP_KAKARIKO_1 is an unused entrance index repurposed to differentiate between HC and OGC fairy fountain exits
+        // (normally both use ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT)
+        ENTR_POTION_SHOP_KAKARIKO_1,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMC,
+        ENTR_DEATH_MOUNTAIN_CRATER_GREAT_FAIRY_EXIT,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMT,
+        ENTR_DEATH_MOUNTAIN_TRAIL_GREAT_FAIRY_EXIT,
+        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_FARORES_ZF,
+        ENTR_ZORAS_FOUNTAIN_OUTSIDE_GREAT_FAIRY,
+        
+        ENTR_LINKS_HOUSE_1,
+        ENTR_KOKIRI_FOREST_OUTSIDE_LINKS_HOUSE,
+        ENTR_TEMPLE_OF_TIME_ENTRANCE,
+        ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_OUTSIDE_TEMPLE,
+        ENTR_WINDMILL_AND_DAMPES_GRAVE_WINDMILL,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_WINDMILL,
+        ENTR_POTION_SHOP_KAKARIKO_FRONT,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_FRONT,
+        ENTR_POTION_SHOP_KAKARIKO_BACK,
+        ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_BACK,
+        
+        ENTR_THIEVES_HIDEOUT_0,
+        ENTR_GERUDOS_FORTRESS_1,
+        ENTR_THIEVES_HIDEOUT_1,
+        ENTR_GERUDOS_FORTRESS_2,
+        ENTR_THIEVES_HIDEOUT_2,
+        ENTR_GERUDOS_FORTRESS_3,
+        ENTR_THIEVES_HIDEOUT_3,
+        ENTR_GERUDOS_FORTRESS_4,
+        ENTR_THIEVES_HIDEOUT_4,
+        ENTR_GERUDOS_FORTRESS_5,
+        ENTR_THIEVES_HIDEOUT_5,
+        ENTR_GERUDOS_FORTRESS_6,
+        ENTR_THIEVES_HIDEOUT_6,
+        ENTR_GERUDOS_FORTRESS_7,
+        ENTR_THIEVES_HIDEOUT_7,
+        ENTR_GERUDOS_FORTRESS_8,
+        ENTR_THIEVES_HIDEOUT_8,
+        ENTR_GERUDOS_FORTRESS_9,
+        ENTR_THIEVES_HIDEOUT_9,
+        ENTR_GERUDOS_FORTRESS_10,
+        ENTR_THIEVES_HIDEOUT_10,
+        ENTR_GERUDOS_FORTRESS_11,
+        ENTR_THIEVES_HIDEOUT_11,
+        ENTR_GERUDOS_FORTRESS_12,
+        ENTR_THIEVES_HIDEOUT_12,
+        ENTR_GERUDOS_FORTRESS_13,
+
+        // Grotto Loads use an entrance index of 0x0700 + their grotto id. The id is used as index for the
+        // grottoLoadTable in soh/soh/Enhancements/randomizer/randomizer_grotto.c
+        // Grotto Returns use an entrance index of 0x0800 + their grotto id. The id is used as index for the
+        // grottoReturnTable in soh/soh/Enhancements/randomizer/randomizer_grotto.c
+        ENTRANCE_GROTTO_LOAD(GROTTO_COLOSSUS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_COLOSSUS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_LH_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_LH_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_OPEN_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_OPEN_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_DMC_HAMMER_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_DMC_HAMMER_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_DMC_UPPER_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_DMC_UPPER_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_GORON_CITY_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_GORON_CITY_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_DMT_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_DMT_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_DMT_COW_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_DMT_COW_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_KAK_OPEN_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_KAK_OPEN_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_KAK_REDEAD_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_KAK_REDEAD_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HC_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HC_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_TEKTITE_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_TEKTITE_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_KAK_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_KAK_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_MARKET_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_MARKET_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_COW_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_COW_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_INSIDE_FENCE_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_INSIDE_FENCE_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_OPEN_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_OPEN_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_HF_SOUTHEAST_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_HF_SOUTHEAST_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_LLR_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_LLR_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_WOLFOS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_WOLFOS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_FAIRY_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_LW_SCRUBS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_LW_SCRUBS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_KF_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_KF_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_ZD_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_ZD_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_GF_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_GF_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_GV_STORMS_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_GV_STORMS_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_GV_OCTOROK_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_GV_OCTOROK_OFFSET),
+        ENTRANCE_GROTTO_LOAD(GROTTO_LW_DEKU_THEATRE_OFFSET),
+        ENTRANCE_GROTTO_EXIT(GROTTO_LW_DEKU_THEATRE_OFFSET),
+        
+        // Graves have their own specified entrance indices
+        ENTR_GRAVE_WITH_FAIRYS_FOUNTAIN_0,
+        ENTR_GRAVEYARD_SHIELD_GRAVE_EXIT,
+        ENTR_REDEAD_GRAVE_0,
+        ENTR_GRAVEYARD_HEART_PIECE_GRAVE_EXIT,
+        ENTR_ROYAL_FAMILYS_TOMB_0,
+        ENTR_GRAVEYARD_ROYAL_TOMB_EXIT,
+        ENTR_WINDMILL_AND_DAMPES_GRAVE_GRAVE,
+        ENTR_GRAVEYARD_DAMPES_GRAVE_EXIT,
+        
+        ENTR_LOST_WOODS_BRIDGE_EAST_EXIT,
+        ENTR_KOKIRI_FOREST_LOWER_EXIT,
+        ENTR_LOST_WOODS_SOUTH_EXIT,
+        ENTR_KOKIRI_FOREST_UPPER_EXIT,
+        ENTR_GORON_CITY_TUNNEL_SHORTCUT,
+        ENTR_LOST_WOODS_TUNNEL_SHORTCUT,
+        ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT,
+        ENTR_LOST_WOODS_UNDERWATER_SHORTCUT,
+        ENTR_SACRED_FOREST_MEADOW_SOUTH_EXIT,
+        ENTR_LOST_WOODS_NORTH_EXIT,
+        ENTR_HYRULE_FIELD_WOODED_EXIT,
+        ENTR_LOST_WOODS_BRIDGE_WEST_EXIT,
+        ENTR_LAKE_HYLIA_NORTH_EXIT,
+        ENTR_HYRULE_FIELD_FENCE_EXIT,
+        ENTR_GERUDO_VALLEY_EAST_EXIT,
+        ENTR_HYRULE_FIELD_ROCKY_PATH,
+        ENTR_MARKET_ENTRANCE_NEAR_GUARD_EXIT,
+        ENTR_HYRULE_FIELD_ON_BRIDGE_SPAWN,
+        ENTR_KAKARIKO_VILLAGE_FRONT_GATE,
+        ENTR_HYRULE_FIELD_STAIRS_EXIT,
+        ENTR_ZORAS_RIVER_WEST_EXIT,
+        ENTR_HYRULE_FIELD_RIVER_EXIT,
+        ENTR_LON_LON_RANCH_ENTRANCE,
+        ENTR_HYRULE_FIELD_CENTER_EXIT,
+        ENTR_ZORAS_DOMAIN_UNDERWATER_SHORTCUT,
+        ENTR_LAKE_HYLIA_UNDERWATER_SHORTCUT,
+        ENTR_GERUDOS_FORTRESS_EAST_EXIT,
+        ENTR_GERUDO_VALLEY_WEST_EXIT,
+        ENTR_HAUNTED_WASTELAND_EAST_EXIT,
+        ENTR_GERUDOS_FORTRESS_GATE_EXIT,
+        ENTR_DESERT_COLOSSUS_EAST_EXIT,
+        ENTR_HAUNTED_WASTELAND_WEST_EXIT,
+        ENTR_MARKET_SOUTH_EXIT,
+        ENTR_MARKET_ENTRANCE_NORTH_EXIT,
+        ENTR_CASTLE_GROUNDS_SOUTH_EXIT,
+        ENTR_MARKET_DAY_CASTLE_EXIT,
+        ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_GOSSIP_STONE_EXIT,
+        ENTR_MARKET_DAY_TEMPLE_EXIT,
+        ENTR_GRAVEYARD_ENTRANCE,
+        ENTR_KAKARIKO_VILLAGE_SOUTHEAST_EXIT,
+        ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT,
+        ENTR_KAKARIKO_VILLAGE_GUARD_GATE,
+        ENTR_GORON_CITY_UPPER_EXIT,
+        ENTR_DEATH_MOUNTAIN_TRAIL_GC_EXIT,
+        ENTR_DEATH_MOUNTAIN_CRATER_GC_EXIT,
+        ENTR_GORON_CITY_DARUNIA_ROOM_EXIT,
+        ENTR_DEATH_MOUNTAIN_CRATER_UPPER_EXIT,
+        ENTR_DEATH_MOUNTAIN_TRAIL_SUMMIT_EXIT,
+        ENTR_ZORAS_DOMAIN_ENTRANCE,
+        ENTR_ZORAS_RIVER_WATERFALL_EXIT,
+        ENTR_ZORAS_FOUNTAIN_TUNNEL_EXIT,
+        ENTR_ZORAS_DOMAIN_KING_ZORA_EXIT,
+        
+        ENTR_LAKE_HYLIA_RIVER_EXIT,
+        
+        ENTR_HYRULE_FIELD_OWL_DROP,
+        ENTR_KAKARIKO_VILLAGE_OWL_DROP,
+        
+        ENTR_LINKS_HOUSE_CHILD_SPAWN,
+        ENTR_HYRULE_FIELD_10, // 0x282 is an unused entrance index repurposed to differentiate between
+                                // Adult Spawn and prelude of light (normally they both use 0x5F4)
+        ENTR_SACRED_FOREST_MEADOW_WARP_PAD,
+        ENTR_DEATH_MOUNTAIN_CRATER_WARP_PAD,
+        ENTR_LAKE_HYLIA_WARP_PAD,
+        ENTR_DESERT_COLOSSUS_WARP_PAD,
+        ENTR_GRAVEYARD_WARP_PAD,
+        ENTR_TEMPLE_OF_TIME_WARP_PAD,
+        
+        ENTR_DEKU_TREE_BOSS_ENTRANCE,
+        ENTR_DEKU_TREE_BOSS_DOOR,
+        ENTR_DODONGOS_CAVERN_BOSS_ENTRANCE,
+        ENTR_DODONGOS_CAVERN_BOSS_DOOR,
+        ENTR_JABU_JABU_BOSS_ENTRANCE,
+        ENTR_JABU_JABU_BOSS_DOOR,
+        ENTR_FOREST_TEMPLE_BOSS_ENTRANCE,
+        ENTR_FOREST_TEMPLE_BOSS_DOOR,
+        ENTR_FIRE_TEMPLE_BOSS_ENTRANCE,
+        ENTR_FIRE_TEMPLE_BOSS_DOOR,
+        ENTR_WATER_TEMPLE_BOSS_ENTRANCE,
+        ENTR_WATER_TEMPLE_BOSS_DOOR,
+        ENTR_SPIRIT_TEMPLE_BOSS_ENTRANCE,
+        ENTR_SPIRIT_TEMPLE_BOSS_DOOR,
+        ENTR_SHADOW_TEMPLE_BOSS_ENTRANCE,
+        ENTR_SHADOW_TEMPLE_BOSS_DOOR,
+
+        ENTR_GANONS_TOWER_0,
+        ENTR_INSIDE_GANONS_CASTLE_1,
+
+        ENTR_KOKIRI_FOREST_DEKU_TREE_BLUE_WARP,
+        ENTR_DEATH_MOUNTAIN_TRAIL_DODONGO_BLUE_WARP,
+        ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP,
+        ENTR_SACRED_FOREST_MEADOW_FOREST_TEMPLE_BLUE_WARP,
+        ENTR_DEATH_MOUNTAIN_CRATER_FIRE_TEMPLE_BLUE_WARP,
+        ENTR_LAKE_HYLIA_WATER_TEMPLE_BLUE_WARP,
+        ENTR_DESERT_COLOSSUS_SPIRIT_TEMPLE_BLUE_WARP,
+        ENTR_GRAVEYARD_SHADOW_TEMPLE_BLUE_WARP,
+        ENTR_OUTSIDE_GANONS_CASTLE_1_2,
+        // clang-format on
+    };
+
+    if (validEntrances.empty()) {
+        // If this happens, something went VERY wrong
+        return ENTR_CHAMBER_OF_THE_SAGES_0;
+    }
+
+    std::uniform_int_distribution<> distrib(0, static_cast<int>(validEntrances.size() - 1));
+    return validEntrances[distrib(gen)];
+}
+
+void Arcade_RequestEntranceOverride(s16 entrance) {
+    if (IS_ARCADE_MODE) {
+        sArcadeOverrideEntrance = entrance;
+    }
+}
+
+void Arcade_ChooseRandomEntrance(PlayState* play) {
+    int randomEntrance = Arcade_GetRandomEntrance();
+
+    auto GetSceneFromEntrance = [](s16 entrance) -> s16 {
+        // Convert grotto-special entrance IDs (0x0700+/0x0800+) to real entrance indices.
+        // Grotto_GetEntranceValueHandlingGrottoRando will map grotto load/exit IDs to real entrance indices
+        // when possible (it returns a concrete entrance index for grotto load/return entries).
+        s16 resolved = Grotto_GetEntranceValueHandlingGrottoRando(entrance);
+
+        // If the grotto helper returned the same special index (unmapped) then resolved may still be a special ID.
+        // In that case, we can't map it to a scene here — return -1 to skip the same-scene check.
+        if (resolved >= ENTRANCE_GROTTO_LOAD_START && resolved < ENTRANCE_GROTTO_EXIT_START) {
+            return -1;
+        }
+        // if (resolved >= ENTRANCE_GROTTO_EXIT_START && resolved < (ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)) {
+        //     return -1;
+        // }
+
+        // resolved should now be a normal entrance index that indexes gEntranceTable.
+        return gEntranceTable[resolved].scene;
+    };
+
+    // Ensure we don't pick an entrance that leads back to the current scene.
+    // Loop until we find one that doesn't (or until a grotto can't be mapped, which is treated as "allow").
+    for (;;) {
+        s16 entranceScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
+        if (entranceScene != -1 && entranceScene == gPlayState->sceneNum) {
+            randomEntrance = Arcade_GetRandomEntrance();
+            continue;
+        }
+        break;
+    }
+
+    play->nextEntranceIndex = randomEntrance;
+
+    // ...and *request* a one-shot arcade-only override so the commit uses our chosen entrance.
+    Arcade_RequestEntranceOverride(static_cast<s16>(randomEntrance));
+
+    SPDLOG_INFO("[Arcade]: Next entrance: {}. Random entrance: {}.", play->nextEntranceIndex, randomEntrance);
+}
+
 extern "C" void Arcade_InitSave() {
 
     // Set player name to Lonk for the few textboxes that show up during Boss Rush. Player can't input their own name.
@@ -573,9 +974,11 @@ extern "C" void Arcade_InitSave() {
         gSaveContext.playerName[i] = amPlayerName[i];
     }
 
+    sArcadeScore = 0;
+
     gSaveContext.ship.quest.id = QUEST_ARCADE;
     gSaveContext.ship.quest.data.arcade.isPaused = true;
-    gSaveContext.entranceIndex = ENTR_CHAMBER_OF_THE_SAGES_0;
+    gSaveContext.entranceIndex = Arcade_GetRandomEntrance();
     gSaveContext.cutsceneIndex = 0x8000;
     gSaveContext.isMagicAcquired = 1;
 
@@ -875,13 +1278,15 @@ void Arcade_OnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_list
         }
         // Prevent saving
         case VB_BE_ABLE_TO_SAVE:
-        // Disable doors so the player can't leave the boss rooms backwards.
-        case VB_BE_ABLE_TO_OPEN_DOORS:
         // There's no heart containers in boss rush
         case VB_SPAWN_HEART_CONTAINER:
         // Rupees are useless in boss rush
         case VB_RENDER_RUPEE_COUNTER: {
             *should = false;
+            break;
+        }
+        case VB_RENDER_SCORE_DISPLAY: {
+            *should = true;
             break;
         }
         // Prevent warning spam
@@ -893,11 +1298,18 @@ void Arcade_OnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_list
     va_end(args);
 }
 
+void Arcade_UpdateScore(s32 scoreToAdd) {
+    sArcadeScore += scoreToAdd;
+    return;
+}
+
 void Arcade_OnSceneInitHandler(s16 sceneNum) {
     // Unpause the timer when the scene loaded isn't the Chamber of Sages.
     if (sceneNum != SCENE_CHAMBER_OF_THE_SAGES) {
         gSaveContext.ship.quest.data.arcade.isPaused = false;
     }
+    Arcade_UpdateScore(9);
+    Arcade_ChooseRandomEntrance(gPlayState);
 }
 
 void Arcade_OnBossDefeatHandler(void* refActor) {
@@ -937,7 +1349,121 @@ void RegisterArcadeMode() {
         COND_HOOK(OnBossDefeat, IS_ARCADE_MODE, Arcade_OnBossDefeatHandler);
 
         COND_ID_HOOK(OnActorUpdate, ACTOR_DOOR_WARP1, IS_ARCADE_MODE, Arcade_OnBlueWarpUpdate);
+
+        // Re-apply the arcade one-shot override during actor updates while a transition is active.
+        COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, [](void* actorPtr) {
+            if (sArcadeOverrideEntrance != -1 && gPlayState != NULL &&
+                gPlayState->transitionTrigger == TRANS_TRIGGER_START) {
+                gPlayState->nextEntranceIndex = sArcadeOverrideEntrance;
+                SPDLOG_DEBUG("[Arcade]: reapplied override -> play->nextEntranceIndex = {}", sArcadeOverrideEntrance);
+            }
+        });
     });
+}
+
+void Arcade_DrawCurrentScore(PlayState* play) {
+    // Draw timer based on the Gameplay Stats total time.
+    if (IS_ARCADE_MODE && VB_RENDER_SCORE_DISPLAY) {
+        s32 X_Margins_Timer = 0;
+        if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.UseMargins"), 0) != 0) {
+            if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) == ORIGINAL_LOCATION) {
+                X_Margins_Timer = Left_HUD_Margin;
+            };
+        }
+        s32 rectLeftOri = OTRGetRectDimensionFromLeftEdge(24 + X_Margins_Timer);
+        s32 rectTopOri = 73;
+        if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) != ORIGINAL_LOCATION) {
+            rectTopOri = (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosY"), 0));
+            if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) == ANCHOR_LEFT) {
+                if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.UseMargins"), 0) != 0) {
+                    X_Margins_Timer = Left_HUD_Margin;
+                };
+                rectLeftOri =
+                    OTRGetRectDimensionFromLeftEdge(CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosX"), 0) + X_Margins_Timer);
+            } else if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) == ANCHOR_RIGHT) {
+                if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.UseMargins"), 0) != 0) {
+                    X_Margins_Timer = Right_HUD_Margin;
+                };
+                rectLeftOri = OTRGetRectDimensionFromRightEdge(CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosX"), 0) +
+                                                               X_Margins_Timer);
+            } else if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) == ANCHOR_NONE) {
+                rectLeftOri = CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosX"), 0) + 204 + X_Margins_Timer;
+            } else if (CVarGetInteger(CVAR_COSMETIC("HUD.Score.PosType"), 0) == HIDDEN) {
+                rectLeftOri = -9999;
+            }
+        }
+
+        s32 rectLeft;
+        s32 rectTop;
+        s32 rectWidth = 8;
+        s32 rectHeightOri = 16;
+        s32 rectHeight;
+
+        OPEN_DISPS(play->state.gfxCtx);
+
+        gDPSetCombineLERP(OVERLAY_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0,
+                          PRIMITIVE, 0);
+
+        gDPSetOtherMode(OVERLAY_DISP++,
+                        G_AD_DISABLE | G_CD_DISABLE | G_CK_NONE | G_TC_FILT | G_TF_BILERP | G_TT_IA16 | G_TL_TILE |
+                            G_TD_CLAMP | G_TP_NONE | G_CYC_1CYCLE | G_PM_NPRIMITIVE,
+                        G_AC_NONE | G_ZS_PRIM | G_RM_XLU_SURF | G_RM_XLU_SURF2);
+
+        std::string scoreStr = std::to_string(sArcadeScore);
+        const char* totalScoreText = scoreStr.c_str();
+        size_t textLength = strlen(totalScoreText);
+        uint16_t textureIndex = 0;
+
+        for (size_t i = 0; i < textLength; i++) {
+            if (totalScoreText[i] == ':' || totalScoreText[i] == '.') {
+                textureIndex = 10;
+            } else {
+                textureIndex = totalScoreText[i] - 48;
+            }
+
+            rectLeft = rectLeftOri + (i * 8);
+            rectTop = rectTopOri;
+            rectHeight = rectHeightOri;
+
+            // Load correct digit (or : symbol)
+            gDPLoadTextureBlock(OVERLAY_DISP++, ((u8*)digitTextures[textureIndex]), G_IM_FMT_I, G_IM_SIZ_8b, rectWidth,
+                                rectHeight, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                                G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+            // Create dot image from the colon image.
+            if (totalScoreText[i] == '.') {
+                rectHeight = rectHeight / 2;
+                rectTop += 5;
+                rectLeft -= 1;
+            }
+
+            // Draw text shadow
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, 255);
+            gDPSetEnvColor(OVERLAY_DISP++, 255, 255, 255, 255);
+            gSPWideTextureRectangle(OVERLAY_DISP++, rectLeft << 2, rectTop << 2, (rectLeft + rectWidth) << 2,
+                                    (rectTop + rectHeight) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+
+            // Draw regular text. Change color based on if the timer is paused, running or the game is completed.
+            if (gSaveContext.ship.stats.gameComplete) {
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 120, 255, 0, 255);
+            } else if (IS_ARCADE_MODE && gSaveContext.ship.quest.data.arcade.isPaused &&
+                       !gSaveContext.ship.stats.rtaTiming) {
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 150, 150, 150, 255);
+            } else {
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, 255);
+            }
+
+            // Offset text so underlaying shadow is to the bottom right of the text.
+            rectLeft -= 1;
+            rectTop -= 1;
+
+            gSPWideTextureRectangle(OVERLAY_DISP++, rectLeft << 2, rectTop << 2, (rectLeft + rectWidth) << 2,
+                                    (rectTop + rectHeight) << 2, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        }
+        // free(totalScoreText);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
 }
 
 static RegisterShipInitFunc initFunc(RegisterArcadeMode);

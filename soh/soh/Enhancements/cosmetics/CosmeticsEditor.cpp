@@ -495,6 +495,7 @@ static const char* MarginCvarList[]{
     CVAR_COSMETIC("HUD.Minimap"),       CVAR_COSMETIC("HUD.SmallKey"),       CVAR_COSMETIC("HUD.Rupees"),
     CVAR_COSMETIC("HUD.Carrots"),       CVAR_COSMETIC("HUD.Timers"),         CVAR_COSMETIC("HUD.ArcheryScore"),
     CVAR_COSMETIC("HUD.TitleCard.Map"), CVAR_COSMETIC("HUD.TitleCard.Boss"), CVAR_COSMETIC("HUD.IGT"),
+    CVAR_COSMETIC("HUD.Score"),
 };
 
 static const char* MarginCvarNonAnchor[]{
@@ -1892,6 +1893,10 @@ void Draw_Placements() {
                         "In-game Gameplay Timer", CVAR_COSMETIC("HUD.IGT"), 0,
                         static_cast<int>(ImGui::GetWindowViewport()->Size.y / 2), -50,
                         static_cast<int>(ImGui::GetWindowViewport()->Size.x / 2) + 10, 1.0f);
+    Draw_Table_Dropdown("In-game Arcade Score position", "tablearcadescore", "In-game Arcade Score settings",
+                       "In-game Arcade Score", CVAR_COSMETIC("HUD.Score"), 0,
+                       static_cast<int>(ImGui::GetWindowViewport()->Size.y / 2), -50,
+                       static_cast<int>(ImGui::GetWindowViewport()->Size.x / 2) + 10, 1.0f);
     if (ImGui::CollapsingHeader("Enemy Health Bar position")) {
         if (ImGui::BeginTable("enemyhealthbar", 1, FlagsTable)) {
             ImGui::TableSetupColumn("Enemy Health Bar settings", FlagsCell, TablesCellsWidth);

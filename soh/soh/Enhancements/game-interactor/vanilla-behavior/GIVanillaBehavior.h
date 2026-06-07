@@ -2038,6 +2038,14 @@ typedef enum {
     // true
     // ```
     // #### `args`
+    // - None
+    VB_RENDER_SCORE_DISPLAY,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
     // - `**Gfx` (`&POLY_OPA_DISP`)
     VB_RENDER_YES_ON_CONTINUE_PROMPT,
 
