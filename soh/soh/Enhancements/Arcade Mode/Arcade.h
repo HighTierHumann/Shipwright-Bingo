@@ -40,3 +40,18 @@ typedef enum {
     AM_CHOICE_HYPERBOSSES_NO,
     AM_CHOICE_HYPERBOSSES_YES,
 } ArcadeHyperBossesChoices;
+
+typedef enum {
+    REQ_NONE,
+
+    // Inventory
+    REQ_STICKS,    REQ_NUTS,    REQ_BOMBS,    REQ_BOW,      REQ_FIRE_ARROWS,  REQ_DINS,
+    REQ_SLINGSHOT, REQ_OCARINA, REQ_BOMBCHUS, REQ_HOOKSHOT, REQ_ICE_ARROWS, //REQ_FARORES // Will never be required or obtainable, but here for ordering
+    REQ_BOOMERANG, REQ_LENS,    REQ_BEANS,    REQ_HAMMER,   REQ_LIGHT_ARROWS, REQ_NAYRUS,
+
+    //Equipment
+    REQ_BGS,
+    REQ_GORON_TUNIC, REQ_ZORA_TUNIC,
+    REQ_SHIELD,      REQ_MIRROR_SHIELD,
+    REQ_IRON_BOOTS,  REQ_HOVER_BOOTS,
+} Arcade_SpawnLogicRequirements;

@@ -6,11 +6,13 @@
 #include "soh_assets.h"
 #include "soh/frame_interpolation.h"
 #include "soh/OTRGlobals.h"
+#include "include/z64camera.h"
 
 #include <array>
 #include <string>
 #include <vector>
 #include <random>
+#include <unordered_map>
 
 extern "C" {
 #include "functions.h"
@@ -19,6 +21,8 @@ extern "C" {
 #include "src/overlays/actors/ovl_Boss_Goma/z_boss_goma.h"
 #include "src/overlays/actors/ovl_Boss_Mo/z_boss_mo.h"
 #include "src/overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
+#include "src/overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
+#include "src/overlays/actors/ovl_En_Door/z_en_door.h"
 #include "src/overlays/gamestates/ovl_file_choose/file_choose.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "textures/icon_item_nes_static/icon_item_nes_static.h"
@@ -35,6 +39,9 @@ void FileChoose_DrawTextRec(GraphicsContext* gfxCtx, s32 r, s32 g, s32 b, s32 a,
 
 static s32 sArcadeScore = -1;
 static s16 sArcadeOverrideEntrance = -1;
+static s8 sArcadeOverrideRoom = -1;
+static s8 sArcadeTransitionsMade = -1;
+static ActorEntry modifiedLinkActorEntry = { 0 };
 
 // Use the existing UI variables from z_parameter.c
 extern "C" {
@@ -120,6 +127,15 @@ typedef struct ArcadeSetting {
     std::array<std::string, LANGUAGE_MAX> name;
     std::vector<std::array<std::string, LANGUAGE_MAX>> choices;
 } ArcadeSetting;
+
+struct ArcadeSpawn {
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 rotY;
+    u16 params;
+    Arcade_SpawnLogicRequirements requirement = REQ_NONE;
+};
 
 ArcadeSetting ArcadeOptions[AM_OPTIONS_MAX] = {
     { { "BOSSES:", "BOSSE:", "BOSS:" },
@@ -382,6 +398,11 @@ void FileChoose_DrawArcadeMenuWindowContents(FileChooseContext* fileChooseContex
     CLOSE_DISPS(fileChooseContext->state.gfxCtx);
 }
 
+void Arcade_UpdateScore(s32 scoreToAdd) {
+    sArcadeScore += scoreToAdd;
+    return;
+}
+
 void Arcade_SpawnBlueWarps(PlayState* play) {
 
     // Spawn blue warps in Chamber of Sages based on what bosses have been defeated.
@@ -538,6 +559,7 @@ void Arcade_HandleBlueWarpHeal(PlayState* play) {
 }
 
 void Arcade_HandleCompleteBoss(PlayState* play) {
+    Arcade_UpdateScore(1000);
     gSaveContext.ship.quest.data.arcade.isPaused = true;
     switch (play->sceneNum) {
         case SCENE_DEKU_TREE_BOSS:
@@ -592,321 +614,321 @@ int Arcade_GetRandomEntrance() {
         // clang-format off
         // Index
         ENTR_DEKU_TREE_ENTRANCE,
-        ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE,
         ENTR_DODONGOS_CAVERN_ENTRANCE,
-        ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN,
-        ENTR_JABU_JABU_ENTRANCE,
-        ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU,
-        ENTR_FOREST_TEMPLE_ENTRANCE,
-        ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE,
-        ENTR_FIRE_TEMPLE_ENTRANCE,
-        ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE,
-        ENTR_WATER_TEMPLE_ENTRANCE,
-        ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,
-        ENTR_SPIRIT_TEMPLE_ENTRANCE,
-        ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE,
-        ENTR_SHADOW_TEMPLE_ENTRANCE,
-        ENTR_GRAVEYARD_OUTSIDE_TEMPLE,
-        ENTR_BOTTOM_OF_THE_WELL_ENTRANCE,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_BOTTOM_OF_THE_WELL,
-        ENTR_ICE_CAVERN_ENTRANCE,
-        ENTR_ZORAS_FOUNTAIN_OUTSIDE_ICE_CAVERN,
-        ENTR_GERUDO_TRAINING_GROUND_ENTRANCE,
-        ENTR_GERUDOS_FORTRESS_OUTSIDE_GERUDO_TRAINING_GROUND,
-        ENTR_INSIDE_GANONS_CASTLE_ENTRANCE,
-        ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN,
+        //ENTR_JABU_JABU_ENTRANCE,
+        //ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU,
+        //ENTR_FOREST_TEMPLE_ENTRANCE,
+        //ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE,
+        //ENTR_FIRE_TEMPLE_ENTRANCE,
+        //ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE,
+        //ENTR_WATER_TEMPLE_ENTRANCE,
+        //ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,
+        //ENTR_SPIRIT_TEMPLE_ENTRANCE,
+        //ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE,
+        //ENTR_SHADOW_TEMPLE_ENTRANCE,
+        //ENTR_GRAVEYARD_OUTSIDE_TEMPLE,
+        //ENTR_BOTTOM_OF_THE_WELL_ENTRANCE,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_BOTTOM_OF_THE_WELL,
+        //ENTR_ICE_CAVERN_ENTRANCE,
+        //ENTR_ZORAS_FOUNTAIN_OUTSIDE_ICE_CAVERN,
+        //ENTR_GERUDO_TRAINING_GROUND_ENTRANCE,
+        //ENTR_GERUDOS_FORTRESS_OUTSIDE_GERUDO_TRAINING_GROUND,
+        //ENTR_INSIDE_GANONS_CASTLE_ENTRANCE,
+        //ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT,
         
-        ENTR_MIDOS_HOUSE_0,
-        ENTR_KOKIRI_FOREST_OUTSIDE_MIDOS_HOUSE,
-        ENTR_SARIAS_HOUSE_0,
-        ENTR_KOKIRI_FOREST_OUTSIDE_SARIAS_HOUSE,
-        ENTR_TWINS_HOUSE_0,
-        ENTR_KOKIRI_FOREST_OUTSIDE_TWINS_HOUSE,
-        ENTR_KNOW_IT_ALL_BROS_HOUSE_0,
-        ENTR_KOKIRI_FOREST_OUTSIDE_KNOW_IT_ALL_HOUSE,
-        ENTR_KOKIRI_SHOP_0,
-        ENTR_KOKIRI_FOREST_OUTSIDE_SHOP,
-        ENTR_LAKESIDE_LABORATORY_0,
-        ENTR_LAKE_HYLIA_OUTSIDE_LAB,
-        ENTR_FISHING_POND_0,
-        ENTR_LAKE_HYLIA_OUTSIDE_FISHING_POND,
-        ENTR_CARPENTERS_TENT_0,
-        ENTR_GERUDO_VALLEY_OUTSIDE_TENT,
-        ENTR_MARKET_GUARD_HOUSE_0,
-        ENTR_MARKET_ENTRANCE_OUTSIDE_GUARD_HOUSE,
-        ENTR_HAPPY_MASK_SHOP_0,
-        ENTR_MARKET_DAY_OUTSIDE_HAPPY_MASK_SHOP,
-        ENTR_BOMBCHU_BOWLING_ALLEY_0,
-        ENTR_MARKET_DAY_OUTSIDE_BOMBCHU_BOWLING,
-        ENTR_POTION_SHOP_MARKET_0,
-        ENTR_MARKET_DAY_OUTSIDE_POTION_SHOP,
-        ENTR_TREASURE_BOX_SHOP_0,
-        ENTR_MARKET_DAY_OUTSIDE_TREASURE_BOX_SHOP,
-        ENTR_BOMBCHU_SHOP_1,
-        ENTR_BACK_ALLEY_DAY_OUTSIDE_BOMBCHU_SHOP,
-        ENTR_BACK_ALLEY_MAN_IN_GREEN_HOUSE,
-        ENTR_BACK_ALLEY_DAY_OUTSIDE_MAN_IN_GREEN_HOUSE,
-        ENTR_KAKARIKO_CENTER_GUEST_HOUSE_0,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_CENTER_GUEST_HOUSE,
-        ENTR_HOUSE_OF_SKULLTULA_0,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SKULKLTULA_HOUSE,
-        ENTR_IMPAS_HOUSE_FRONT,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_FRONT,
-        ENTR_IMPAS_HOUSE_BACK,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_BACK,
-        ENTR_POTION_SHOP_GRANNY_0,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOP_GRANNY,
-        ENTR_GRAVEKEEPERS_HUT_0,
-        ENTR_GRAVEYARD_OUTSIDE_DAMPES_HUT,
-        ENTR_GORON_SHOP_0,
-        ENTR_GORON_CITY_OUTSIDE_SHOP,
-        ENTR_ZORA_SHOP_0,
-        ENTR_ZORAS_DOMAIN_OUTSIDE_SHOP,
-        ENTR_LON_LON_BUILDINGS_TALONS_HOUSE,
-        ENTR_LON_LON_RANCH_OUTSIDE_TALONS_HOUSE,
-        ENTR_STABLE_0,
-        ENTR_LON_LON_RANCH_OUTSIDE_STABLES,
-        ENTR_LON_LON_BUILDINGS_TOWER,
-        ENTR_LON_LON_RANCH_OUTSIDE_TOWER,
-        ENTR_BAZAAR_1,
-        ENTR_MARKET_DAY_OUTSIDE_BAZAAR,
-        ENTR_SHOOTING_GALLERY_1,
-        ENTR_MARKET_DAY_OUTSIDE_SHOOTING_GALLERY,
-        ENTR_BAZAAR_0,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_BAZAAR,
-        ENTR_SHOOTING_GALLERY_0,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOOTING_GALLERY,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_NAYRUS_COLOSSUS,
-        ENTR_DESERT_COLOSSUS_GREAT_FAIRY_EXIT,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_DINS_HC,
-        ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_OGC_DD,
-        // ENTR_POTION_SHOP_KAKARIKO_1 is an unused entrance index repurposed to differentiate between HC and OGC fairy fountain exits
-        // (normally both use ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT)
-        ENTR_POTION_SHOP_KAKARIKO_1,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMC,
-        ENTR_DEATH_MOUNTAIN_CRATER_GREAT_FAIRY_EXIT,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMT,
-        ENTR_DEATH_MOUNTAIN_TRAIL_GREAT_FAIRY_EXIT,
-        ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_FARORES_ZF,
-        ENTR_ZORAS_FOUNTAIN_OUTSIDE_GREAT_FAIRY,
-        
-        ENTR_LINKS_HOUSE_1,
-        ENTR_KOKIRI_FOREST_OUTSIDE_LINKS_HOUSE,
-        ENTR_TEMPLE_OF_TIME_ENTRANCE,
-        ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_OUTSIDE_TEMPLE,
-        ENTR_WINDMILL_AND_DAMPES_GRAVE_WINDMILL,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_WINDMILL,
-        ENTR_POTION_SHOP_KAKARIKO_FRONT,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_FRONT,
-        ENTR_POTION_SHOP_KAKARIKO_BACK,
-        ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_BACK,
-        
-        ENTR_THIEVES_HIDEOUT_0,
-        ENTR_GERUDOS_FORTRESS_1,
-        ENTR_THIEVES_HIDEOUT_1,
-        ENTR_GERUDOS_FORTRESS_2,
-        ENTR_THIEVES_HIDEOUT_2,
-        ENTR_GERUDOS_FORTRESS_3,
-        ENTR_THIEVES_HIDEOUT_3,
-        ENTR_GERUDOS_FORTRESS_4,
-        ENTR_THIEVES_HIDEOUT_4,
-        ENTR_GERUDOS_FORTRESS_5,
-        ENTR_THIEVES_HIDEOUT_5,
-        ENTR_GERUDOS_FORTRESS_6,
-        ENTR_THIEVES_HIDEOUT_6,
-        ENTR_GERUDOS_FORTRESS_7,
-        ENTR_THIEVES_HIDEOUT_7,
-        ENTR_GERUDOS_FORTRESS_8,
-        ENTR_THIEVES_HIDEOUT_8,
-        ENTR_GERUDOS_FORTRESS_9,
-        ENTR_THIEVES_HIDEOUT_9,
-        ENTR_GERUDOS_FORTRESS_10,
-        ENTR_THIEVES_HIDEOUT_10,
-        ENTR_GERUDOS_FORTRESS_11,
-        ENTR_THIEVES_HIDEOUT_11,
-        ENTR_GERUDOS_FORTRESS_12,
-        ENTR_THIEVES_HIDEOUT_12,
-        ENTR_GERUDOS_FORTRESS_13,
+        //ENTR_MIDOS_HOUSE_0,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_MIDOS_HOUSE,
+        //ENTR_SARIAS_HOUSE_0,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_SARIAS_HOUSE,
+        //ENTR_TWINS_HOUSE_0,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_TWINS_HOUSE,
+        //ENTR_KNOW_IT_ALL_BROS_HOUSE_0,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_KNOW_IT_ALL_HOUSE,
+        //ENTR_KOKIRI_SHOP_0,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_SHOP,
+        //ENTR_LAKESIDE_LABORATORY_0,
+        //ENTR_LAKE_HYLIA_OUTSIDE_LAB,
+        //ENTR_FISHING_POND_0,
+        //ENTR_LAKE_HYLIA_OUTSIDE_FISHING_POND,
+        //ENTR_CARPENTERS_TENT_0,
+        //ENTR_GERUDO_VALLEY_OUTSIDE_TENT,
+        //ENTR_MARKET_GUARD_HOUSE_0,
+        //ENTR_MARKET_ENTRANCE_OUTSIDE_GUARD_HOUSE,
+        //ENTR_HAPPY_MASK_SHOP_0,
+        //ENTR_MARKET_DAY_OUTSIDE_HAPPY_MASK_SHOP,
+        //ENTR_BOMBCHU_BOWLING_ALLEY_0,
+        //ENTR_MARKET_DAY_OUTSIDE_BOMBCHU_BOWLING,
+        //ENTR_POTION_SHOP_MARKET_0,
+        //ENTR_MARKET_DAY_OUTSIDE_POTION_SHOP,
+        //ENTR_TREASURE_BOX_SHOP_0,
+        //ENTR_MARKET_DAY_OUTSIDE_TREASURE_BOX_SHOP,
+        //ENTR_BOMBCHU_SHOP_1,
+        //ENTR_BACK_ALLEY_DAY_OUTSIDE_BOMBCHU_SHOP,
+        //ENTR_BACK_ALLEY_MAN_IN_GREEN_HOUSE,
+        //ENTR_BACK_ALLEY_DAY_OUTSIDE_MAN_IN_GREEN_HOUSE,
+        //ENTR_KAKARIKO_CENTER_GUEST_HOUSE_0,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_CENTER_GUEST_HOUSE,
+        //ENTR_HOUSE_OF_SKULLTULA_0,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_SKULKLTULA_HOUSE,
+        //ENTR_IMPAS_HOUSE_FRONT,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_FRONT,
+        //ENTR_IMPAS_HOUSE_BACK,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_IMPAS_HOUSE_BACK,
+        //ENTR_POTION_SHOP_GRANNY_0,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOP_GRANNY,
+        //ENTR_GRAVEKEEPERS_HUT_0,
+        //ENTR_GRAVEYARD_OUTSIDE_DAMPES_HUT,
+        //ENTR_GORON_SHOP_0,
+        //ENTR_GORON_CITY_OUTSIDE_SHOP,
+        //ENTR_ZORA_SHOP_0,
+        //ENTR_ZORAS_DOMAIN_OUTSIDE_SHOP,
+        //ENTR_LON_LON_BUILDINGS_TALONS_HOUSE,
+        //ENTR_LON_LON_RANCH_OUTSIDE_TALONS_HOUSE,
+        //ENTR_STABLE_0,
+        //ENTR_LON_LON_RANCH_OUTSIDE_STABLES,
+        //ENTR_LON_LON_BUILDINGS_TOWER,
+        //ENTR_LON_LON_RANCH_OUTSIDE_TOWER,
+        //ENTR_BAZAAR_1,
+        //ENTR_MARKET_DAY_OUTSIDE_BAZAAR,
+        //ENTR_SHOOTING_GALLERY_1,
+        //ENTR_MARKET_DAY_OUTSIDE_SHOOTING_GALLERY,
+        //ENTR_BAZAAR_0,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_BAZAAR,
+        //ENTR_SHOOTING_GALLERY_0,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_SHOOTING_GALLERY,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_NAYRUS_COLOSSUS,
+        //ENTR_DESERT_COLOSSUS_GREAT_FAIRY_EXIT,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_DINS_HC,
+        //ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_OGC_DD,
+        //// ENTR_POTION_SHOP_KAKARIKO_1 is an unused entrance index repurposed to differentiate between HC and OGC fairy fountain exits
+        //// (normally both use ENTR_CASTLE_GROUNDS_GREAT_FAIRY_EXIT)
+        //ENTR_POTION_SHOP_KAKARIKO_1,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMC,
+        //ENTR_DEATH_MOUNTAIN_CRATER_GREAT_FAIRY_EXIT,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_MAGIC_DMT,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_GREAT_FAIRY_EXIT,
+        //ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_FARORES_ZF,
+        //ENTR_ZORAS_FOUNTAIN_OUTSIDE_GREAT_FAIRY,
+        //
+        //ENTR_LINKS_HOUSE_1,
+        //ENTR_KOKIRI_FOREST_OUTSIDE_LINKS_HOUSE,
+        //ENTR_TEMPLE_OF_TIME_ENTRANCE,
+        //ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_OUTSIDE_TEMPLE,
+        //ENTR_WINDMILL_AND_DAMPES_GRAVE_WINDMILL,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_WINDMILL,
+        //ENTR_POTION_SHOP_KAKARIKO_FRONT,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_FRONT,
+        //ENTR_POTION_SHOP_KAKARIKO_BACK,
+        //ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_BACK,
+        //
+        //ENTR_THIEVES_HIDEOUT_0,
+        //ENTR_GERUDOS_FORTRESS_1,
+        //ENTR_THIEVES_HIDEOUT_1,
+        //ENTR_GERUDOS_FORTRESS_2,
+        //ENTR_THIEVES_HIDEOUT_2,
+        //ENTR_GERUDOS_FORTRESS_3,
+        //ENTR_THIEVES_HIDEOUT_3,
+        //ENTR_GERUDOS_FORTRESS_4,
+        //ENTR_THIEVES_HIDEOUT_4,
+        //ENTR_GERUDOS_FORTRESS_5,
+        //ENTR_THIEVES_HIDEOUT_5,
+        //ENTR_GERUDOS_FORTRESS_6,
+        //ENTR_THIEVES_HIDEOUT_6,
+        //ENTR_GERUDOS_FORTRESS_7,
+        //ENTR_THIEVES_HIDEOUT_7,
+        //ENTR_GERUDOS_FORTRESS_8,
+        //ENTR_THIEVES_HIDEOUT_8,
+        //ENTR_GERUDOS_FORTRESS_9,
+        //ENTR_THIEVES_HIDEOUT_9,
+        //ENTR_GERUDOS_FORTRESS_10,
+        //ENTR_THIEVES_HIDEOUT_10,
+        //ENTR_GERUDOS_FORTRESS_11,
+        //ENTR_THIEVES_HIDEOUT_11,
+        //ENTR_GERUDOS_FORTRESS_12,
+        //ENTR_THIEVES_HIDEOUT_12,
+        //ENTR_GERUDOS_FORTRESS_13,
 
         // Grotto Loads use an entrance index of 0x0700 + their grotto id. The id is used as index for the
         // grottoLoadTable in soh/soh/Enhancements/randomizer/randomizer_grotto.c
         // Grotto Returns use an entrance index of 0x0800 + their grotto id. The id is used as index for the
         // grottoReturnTable in soh/soh/Enhancements/randomizer/randomizer_grotto.c
-        ENTRANCE_GROTTO_LOAD(GROTTO_COLOSSUS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_COLOSSUS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_LH_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_LH_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_ZR_OPEN_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_ZR_OPEN_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_DMC_HAMMER_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_DMC_HAMMER_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_DMC_UPPER_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_DMC_UPPER_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_GORON_CITY_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_GORON_CITY_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_DMT_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_DMT_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_DMT_COW_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_DMT_COW_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_KAK_OPEN_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_KAK_OPEN_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_KAK_REDEAD_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_KAK_REDEAD_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HC_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HC_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_TEKTITE_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_TEKTITE_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_KAK_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_KAK_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_MARKET_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_MARKET_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_COW_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_COW_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_INSIDE_FENCE_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_INSIDE_FENCE_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_OPEN_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_OPEN_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_HF_SOUTHEAST_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_HF_SOUTHEAST_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_LLR_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_LLR_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_WOLFOS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_WOLFOS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_SFM_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_SFM_FAIRY_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_LW_SCRUBS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_LW_SCRUBS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_KF_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_KF_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_ZD_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_ZD_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_GF_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_GF_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_GV_STORMS_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_GV_STORMS_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_GV_OCTOROK_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_GV_OCTOROK_OFFSET),
-        ENTRANCE_GROTTO_LOAD(GROTTO_LW_DEKU_THEATRE_OFFSET),
-        ENTRANCE_GROTTO_EXIT(GROTTO_LW_DEKU_THEATRE_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_COLOSSUS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_COLOSSUS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_LH_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_LH_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_ZR_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_ZR_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_ZR_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_ZR_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_ZR_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_ZR_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_DMC_HAMMER_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_DMC_HAMMER_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_DMC_UPPER_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_DMC_UPPER_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_GORON_CITY_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_GORON_CITY_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_DMT_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_DMT_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_DMT_COW_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_DMT_COW_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_KAK_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_KAK_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_KAK_REDEAD_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_KAK_REDEAD_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HC_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HC_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_TEKTITE_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_TEKTITE_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_KAK_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_KAK_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_NEAR_MARKET_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_NEAR_MARKET_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_COW_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_COW_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_INSIDE_FENCE_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_INSIDE_FENCE_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_OPEN_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_HF_SOUTHEAST_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_HF_SOUTHEAST_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_LLR_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_LLR_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_SFM_WOLFOS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_SFM_WOLFOS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_SFM_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_SFM_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_SFM_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_SFM_FAIRY_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_LW_SCRUBS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_LW_SCRUBS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_LW_NEAR_SHORTCUTS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_KF_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_KF_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_ZD_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_ZD_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_GF_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_GF_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_GV_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_GV_STORMS_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_GV_OCTOROK_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_GV_OCTOROK_OFFSET),
+        //ENTRANCE_GROTTO_LOAD(GROTTO_LW_DEKU_THEATRE_OFFSET),
+        //ENTRANCE_GROTTO_EXIT(GROTTO_LW_DEKU_THEATRE_OFFSET),
         
         // Graves have their own specified entrance indices
-        ENTR_GRAVE_WITH_FAIRYS_FOUNTAIN_0,
-        ENTR_GRAVEYARD_SHIELD_GRAVE_EXIT,
-        ENTR_REDEAD_GRAVE_0,
-        ENTR_GRAVEYARD_HEART_PIECE_GRAVE_EXIT,
-        ENTR_ROYAL_FAMILYS_TOMB_0,
-        ENTR_GRAVEYARD_ROYAL_TOMB_EXIT,
-        ENTR_WINDMILL_AND_DAMPES_GRAVE_GRAVE,
-        ENTR_GRAVEYARD_DAMPES_GRAVE_EXIT,
-        
-        ENTR_LOST_WOODS_BRIDGE_EAST_EXIT,
-        ENTR_KOKIRI_FOREST_LOWER_EXIT,
-        ENTR_LOST_WOODS_SOUTH_EXIT,
-        ENTR_KOKIRI_FOREST_UPPER_EXIT,
-        ENTR_GORON_CITY_TUNNEL_SHORTCUT,
-        ENTR_LOST_WOODS_TUNNEL_SHORTCUT,
-        ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT,
-        ENTR_LOST_WOODS_UNDERWATER_SHORTCUT,
-        ENTR_SACRED_FOREST_MEADOW_SOUTH_EXIT,
-        ENTR_LOST_WOODS_NORTH_EXIT,
-        ENTR_HYRULE_FIELD_WOODED_EXIT,
-        ENTR_LOST_WOODS_BRIDGE_WEST_EXIT,
-        ENTR_LAKE_HYLIA_NORTH_EXIT,
-        ENTR_HYRULE_FIELD_FENCE_EXIT,
-        ENTR_GERUDO_VALLEY_EAST_EXIT,
-        ENTR_HYRULE_FIELD_ROCKY_PATH,
-        ENTR_MARKET_ENTRANCE_NEAR_GUARD_EXIT,
-        ENTR_HYRULE_FIELD_ON_BRIDGE_SPAWN,
-        ENTR_KAKARIKO_VILLAGE_FRONT_GATE,
-        ENTR_HYRULE_FIELD_STAIRS_EXIT,
-        ENTR_ZORAS_RIVER_WEST_EXIT,
-        ENTR_HYRULE_FIELD_RIVER_EXIT,
-        ENTR_LON_LON_RANCH_ENTRANCE,
-        ENTR_HYRULE_FIELD_CENTER_EXIT,
-        ENTR_ZORAS_DOMAIN_UNDERWATER_SHORTCUT,
-        ENTR_LAKE_HYLIA_UNDERWATER_SHORTCUT,
-        ENTR_GERUDOS_FORTRESS_EAST_EXIT,
-        ENTR_GERUDO_VALLEY_WEST_EXIT,
-        ENTR_HAUNTED_WASTELAND_EAST_EXIT,
-        ENTR_GERUDOS_FORTRESS_GATE_EXIT,
-        ENTR_DESERT_COLOSSUS_EAST_EXIT,
-        ENTR_HAUNTED_WASTELAND_WEST_EXIT,
-        ENTR_MARKET_SOUTH_EXIT,
-        ENTR_MARKET_ENTRANCE_NORTH_EXIT,
-        ENTR_CASTLE_GROUNDS_SOUTH_EXIT,
-        ENTR_MARKET_DAY_CASTLE_EXIT,
-        ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_GOSSIP_STONE_EXIT,
-        ENTR_MARKET_DAY_TEMPLE_EXIT,
-        ENTR_GRAVEYARD_ENTRANCE,
-        ENTR_KAKARIKO_VILLAGE_SOUTHEAST_EXIT,
-        ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT,
-        ENTR_KAKARIKO_VILLAGE_GUARD_GATE,
-        ENTR_GORON_CITY_UPPER_EXIT,
-        ENTR_DEATH_MOUNTAIN_TRAIL_GC_EXIT,
-        ENTR_DEATH_MOUNTAIN_CRATER_GC_EXIT,
-        ENTR_GORON_CITY_DARUNIA_ROOM_EXIT,
-        ENTR_DEATH_MOUNTAIN_CRATER_UPPER_EXIT,
-        ENTR_DEATH_MOUNTAIN_TRAIL_SUMMIT_EXIT,
-        ENTR_ZORAS_DOMAIN_ENTRANCE,
-        ENTR_ZORAS_RIVER_WATERFALL_EXIT,
-        ENTR_ZORAS_FOUNTAIN_TUNNEL_EXIT,
-        ENTR_ZORAS_DOMAIN_KING_ZORA_EXIT,
-        
-        ENTR_LAKE_HYLIA_RIVER_EXIT,
-        
-        ENTR_HYRULE_FIELD_OWL_DROP,
-        ENTR_KAKARIKO_VILLAGE_OWL_DROP,
-        
-        ENTR_LINKS_HOUSE_CHILD_SPAWN,
-        ENTR_HYRULE_FIELD_10, // 0x282 is an unused entrance index repurposed to differentiate between
-                                // Adult Spawn and prelude of light (normally they both use 0x5F4)
-        ENTR_SACRED_FOREST_MEADOW_WARP_PAD,
-        ENTR_DEATH_MOUNTAIN_CRATER_WARP_PAD,
-        ENTR_LAKE_HYLIA_WARP_PAD,
-        ENTR_DESERT_COLOSSUS_WARP_PAD,
-        ENTR_GRAVEYARD_WARP_PAD,
-        ENTR_TEMPLE_OF_TIME_WARP_PAD,
-        
-        ENTR_DEKU_TREE_BOSS_ENTRANCE,
-        ENTR_DEKU_TREE_BOSS_DOOR,
-        ENTR_DODONGOS_CAVERN_BOSS_ENTRANCE,
-        ENTR_DODONGOS_CAVERN_BOSS_DOOR,
-        ENTR_JABU_JABU_BOSS_ENTRANCE,
-        ENTR_JABU_JABU_BOSS_DOOR,
-        ENTR_FOREST_TEMPLE_BOSS_ENTRANCE,
-        ENTR_FOREST_TEMPLE_BOSS_DOOR,
-        ENTR_FIRE_TEMPLE_BOSS_ENTRANCE,
-        ENTR_FIRE_TEMPLE_BOSS_DOOR,
-        ENTR_WATER_TEMPLE_BOSS_ENTRANCE,
-        ENTR_WATER_TEMPLE_BOSS_DOOR,
-        ENTR_SPIRIT_TEMPLE_BOSS_ENTRANCE,
-        ENTR_SPIRIT_TEMPLE_BOSS_DOOR,
-        ENTR_SHADOW_TEMPLE_BOSS_ENTRANCE,
-        ENTR_SHADOW_TEMPLE_BOSS_DOOR,
-
-        ENTR_GANONS_TOWER_0,
-        ENTR_INSIDE_GANONS_CASTLE_1,
-
-        ENTR_KOKIRI_FOREST_DEKU_TREE_BLUE_WARP,
-        ENTR_DEATH_MOUNTAIN_TRAIL_DODONGO_BLUE_WARP,
-        ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP,
-        ENTR_SACRED_FOREST_MEADOW_FOREST_TEMPLE_BLUE_WARP,
-        ENTR_DEATH_MOUNTAIN_CRATER_FIRE_TEMPLE_BLUE_WARP,
-        ENTR_LAKE_HYLIA_WATER_TEMPLE_BLUE_WARP,
-        ENTR_DESERT_COLOSSUS_SPIRIT_TEMPLE_BLUE_WARP,
-        ENTR_GRAVEYARD_SHADOW_TEMPLE_BLUE_WARP,
-        ENTR_OUTSIDE_GANONS_CASTLE_1_2,
+        //ENTR_GRAVE_WITH_FAIRYS_FOUNTAIN_0,
+        //ENTR_GRAVEYARD_SHIELD_GRAVE_EXIT,
+        //ENTR_REDEAD_GRAVE_0,
+        //ENTR_GRAVEYARD_HEART_PIECE_GRAVE_EXIT,
+        //ENTR_ROYAL_FAMILYS_TOMB_0,
+        //ENTR_GRAVEYARD_ROYAL_TOMB_EXIT,
+        //ENTR_WINDMILL_AND_DAMPES_GRAVE_GRAVE,
+        //ENTR_GRAVEYARD_DAMPES_GRAVE_EXIT,
+        //
+        //ENTR_LOST_WOODS_BRIDGE_EAST_EXIT,
+        //ENTR_KOKIRI_FOREST_LOWER_EXIT,
+        //ENTR_LOST_WOODS_SOUTH_EXIT,
+        //ENTR_KOKIRI_FOREST_UPPER_EXIT,
+        //ENTR_GORON_CITY_TUNNEL_SHORTCUT,
+        //ENTR_LOST_WOODS_TUNNEL_SHORTCUT,
+        //ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT,
+        //ENTR_LOST_WOODS_UNDERWATER_SHORTCUT,
+        //ENTR_SACRED_FOREST_MEADOW_SOUTH_EXIT,
+        //ENTR_LOST_WOODS_NORTH_EXIT,
+        //ENTR_HYRULE_FIELD_WOODED_EXIT,
+        //ENTR_LOST_WOODS_BRIDGE_WEST_EXIT,
+        //ENTR_LAKE_HYLIA_NORTH_EXIT,
+        //ENTR_HYRULE_FIELD_FENCE_EXIT,
+        //ENTR_GERUDO_VALLEY_EAST_EXIT,
+        //ENTR_HYRULE_FIELD_ROCKY_PATH,
+        //ENTR_MARKET_ENTRANCE_NEAR_GUARD_EXIT,
+        //ENTR_HYRULE_FIELD_ON_BRIDGE_SPAWN,
+        //ENTR_KAKARIKO_VILLAGE_FRONT_GATE,
+        //ENTR_HYRULE_FIELD_STAIRS_EXIT,
+        //ENTR_ZORAS_RIVER_WEST_EXIT,
+        //ENTR_HYRULE_FIELD_RIVER_EXIT,
+        //ENTR_LON_LON_RANCH_ENTRANCE,
+        //ENTR_HYRULE_FIELD_CENTER_EXIT,
+        //ENTR_ZORAS_DOMAIN_UNDERWATER_SHORTCUT,
+        //ENTR_LAKE_HYLIA_UNDERWATER_SHORTCUT,
+        //ENTR_GERUDOS_FORTRESS_EAST_EXIT,
+        //ENTR_GERUDO_VALLEY_WEST_EXIT,
+        //ENTR_HAUNTED_WASTELAND_EAST_EXIT,
+        //ENTR_GERUDOS_FORTRESS_GATE_EXIT,
+        //ENTR_DESERT_COLOSSUS_EAST_EXIT,
+        //ENTR_HAUNTED_WASTELAND_WEST_EXIT,
+        //ENTR_MARKET_SOUTH_EXIT,
+        //ENTR_MARKET_ENTRANCE_NORTH_EXIT,
+        //ENTR_CASTLE_GROUNDS_SOUTH_EXIT,
+        //ENTR_MARKET_DAY_CASTLE_EXIT,
+        //ENTR_TEMPLE_OF_TIME_EXTERIOR_DAY_GOSSIP_STONE_EXIT,
+        //ENTR_MARKET_DAY_TEMPLE_EXIT,
+        //ENTR_GRAVEYARD_ENTRANCE,
+        //ENTR_KAKARIKO_VILLAGE_SOUTHEAST_EXIT,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT,
+        //ENTR_KAKARIKO_VILLAGE_GUARD_GATE,
+        //ENTR_GORON_CITY_UPPER_EXIT,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_GC_EXIT,
+        //ENTR_DEATH_MOUNTAIN_CRATER_GC_EXIT,
+        //ENTR_GORON_CITY_DARUNIA_ROOM_EXIT,
+        //ENTR_DEATH_MOUNTAIN_CRATER_UPPER_EXIT,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_SUMMIT_EXIT,
+        //ENTR_ZORAS_DOMAIN_ENTRANCE,
+        //ENTR_ZORAS_RIVER_WATERFALL_EXIT,
+        //ENTR_ZORAS_FOUNTAIN_TUNNEL_EXIT,
+        //ENTR_ZORAS_DOMAIN_KING_ZORA_EXIT,
+        //
+        //ENTR_LAKE_HYLIA_RIVER_EXIT,
+        //
+        //ENTR_HYRULE_FIELD_OWL_DROP,
+        //ENTR_KAKARIKO_VILLAGE_OWL_DROP,
+        //
+        //ENTR_LINKS_HOUSE_CHILD_SPAWN,
+        //ENTR_HYRULE_FIELD_10, // 0x282 is an unused entrance index repurposed to differentiate between
+        //                        // Adult Spawn and prelude of light (normally they both use 0x5F4)
+        //ENTR_SACRED_FOREST_MEADOW_WARP_PAD,
+        //ENTR_DEATH_MOUNTAIN_CRATER_WARP_PAD,
+        //ENTR_LAKE_HYLIA_WARP_PAD,
+        //ENTR_DESERT_COLOSSUS_WARP_PAD,
+        //ENTR_GRAVEYARD_WARP_PAD,
+        //ENTR_TEMPLE_OF_TIME_WARP_PAD,
+        //
+        //ENTR_DEKU_TREE_BOSS_ENTRANCE,
+        //ENTR_DEKU_TREE_BOSS_DOOR,
+        //ENTR_DODONGOS_CAVERN_BOSS_ENTRANCE,
+        //ENTR_DODONGOS_CAVERN_BOSS_DOOR,
+        //ENTR_JABU_JABU_BOSS_ENTRANCE,
+        //ENTR_JABU_JABU_BOSS_DOOR,
+        //ENTR_FOREST_TEMPLE_BOSS_ENTRANCE,
+        //ENTR_FOREST_TEMPLE_BOSS_DOOR,
+        //ENTR_FIRE_TEMPLE_BOSS_ENTRANCE,
+        //ENTR_FIRE_TEMPLE_BOSS_DOOR,
+        //ENTR_WATER_TEMPLE_BOSS_ENTRANCE,
+        //ENTR_WATER_TEMPLE_BOSS_DOOR,
+        //ENTR_SPIRIT_TEMPLE_BOSS_ENTRANCE,
+        //ENTR_SPIRIT_TEMPLE_BOSS_DOOR,
+        //ENTR_SHADOW_TEMPLE_BOSS_ENTRANCE,
+        //ENTR_SHADOW_TEMPLE_BOSS_DOOR,
+        //
+        //ENTR_GANONS_TOWER_0,
+        //ENTR_INSIDE_GANONS_CASTLE_1,
+        //
+        //ENTR_KOKIRI_FOREST_DEKU_TREE_BLUE_WARP,
+        //ENTR_DEATH_MOUNTAIN_TRAIL_DODONGO_BLUE_WARP,
+        //ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP,
+        //ENTR_SACRED_FOREST_MEADOW_FOREST_TEMPLE_BLUE_WARP,
+        //ENTR_DEATH_MOUNTAIN_CRATER_FIRE_TEMPLE_BLUE_WARP,
+        //ENTR_LAKE_HYLIA_WATER_TEMPLE_BLUE_WARP,
+        //ENTR_DESERT_COLOSSUS_SPIRIT_TEMPLE_BLUE_WARP,
+        //ENTR_GRAVEYARD_SHADOW_TEMPLE_BLUE_WARP,
+        //ENTR_OUTSIDE_GANONS_CASTLE_1_2,
         // clang-format on
     };
 
@@ -917,6 +939,28 @@ int Arcade_GetRandomEntrance() {
 
     std::uniform_int_distribution<> distrib(0, static_cast<int>(validEntrances.size() - 1));
     return validEntrances[distrib(gen)];
+}
+
+u8 Arcade_GetSceneRoomCount(s16 sceneId) {
+    static const std::unordered_map<s16, u8> sceneRoomCounts = {
+        { SCENE_DEKU_TREE, 10 },
+        { SCENE_DODONGOS_CAVERN, 15 },
+        //{ SCENE_JABU_JABU, 14 },
+        //{ SCENE_FOREST_TEMPLE, 21 },
+        //{ SCENE_FIRE_TEMPLE, 26 },
+        //{ SCENE_WATER_TEMPLE, 23 },
+        //{ SCENE_SPIRIT_TEMPLE, 30 },
+        //{ SCENE_SHADOW_TEMPLE, 28 },
+        //{ SCENE_BOTTOM_OF_THE_WELL, 7 },
+        //{ SCENE_ICE_CAVERN, 12 },
+        //{ SCENE_GERUDO_TRAINING_GROUND, 11 },
+        //{ SCENE_THIEVES_HIDEOUT, 14 },
+        //{ SCENE_INSIDE_GANONS_CASTLE, 19 },
+        //{ SCENE_GANONS_TOWER, 10 },
+    };
+
+    auto it = sceneRoomCounts.find(sceneId);
+    return (it != sceneRoomCounts.end()) ? it->second : 1;
 }
 
 void Arcade_RequestEntranceOverride(s16 entrance) {
@@ -939,31 +983,188 @@ void Arcade_ChooseRandomEntrance(PlayState* play) {
         if (resolved >= ENTRANCE_GROTTO_LOAD_START && resolved < ENTRANCE_GROTTO_EXIT_START) {
             return -1;
         }
-        // if (resolved >= ENTRANCE_GROTTO_EXIT_START && resolved < (ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)) {
-        //     return -1;
-        // }
+        //if (resolved >= ENTRANCE_GROTTO_EXIT_START && resolved < (ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)) {
+        //    return -1;
+        //}
 
         // resolved should now be a normal entrance index that indexes gEntranceTable.
         return gEntranceTable[resolved].scene;
     };
 
-    // Ensure we don't pick an entrance that leads back to the current scene.
-    // Loop until we find one that doesn't (or until a grotto can't be mapped, which is treated as "allow").
-    for (;;) {
-        s16 entranceScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
-        if (entranceScene != -1 && entranceScene == gPlayState->sceneNum) {
-            randomEntrance = Arcade_GetRandomEntrance();
-            continue;
+    s16 targetScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
+    s8 targetRoom = 0;
+
+    // Determine room count and randomly select a room if > 1
+    if (targetScene != -1) {
+        u8 numRooms = Arcade_GetSceneRoomCount(targetScene);
+        if (numRooms > 1) {
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            std::uniform_int_distribution<> distrib(0, numRooms - 1);
+            targetRoom = distrib(gen);
         }
-        break;
     }
 
-    play->nextEntranceIndex = randomEntrance;
+    // Ensure we don't pick an entrance that leads back to the current scene.
+    // Loop until we find one that doesn't (or until a grotto can't be mapped, which is treated as "allow").
+    // for (;;) {
+    //     s16 entranceScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
+    //     if (entranceScene != -1 && entranceScene == gPlayState->sceneNum) {
+    //         randomEntrance = Arcade_GetRandomEntrance();
+    //         continue;
+    //     }
+    //     break;
+    // }
 
-    // ...and *request* a one-shot arcade-only override so the commit uses our chosen entrance.
+    // Set the targeted room.
+    // Note: Entrance_Setup usually overwrites curRoom.num during transition,
+    // which is why sArcadeOverrideRoom is exposed for your custom bounds/spawn logic.
+    play->nextEntranceIndex = randomEntrance;
+    sArcadeOverrideRoom = targetRoom;
+
+    // Request a one-shot arcade-only override so the commit uses our chosen entrance.
     Arcade_RequestEntranceOverride(static_cast<s16>(randomEntrance));
 
-    SPDLOG_INFO("[Arcade]: Next entrance: {}. Random entrance: {}.", play->nextEntranceIndex, randomEntrance);
+    sArcadeTransitionsMade++;
+
+    if (sArcadeTransitionsMade == 10) {
+        if (play->linkAgeOnLoad == LINK_AGE_CHILD) {
+            play->linkAgeOnLoad = LINK_AGE_ADULT;
+        } else {
+            play->linkAgeOnLoad = LINK_AGE_CHILD;
+        }
+
+        sArcadeTransitionsMade = 0;
+    }
+
+    SPDLOG_INFO("[Arcade]: Next scene: {}. Next room: {}.", play->nextEntranceIndex, sArcadeOverrideRoom);
+    SPDLOG_INFO("[Arcade]: Total transitions made: {}.", sArcadeTransitionsMade);
+}
+
+void Arcade_UpdateLinkSpawn(s32 sceneNum, s8 curRoom) {
+    modifiedLinkActorEntry.id = gPlayState->linkActorEntry->id;
+    modifiedLinkActorEntry.pos = gPlayState->linkActorEntry->pos;
+    modifiedLinkActorEntry.rot = gPlayState->linkActorEntry->rot;
+    modifiedLinkActorEntry.params = gPlayState->linkActorEntry->params;
+
+    static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sDekuTreeSpawns = {
+       // Room     posX   posY   posZ   rotY               Spawn Param    Requirement
+        { 0x0, { { -4,    0,     554,   (s16)0x8000,       0x0DFF, },
+                 { -390,  400,   389,   (s16)0x6062,       0x0DFF, },
+                 { -468,  800,   -5,    (s16)0x3f9a,       0x0DFF, } } },
+
+        { 0x1, { { -519,  400,   522,   (s16)0xe062,       0x0DFF, },
+                 { -872,  400,   870,   (s16)0x605c,       0x0DFF, } } },
+
+        { 0x2, { { -1005, 400,   997,   (s16)0xe05c,       0x0DFF, } } },
+
+        { 0x3, { { -81,   -880,  488,   (s16)0x7f9a,       0x0DFF, } } },
+
+        { 0x4, { { -75,   -880,  672,   (s16)0xff9a,       0x0DFF, },
+                 { -243,  -880,  965,   (s16)0x3f9a,       0x0DFF, } } },
+
+        { 0x5, { { -427,  -880,  967,   (s16)0xffffbf9a,   0x0DFF, },
+                 { -1443  -760,  1070,  (s16)0x3f9a,       0x0DFF, } } },
+
+        { 0x6, { { -1627, -760,  1071,  (s16)0xffffbf9a,   0x0DFF, },
+                 { -1855, -760,  862,   (s16)0xffffff9a,   0x0DFF, } } },
+
+        { 0x7, { { -1856, -760,  678,   (s16)0x7f9a,       0x0DFF, } } },
+
+        { 0x8, { { -2486, -760,  -517,  (s16)0xffffa062,   0x0DFF, } } },
+
+        { 0x9, { { -850,  -1880, -894,  (s16)0xfa5,        0x0DFF, } } },
+
+        { 0xA, { { -652,  800,   1,     (s16)0xffffbf9a,   0x0DFF, } } },
+    };
+
+    static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sDodongoCavernSpawns = {
+       // Room     posX   posY   posZ   rotY               Param (0x0DFF is stationary)
+        // Main Room
+        { 0x0, { { -3,    0,     369,   (s16)0xffff8000,   0x0DFF },
+                 { -752,  0,     -1521, (s16)0x3f9a,       0x0DFF },
+                 { -1460, 531,   -320,  (s16)0x3f9a,       0x0DFF } } },
+        
+        // Right Scarecrow Room + Keese Pot Hallway
+        { 0x1, { { 3560,  100,   -472,  (s16)0xffffff9a,   0x0DFF },
+                 { 3560,  100,   -648,  (s16)0x7f9a,       0x0DFF },
+                 { 3560,  100,   -1188, (s16)0xffffff9a,   0x0DFF } } },
+
+        // Staircase Room
+        { 0x2, { { -928,  0,     -1520, (s16)0xffffbf9a,   0x0DFF },
+                 { -1960, 0,     -828,  (s16)0x7f9a,       0x0DFF },
+                 { -1960, 531,   -820,  (s16)0x7f9a,       0x0DFF } } },
+
+        // Lizalfos Battle Room
+        { 0x3, { { 3560,  100,   -1364, (s16)0x7f9a,       0x0DFF },
+                 { 2860,  100,   -2387, (s16)0x2af9,       0x0DFF },
+                 { 4337,  531,   -688,  (s16)0x7f9a,       0x0DFF },
+                 { 3868,  531,   -921,  (s16)0x3f9a,       0x0DFF } } },
+
+        // Blue Dodongo Room
+        { 0x4, { { 2710,  100,   -2474, (s16)0xffffaaf9,   0x0DFF },
+                 { 1548,  80,    -922,  (s16)0x3f9a,       0x0DFF } } },
+
+        // Pillar Switch Room
+        { 0x5, { { -1960, -531,  -644,  (s16)0xffffff9a,   0x0DFF },
+                 { -1635, 531,   -318,  (s16)0xffffbf9a,   0x0DFF } } },
+
+        // Near Bombs Scrubs Room
+        { 0x6, { { 1837,  411,   -1568, (s16)0x7f9a,       0x0DFF } } },
+
+        // Push Block Boss Door Room
+        { 0x7, { { -245,  16,    -2783, (s16)0x4000,       0x0DFF },
+                 { -2,    76,    -2058, (s16)0x7f9a,       0x0DFF } } },
+
+        // Fire Keese Back Room
+        { 0x8, { { 1472,  16,    -3871, (s16)0x0,          0x0DFF } } },
+
+        // Bomb Bag Chest Room
+        { 0x9, { { 1840,  411,   -1230, (s16)0xffffff9a,   0x0DFF } } },
+
+        // First Flame Pillar Room
+        { 0xA, { { 4341,  531,   -512,  (s16)0xffffff9a,   0x0DFF } } },
+
+        // Gold Skulltula Torch Room
+        { 0xB, { { 2560,  0,     208,   (s16)0xffffff9a,   0x0DFF } } },
+
+        // Second Flame Pillar Room
+        { 0xC, { { 3692,  531,  -918,   (s16)0xffffbf9a,   0x0DFF } } },
+
+        // Blue Dodongo Scrub Room
+        { 0xD, { { 2430,  100,  -2980,  (s16)0x7f9a,       0x0DFF } } },
+
+        // Back Gold Skulltula Room
+        { 0xE, { { 1470,  76,   -4317,  (s16)0x7f9a,       0x0DFF } } },
+
+        // Compass Chest Room
+        { 0xF, { { -1958, 0,    -652,   (s16)0xffffff9a, 0x0DFF } } },
+    };
+
+    const std::vector<ArcadeSpawn>* availableSpawns = nullptr;
+
+    if (sceneNum == SCENE_DEKU_TREE) {
+        if (sDekuTreeSpawns.contains(curRoom)) {
+            availableSpawns = &sDekuTreeSpawns.at(curRoom);
+        }
+    } else if (sceneNum == SCENE_DODONGOS_CAVERN) {
+        if (sDodongoCavernSpawns.contains(curRoom)) {
+            availableSpawns = &sDodongoCavernSpawns.at(curRoom);
+        }
+    }
+
+    if (availableSpawns != nullptr && !availableSpawns->empty()) {
+        s8 randomSpawnIndex = rand() % availableSpawns->size();
+        const ArcadeSpawn& chosenSpawn = (*availableSpawns)[randomSpawnIndex];
+
+        modifiedLinkActorEntry.pos.x = chosenSpawn.x;
+        modifiedLinkActorEntry.pos.y = chosenSpawn.y;
+        modifiedLinkActorEntry.pos.z = chosenSpawn.z;
+        modifiedLinkActorEntry.rot.y = chosenSpawn.rotY;
+        modifiedLinkActorEntry.params = chosenSpawn.params;
+
+        gPlayState->linkActorEntry = &modifiedLinkActorEntry;
+    }
 }
 
 extern "C" void Arcade_InitSave() {
@@ -975,6 +1176,7 @@ extern "C" void Arcade_InitSave() {
     }
 
     sArcadeScore = 0;
+    sArcadeTransitionsMade = 0;
 
     gSaveContext.ship.quest.id = QUEST_ARCADE;
     gSaveContext.ship.quest.data.arcade.isPaused = true;
@@ -1298,18 +1500,29 @@ void Arcade_OnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_list
     va_end(args);
 }
 
-void Arcade_UpdateScore(s32 scoreToAdd) {
-    sArcadeScore += scoreToAdd;
-    return;
-}
-
 void Arcade_OnSceneInitHandler(s16 sceneNum) {
     // Unpause the timer when the scene loaded isn't the Chamber of Sages.
     if (sceneNum != SCENE_CHAMBER_OF_THE_SAGES) {
         gSaveContext.ship.quest.data.arcade.isPaused = false;
     }
     Arcade_UpdateScore(9);
+
+    if (gSaveContext.respawnFlag <= 0 && sArcadeOverrideRoom != -1) {
+        s8 origRoom = gPlayState->roomCtx.curRoom.num;
+
+        if (origRoom != sArcadeOverrideRoom) {
+            // Reset room ctx back to prev room and then load the new room
+            gPlayState->roomCtx.status = 0;
+            gPlayState->roomCtx.curRoom = gPlayState->roomCtx.prevRoom;
+            func_8009728C(gPlayState, &gPlayState->roomCtx, sArcadeOverrideRoom);
+        }
+    }
+
+    s8 currentRoom = (sArcadeOverrideRoom != -1) ? sArcadeOverrideRoom : gPlayState->roomCtx.curRoom.num;
+    Arcade_UpdateLinkSpawn(sceneNum, currentRoom);
+
     Arcade_ChooseRandomEntrance(gPlayState);
+    SPDLOG_INFO("[Arcade] SceneInit curRoom.num {}", gPlayState->roomCtx.curRoom.num);
 }
 
 void Arcade_OnBossDefeatHandler(void* refActor) {
@@ -1322,6 +1535,26 @@ void Arcade_OnBlueWarpUpdate(void* actor) {
     if (blueWarp->warpTimer > 160) {
         Arcade_HandleBlueWarp(gPlayState, blueWarp->actor.world.pos.x, blueWarp->actor.world.pos.z);
     }
+}
+
+void Arcade_HandleDoorWarping(PlayState* play, bool doorIsOpening) {
+    Player* player = GET_PLAYER(gPlayState);
+    if (player->stateFlags1 == PLAYER_STATE1_IN_CUTSCENE && doorIsOpening) {
+        play->nextEntranceIndex = sArcadeOverrideEntrance;
+        gSaveContext.nextCutsceneIndex = 0x8000;
+        play->transitionTrigger = TRANS_TRIGGER_START;
+        play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
+    }
+}
+
+void Arcade_OnShutterDoorOpen(void* actor) {
+    DoorShutter* shutterDoor = static_cast<DoorShutter*>(actor);
+    Arcade_HandleDoorWarping(gPlayState, shutterDoor->unk_164);
+}
+
+void Arcade_OnEnDoorOpen(void* actor) {
+    EnDoor* enDoor = static_cast<EnDoor*>(actor);
+    Arcade_HandleDoorWarping(gPlayState, enDoor->playerIsOpening);
 }
 
 void RegisterArcadeMode() {
@@ -1350,12 +1583,14 @@ void RegisterArcadeMode() {
 
         COND_ID_HOOK(OnActorUpdate, ACTOR_DOOR_WARP1, IS_ARCADE_MODE, Arcade_OnBlueWarpUpdate);
 
+        COND_ID_HOOK(OnActorUpdate, ACTOR_DOOR_SHUTTER, IS_ARCADE_MODE, Arcade_OnShutterDoorOpen);
+        COND_ID_HOOK(OnActorUpdate, ACTOR_EN_DOOR, IS_ARCADE_MODE, Arcade_OnEnDoorOpen);
+
         // Re-apply the arcade one-shot override during actor updates while a transition is active.
         COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, [](void* actorPtr) {
             if (sArcadeOverrideEntrance != -1 && gPlayState != NULL &&
                 gPlayState->transitionTrigger == TRANS_TRIGGER_START) {
                 gPlayState->nextEntranceIndex = sArcadeOverrideEntrance;
-                SPDLOG_DEBUG("[Arcade]: reapplied override -> play->nextEntranceIndex = {}", sArcadeOverrideEntrance);
             }
         });
     });
