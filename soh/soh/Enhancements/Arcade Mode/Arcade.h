@@ -54,4 +54,19 @@ typedef enum {
     REQ_GORON_TUNIC, REQ_ZORA_TUNIC,
     REQ_SHIELD,      REQ_MIRROR_SHIELD,
     REQ_IRON_BOOTS,  REQ_HOVER_BOOTS,
+    REQ_STRENGTH,
 } Arcade_SpawnLogicRequirements;
+
+typedef enum {
+    AGE_NONE,
+    AGE_ADULT,
+    AGE_CHILD
+} Arcade_AgeRequirements;
+
+typedef enum {
+    TRICK_NONE,
+    TRICK_GROUNDJUMP,
+    TRICK_WEIRDSHOT,
+    TRICK_QPA,
+    TRICK_ISG,
+} Arcade_TrickRequirements;

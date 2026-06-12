@@ -8,6 +8,10 @@ struct EnCrow;
 
 typedef void (*EnCrowActionFunc)(struct EnCrow*, PlayState*);
 
+typedef enum EnCrowType {
+    /* 0 */ EN_CROW_NORMAL
+} EnCrowType;
+
 typedef struct EnCrow {
     /* 0x0000 */ Actor actor;
     /* 0x014C */ Vec3f bodyPartsPos[4];

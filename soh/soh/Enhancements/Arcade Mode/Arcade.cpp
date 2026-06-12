@@ -7,12 +7,14 @@
 #include "soh/frame_interpolation.h"
 #include "soh/OTRGlobals.h"
 #include "include/z64camera.h"
+#include "soh/Notification/Notification.h"
 
 #include <array>
 #include <string>
 #include <vector>
 #include <random>
 #include <unordered_map>
+#include <cmath>
 
 extern "C" {
 #include "functions.h"
@@ -21,13 +23,37 @@ extern "C" {
 #include "src/overlays/actors/ovl_Boss_Goma/z_boss_goma.h"
 #include "src/overlays/actors/ovl_Boss_Mo/z_boss_mo.h"
 #include "src/overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
-#include "src/overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
-#include "src/overlays/actors/ovl_En_Door/z_en_door.h"
 #include "src/overlays/gamestates/ovl_file_choose/file_choose.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "textures/icon_item_nes_static/icon_item_nes_static.h"
 #include "textures/icon_item_ger_static/icon_item_ger_static.h"
 #include "textures/icon_item_fra_static/icon_item_fra_static.h"
+#include "soh/Enhancements/randomizer/randomizer_grotto.h"
+
+#include "src/overlays/actors/ovl_En_Door/z_en_door.h"
+#include "src/overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
+#include "src/overlays/actors/ovl_En_Holl/z_en_holl.h"
+#include "src/overlays/actors/ovl_Bg_Heavy_block/z_bg_heavy_block.h"
+
+#include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
+#include "src/overlays/actors/ovl_En_Dekubaba/z_en_dekubaba.h"
+#include "src/overlays/actors/ovl_En_Mb/z_en_mb.h"
+#include "src/overlays/actors/ovl_En_Tite/z_en_tite.h"
+#include "src/overlays/actors/ovl_En_Zf/z_en_zf.h"
+#include "src/overlays/actors/ovl_En_Wf/z_en_wf.h"
+#include "src/overlays/actors/ovl_En_Reeba/z_en_reeba.h"
+#include "src/overlays/actors/ovl_En_Peehat/z_en_peehat.h"
+#include "src/overlays/actors/ovl_En_Po_Field/z_en_po_field.h"
+#include "src/overlays/actors/ovl_En_Poh/z_en_poh.h"
+#include "src/overlays/actors/ovl_En_Tp/z_en_tp.h"
+#include "src/overlays/actors/ovl_En_Firefly/z_en_firefly.h"
+#include "src/overlays/actors/ovl_En_Rd/z_en_rd.h"
+#include "src/overlays/actors/ovl_En_Am/z_en_am.h"
+#include "src/overlays/actors/ovl_En_Ik/z_en_ik.h"
+#include "src/overlays/actors/ovl_En_Test/z_en_test.h"
+#include "src/overlays/actors/ovl_En_Crow/z_en_crow.h"
+#include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
+#include "src/overlays/actors/ovl_En_Bom/z_en_bom.h"
 
 extern PlayState* gPlayState;
 
@@ -42,6 +68,7 @@ static s16 sArcadeOverrideEntrance = -1;
 static s8 sArcadeOverrideRoom = -1;
 static s8 sArcadeTransitionsMade = -1;
 static ActorEntry modifiedLinkActorEntry = { 0 };
+static bool sArcadeLockClosestDoor = false;
 
 // Use the existing UI variables from z_parameter.c
 extern "C" {
@@ -54,7 +81,11 @@ extern "C" {
     float OTRGetRectDimensionFromLeftEdge(float v);
     float OTRGetRectDimensionFromRightEdge(float v);
     s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex);
-}
+
+    void DoorShutter_SetupAction(DoorShutter*, DoorShutterActionFunc);
+    void DoorShutter_SetupType(DoorShutter*, PlayState*);
+    void EnHoll_Draw(Actor* thisx, PlayState* play);
+    }
 
 typedef enum {
     AM_CHOICE_BOSSES_ALL,
@@ -135,7 +166,89 @@ struct ArcadeSpawn {
     s16 rotY;
     u16 params;
     Arcade_SpawnLogicRequirements requirement = REQ_NONE;
+    Arcade_TrickRequirements trickName = TRICK_NONE;
 };
+
+struct ArcadeEnemyTable {
+    s32 enemyScore;
+    std::string enemyName;
+    s32 enemyParams;
+};
+
+// clang-format off
+static const std::vector<std::pair<s16, ArcadeEnemyTable>> sEnemyScoreTable = {
+    { ACTOR_EN_ANUBICE_TAG, {30  ,     "Anubis"               ,                                }}, // Anubis
+    { ACTOR_EN_AM,          {15  ,     "Armos"                ,                                }}, // Armos
+    { ACTOR_EN_DODOJR,      {5   ,     "Baby Dodongo"         ,                                }}, // Baby Dodongo
+    { ACTOR_EN_VALI,        {20  ,     "Bari"                 ,                                }}, // Bari (big jellyfish)
+    { ACTOR_EN_VM,          {20  ,     "Beamos"               ,                                }}, // Beamos
+    { ACTOR_EN_BILI,        {10  ,     "Biri"                 ,                                }}, // Biri (jellyfish)
+    { ACTOR_EN_BB,          {10  ,     "Blue Bubble"          ,  ENBB_BLUE                     }}, // Bubble (flying skull enemy) (blue)
+    { ACTOR_EN_BB,          {10  ,     "Red Bubble"           ,  ENBB_RED                      }}, // Bubble (flying skull enemy) (red)
+    { ACTOR_EN_BB,          {10  ,     "Green Bubble"         ,  ENBB_GREEN                    }}, // Bubble (flying skull enemy) (green)
+    { ACTOR_EN_BB,          {10  ,     "Big Green Bubble"     ,  ENBB_GREEN_BIG                }}, // Bubble (flying skull enemy) (green big)
+    { ACTOR_EN_TORCH2,      {1000,     "Dark Link"            ,                                }}, // Dark Link
+    { ACTOR_EN_DEKUBABA,    {10  ,     "Large Deku Baba"      ,  DEKUBABA_BIG                  }}, // Deku Baba (large)
+    { ACTOR_EN_DEKUBABA,    {10  ,     "Small Deku Baba"      ,  DEKUBABA_NORMAL               }}, // Deku Baba (small)
+    { ACTOR_EN_DODONGO,     {20  ,     "Dodongo"              ,                                }}, // Dodongo
+    { ACTOR_EN_TP,          {10  ,     "Electric Tailpasaran" ,                                }}, // Electric Tailpasaran
+    { ACTOR_EN_FD,          {200 ,     "Flare Dancer"         ,                                }}, // Flare Dancer
+    { ACTOR_EN_FLOORMAS,    {50  ,     "Floormaster"          ,       0                        }}, // Floormaster
+    { ACTOR_EN_FLOORMAS,    {10  ,     "Invisible Floormaster",      -1                        }}, // Floormaster (invisible)
+    { ACTOR_EN_YUKABYUN,    {0   ,     "Flying Floor Tile"    ,                                }}, // Flying Floor Tile
+    { ACTOR_EN_PEEHAT,      {30  ,     "Peahat"               ,  PEAHAT_TYPE_FLYING            }}, // Flying Peahat
+    { ACTOR_EN_PEEHAT,      {10  ,     "Peahat Larva"         ,  PEAHAT_TYPE_LARVA             }}, // Flying Peahat Larva
+    { ACTOR_EN_TUBO_TRAP,   {0   ,     "Flying Pot"           ,                                }}, // Flying pot
+    { ACTOR_EN_FZ,          {30  ,     "Freezard"             ,                                }}, // Freezard
+    { ACTOR_EN_GELDB,       {100 ,     "Gerudo Guard"         ,                                }}, // Gerudo Fighter
+    { ACTOR_EN_GOMA,        {10  ,     "Gohma Larva"          ,                                }}, // Gohma Larva (Non-Gohma rooms)
+    { ACTOR_EN_CROW,        {10  ,     "Guay"                 ,                                }}, // Guay
+    { ACTOR_EN_IK,          {300 ,     "Black Iron Knuckle"   ,  EN_IK_BLACK                   }}, // Iron Knuckle (black, standing)
+    { ACTOR_EN_IK,          {300 ,     "White Iron Knuckle"   ,  EN_IK_WHITE                   }}, // Iron Knuckle (white, standing)
+    { ACTOR_EN_IK,          {300 ,     "White Iron Knuckle"   ,  EN_IK_WHITE_CHAIR             }}, // Iron Knuckle (white, chair)
+    { ACTOR_EN_FIREFLY,     {10  ,     "Keese"                ,  KEESE_NORMAL_FLY              }}, // Keese
+    { ACTOR_EN_FIREFLY,     {10  ,     "Keese"                ,  KEESE_NORMAL_PERCH            }}, // Keese
+    { ACTOR_EN_FIREFLY,     {15  ,     "Invisible Keese"      ,  KEESE_NORMAL_INVIS            }}, // Keese (invisible)
+    { ACTOR_EN_FIREFLY,     {15  ,     "Fire Keese"           ,  KEESE_FIRE_FLY                }}, // Keese (Fire)
+    { ACTOR_EN_FIREFLY,     {15  ,     "Fire Keese"           ,  KEESE_FIRE_PERCH              }}, // Keese (Fire)
+    { ACTOR_EN_FIREFLY,     {20  ,     "Invisible Fire Keese" ,  KEESE_FIRE_INVIS              }}, // Keese (Fire invisible)
+    { ACTOR_EN_FIREFLY,     {15  ,     "Ice Keese"            ,  KEESE_ICE_FLY                 }}, // Keese (Ice)
+    { ACTOR_EN_FIREFLY,     {20  ,     "Invisible Ice Keese"  ,  KEESE_ICE_INVIS               }}, // Keese (Ice invisible)
+    { ACTOR_EN_REEBA,       {10  ,     "Leever"               ,  LEEVER_SMALL                  }}, // Leever
+    { ACTOR_EN_REEBA,       {100 ,     "Purple Leever"        ,  LEEVER_BIG                    }}, // Leever (Purple)
+    { ACTOR_EN_RR,          {10  ,     "Like-Like"            ,                                }}, // Like-Like
+    { ACTOR_EN_ZF,          {10  ,     "Lizalfos"             ,  ENZF_TYPE_LIZALFOS_LONE       }}, // Lizalfos (normal)
+    { ACTOR_EN_ZF,          {10  ,     "Lizalfos"             ,  ENZF_TYPE_LIZALFOS_MINIBOSS_A }}, // Lizalfos (miniboss A)
+    { ACTOR_EN_ZF,          {10  ,     "Lizalfos"             ,  ENZF_TYPE_LIZALFOS_MINIBOSS_B }}, // Lizalfos (miniboss A)
+    { ACTOR_EN_ZF,          {100 ,     "Dinolfos"             ,  ENZF_TYPE_DINOLFOS            }}, // Lizalfos (dinolfos)
+    { ACTOR_EN_DEKUNUTS,    {10  ,     "Mad Scrub"            ,                                }}, // Mad Scrub (triple attack)
+    { ACTOR_EN_MB,          {50  ,     "Club Moblin"          ,  ENMB_TYPE_CLUB                }}, // Moblin Club
+    { ACTOR_EN_MB,          {70  ,     "Spear Moblin"         ,  ENMB_TYPE_SPEAR_PATROL        }}, // Moblin Spear
+    { ACTOR_EN_OKUTA,       {10  ,     "Octorok"              ,                                }}, // Octorok
+    { ACTOR_EN_POH,         {10  ,     "Poe"                  ,  EN_POH_NORMAL                 }}, // Poe
+    { ACTOR_EN_POH,         {10  ,     "Sharp"                ,  EN_POH_SHARP                  }}, // Poe (composer Sharp)
+    { ACTOR_EN_POH,         {10  ,     "Flat"                 ,  EN_POH_FLAT                   }}, // Poe (composer Flat)
+    { ACTOR_EN_RD,          {20  ,     "Invisible Redead"     ,  EN_RD_REDEAD_INVIS            }}, // Redead (invisible)
+    { ACTOR_EN_RD,          {10  ,     "Redead"               ,  EN_RD_REDEAD_NORMAL           }}, // Redead (standing)
+    { ACTOR_EN_RD,          {30  ,     "Gibdo"                ,  EN_RD_GIBDO                   }}, // Redead (Gibdo)
+    { ACTOR_EN_BUBBLE,      {5   ,     "Bubble (Literal)"     ,                                }}, // Shabom (bubble)
+    { ACTOR_EN_SB,          {10  ,     "Shell Blade"          ,                                }}, // Shell Blade
+    { ACTOR_EN_SKJ,         {10  ,     "Skull Kid"            ,                                }}, // Skull Kid
+    { ACTOR_EN_ST,          {10  ,     "Skulltula"            ,       0                        }}, // Skulltula
+    { ACTOR_EN_ST,          {10  ,     "Large Skulltula"      ,       1                        }}, // Skulltula (big)
+    { ACTOR_EN_ST,          {10  ,     "Invisible Skulltula"  ,       2                        }}, // Skulltula (invisible)
+    { ACTOR_EN_NY,          {10  ,     "Spike"                ,                                }}, // Spike (rolling enemy)
+    { ACTOR_EN_SKB,         {10  ,     "Stalchild"            ,                                }}, // Stalchild
+    { ACTOR_EN_TEST,        {100 ,     "Stalfos"              ,                                }}, // Stalfos (cannot differentiate between normal and invisible, so award same score)
+    { ACTOR_EN_EIYER,       {10  ,     "Stinger"              ,                                }}, // Stinger (land) (One in formation, sink under floor and do not activate)
+    { ACTOR_EN_TITE,        {10  ,     "Red Tektite"          ,  TEKTITE_RED                   }}, // Tektite (red)
+    { ACTOR_EN_TITE,        {20  ,     "Blue Tektite"         ,  TEKTITE_BLUE                  }}, // Tektite (blue)
+    { ACTOR_EN_BW,          {10  ,     "Torch Slug"           ,                                }}, // Torch Slug
+    { ACTOR_EN_WALLMAS,     {100 ,     "Wallmaster"           ,                                }}, // Wallmaster
+    { ACTOR_EN_KAREBABA,    {5   ,     "Withered Deku Baba"   ,                                }}, // Withered Deku Baba
+    { ACTOR_EN_WF,          {20  ,     "Wolfos"               ,  WOLFOS_NORMAL                 }}, // Wolfos (normal)
+    { ACTOR_EN_WF,          {30  ,     "White Wolfos"         ,  WOLFOS_WHITE                  }}, // Wolfos (white)
+};                                                                   
 
 ArcadeSetting ArcadeOptions[AM_OPTIONS_MAX] = {
     { { "BOSSES:", "BOSSE:", "BOSS:" },
@@ -460,7 +573,6 @@ void Arcade_SetEquipment(u8 linkAge) {
         amCButtonSlots = { SLOT_STICK, SLOT_NUT, SLOT_BOMB, SLOT_NONE, SLOT_NONE, SLOT_NONE, SLOT_NONE };
 
         Inventory_ChangeEquipment(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_KOKIRI);
-        Inventory_ChangeEquipment(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_DEKU);
         // Set Adult equipment.
     } else {
         amButtonItems = { ITEM_SWORD_MASTER, ITEM_BOW,  ITEM_HAMMER, ITEM_BOMB,
@@ -469,8 +581,6 @@ void Arcade_SetEquipment(u8 linkAge) {
         amCButtonSlots = { SLOT_BOW, SLOT_HAMMER, SLOT_BOMB, SLOT_NONE, SLOT_NONE, SLOT_NONE, SLOT_NONE };
 
         Inventory_ChangeEquipment(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_MASTER);
-        Inventory_ChangeEquipment(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_MIRROR);
-        Inventory_ChangeEquipment(EQUIP_TYPE_TUNIC, EQUIP_VALUE_TUNIC_GORON);
     }
 
     // Button Items
@@ -606,6 +716,82 @@ void Arcade_HandleCompleteBoss(PlayState* play) {
     }
 }
 
+void Arcade_HandleEnemyDefeated(Actor* killedActor) {
+    if (killedActor == nullptr) {
+        return;
+    }
+
+    Player* player = GET_PLAYER(gPlayState);
+
+    for (const auto& entry : sEnemyScoreTable) {
+        int16_t tableActorId = entry.first;
+        const ArcadeEnemyTable& enemyData = entry.second;
+
+        if (tableActorId == killedActor->id) {
+            if (enemyData.enemyParams == NULL || enemyData.enemyParams == killedActor->params) {
+                int32_t scoreReward = enemyData.enemyScore;
+                Arcade_UpdateScore(scoreReward);
+
+                std::string messagePrefix = "+" + std::to_string(scoreReward);
+                std::string messageSuffix = enemyData.enemyName;
+                
+                Notification::Emit({
+                    .prefix = messagePrefix,
+                    .prefixColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f),
+                    .message = "points awarded for killing",
+                    .suffix = messageSuffix,
+                    .suffixColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
+                    .mute = true
+                });
+            }
+        }
+    }
+
+    if (killedActor->xzDistToPlayer > 800.0f) {
+        int32_t marksmanBonus = 50;
+        int32_t distanceFromPlayer = killedActor->xzDistToPlayer;
+        int32_t distanceFromPlayerBonus = 0;
+        if (player->heldItemId == ITEM_SLINGSHOT) {
+            distanceFromPlayerBonus = ((distanceFromPlayer - 800) / 10) * 10;
+        } else if (player->heldItemId == ITEM_BOW) {
+            distanceFromPlayerBonus = ((distanceFromPlayer - 800) / 20) * 10; // Currently, actors thats position is changed when struck by an arrow (Keese in particular) can award HUGE points when they finally die, so only award half the points
+        }
+
+        marksmanBonus += distanceFromPlayerBonus;
+        Arcade_UpdateScore(marksmanBonus);
+
+        std::string messagePrefix = "+" + std::to_string(marksmanBonus);
+        std::string messageSuffix = std::to_string(distanceFromPlayer) + " units";
+
+        Notification::Emit({
+            .prefix = messagePrefix,
+            .prefixColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f),
+            .message = "point Marksman bonus! Enemy distance:",
+            .suffix = messageSuffix,
+            .suffixColor = ImVec4(0.0f, 0.5f, 1.0f, 1.0f),
+            .mute = true,
+        });
+        Audio_PlaySoundGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+    }
+}
+
+void Arcade_HandleWonderCollect(Actor* wonderActor) {
+    EnWonderItem* wonder = (EnWonderItem*)wonderActor;
+
+    if (wonder == nullptr) {
+        return;
+    }
+
+    if (wonder->itemDrop == WONDERITEM_DROP_GREEN_RUPEE) {
+        Arcade_UpdateScore(3);
+    } else if (wonder->itemDrop == WONDERITEM_DROP_BLUE_RUPEE) {
+        Arcade_UpdateScore(10);
+    } else if (wonder->itemDrop == WONDERITEM_DROP_RED_RUPEE) {
+        Arcade_UpdateScore(40);
+    }
+}
+
 int Arcade_GetRandomEntrance() {
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -613,15 +799,15 @@ int Arcade_GetRandomEntrance() {
     static const std::vector<s16> validEntrances = {
         // clang-format off
         // Index
-        ENTR_DEKU_TREE_ENTRANCE,
+        //ENTR_DEKU_TREE_ENTRANCE,
         //ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE,
-        ENTR_DODONGOS_CAVERN_ENTRANCE,
+        //ENTR_DODONGOS_CAVERN_ENTRANCE,
         //ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN,
         //ENTR_JABU_JABU_ENTRANCE,
         //ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU,
         //ENTR_FOREST_TEMPLE_ENTRANCE,
         //ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE,
-        //ENTR_FIRE_TEMPLE_ENTRANCE,
+        ENTR_FIRE_TEMPLE_ENTRANCE,
         //ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE,
         //ENTR_WATER_TEMPLE_ENTRANCE,
         //ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,
@@ -712,7 +898,7 @@ int Arcade_GetRandomEntrance() {
         //ENTR_DEATH_MOUNTAIN_TRAIL_GREAT_FAIRY_EXIT,
         //ENTR_GREAT_FAIRYS_FOUNTAIN_SPELLS_FARORES_ZF,
         //ENTR_ZORAS_FOUNTAIN_OUTSIDE_GREAT_FAIRY,
-        //
+
         //ENTR_LINKS_HOUSE_1,
         //ENTR_KOKIRI_FOREST_OUTSIDE_LINKS_HOUSE,
         //ENTR_TEMPLE_OF_TIME_ENTRANCE,
@@ -723,7 +909,7 @@ int Arcade_GetRandomEntrance() {
         //ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_FRONT,
         //ENTR_POTION_SHOP_KAKARIKO_BACK,
         //ENTR_KAKARIKO_VILLAGE_OUTSIDE_POTION_SHOP_BACK,
-        //
+
         //ENTR_THIEVES_HIDEOUT_0,
         //ENTR_GERUDOS_FORTRESS_1,
         //ENTR_THIEVES_HIDEOUT_1,
@@ -831,7 +1017,7 @@ int Arcade_GetRandomEntrance() {
         //ENTR_GRAVEYARD_ROYAL_TOMB_EXIT,
         //ENTR_WINDMILL_AND_DAMPES_GRAVE_GRAVE,
         //ENTR_GRAVEYARD_DAMPES_GRAVE_EXIT,
-        //
+
         //ENTR_LOST_WOODS_BRIDGE_EAST_EXIT,
         //ENTR_KOKIRI_FOREST_LOWER_EXIT,
         //ENTR_LOST_WOODS_SOUTH_EXIT,
@@ -901,24 +1087,15 @@ int Arcade_GetRandomEntrance() {
         //ENTR_TEMPLE_OF_TIME_WARP_PAD,
         //
         //ENTR_DEKU_TREE_BOSS_ENTRANCE,
-        //ENTR_DEKU_TREE_BOSS_DOOR,
         //ENTR_DODONGOS_CAVERN_BOSS_ENTRANCE,
-        //ENTR_DODONGOS_CAVERN_BOSS_DOOR,
         //ENTR_JABU_JABU_BOSS_ENTRANCE,
-        //ENTR_JABU_JABU_BOSS_DOOR,
         //ENTR_FOREST_TEMPLE_BOSS_ENTRANCE,
-        //ENTR_FOREST_TEMPLE_BOSS_DOOR,
         //ENTR_FIRE_TEMPLE_BOSS_ENTRANCE,
-        //ENTR_FIRE_TEMPLE_BOSS_DOOR,
         //ENTR_WATER_TEMPLE_BOSS_ENTRANCE,
-        //ENTR_WATER_TEMPLE_BOSS_DOOR,
         //ENTR_SPIRIT_TEMPLE_BOSS_ENTRANCE,
-        //ENTR_SPIRIT_TEMPLE_BOSS_DOOR,
         //ENTR_SHADOW_TEMPLE_BOSS_ENTRANCE,
-        //ENTR_SHADOW_TEMPLE_BOSS_DOOR,
         //
         //ENTR_GANONS_TOWER_0,
-        //ENTR_INSIDE_GANONS_CASTLE_1,
         //
         //ENTR_KOKIRI_FOREST_DEKU_TREE_BLUE_WARP,
         //ENTR_DEATH_MOUNTAIN_TRAIL_DODONGO_BLUE_WARP,
@@ -941,13 +1118,13 @@ int Arcade_GetRandomEntrance() {
     return validEntrances[distrib(gen)];
 }
 
-u8 Arcade_GetSceneRoomCount(s16 sceneId) {
-    static const std::unordered_map<s16, u8> sceneRoomCounts = {
-        { SCENE_DEKU_TREE, 10 },
-        { SCENE_DODONGOS_CAVERN, 15 },
-        //{ SCENE_JABU_JABU, 14 },
-        //{ SCENE_FOREST_TEMPLE, 21 },
-        //{ SCENE_FIRE_TEMPLE, 26 },
+u8 Arcade_GetSceneRoom(s16 sceneId) {
+    static const std::unordered_map<s16, std::vector<s16>> sceneValidRooms = {
+        { SCENE_DEKU_TREE,       { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA } },
+        { SCENE_DODONGOS_CAVERN, { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF } },
+        { SCENE_JABU_JABU,       { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF } },
+        { SCENE_FOREST_TEMPLE,   { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,      0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15 } }, // Well omitted
+        { SCENE_FIRE_TEMPLE,     { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8,      0xA, 0xB,      0xD, 0xE, 0xF, 0x10, 0x11, 0x12, 0x13,       0x15,       0x18 } }, // Gorons & barren rooms omitted
         //{ SCENE_WATER_TEMPLE, 23 },
         //{ SCENE_SPIRIT_TEMPLE, 30 },
         //{ SCENE_SHADOW_TEMPLE, 28 },
@@ -959,8 +1136,21 @@ u8 Arcade_GetSceneRoomCount(s16 sceneId) {
         //{ SCENE_GANONS_TOWER, 10 },
     };
 
-    auto it = sceneRoomCounts.find(sceneId);
-    return (it != sceneRoomCounts.end()) ? it->second : 1;
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    auto it = sceneValidRooms.find(sceneId);
+
+    if (it != sceneValidRooms.end()) {
+        const std::vector<s16>& roomList = it->second;
+        std::uniform_int_distribution<size_t> dist(0, roomList.size() - 1);
+
+        return static_cast<u8>(roomList[dist(gen)]);
+    }
+
+    // UH OH, very bad!
+    SPDLOG_ERROR("[Arcade]: UH OH! Returned 0 finding room!");
+    return 0;
 }
 
 void Arcade_RequestEntranceOverride(s16 entrance) {
@@ -983,38 +1173,16 @@ void Arcade_ChooseRandomEntrance(PlayState* play) {
         if (resolved >= ENTRANCE_GROTTO_LOAD_START && resolved < ENTRANCE_GROTTO_EXIT_START) {
             return -1;
         }
-        //if (resolved >= ENTRANCE_GROTTO_EXIT_START && resolved < (ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)) {
-        //    return -1;
-        //}
+        if (resolved >= ENTRANCE_GROTTO_EXIT_START && resolved < (ENTRANCE_GROTTO_EXIT_START + NUM_GROTTOS)) {
+            return -1;
+        }
 
         // resolved should now be a normal entrance index that indexes gEntranceTable.
         return gEntranceTable[resolved].scene;
     };
 
     s16 targetScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
-    s8 targetRoom = 0;
-
-    // Determine room count and randomly select a room if > 1
-    if (targetScene != -1) {
-        u8 numRooms = Arcade_GetSceneRoomCount(targetScene);
-        if (numRooms > 1) {
-            static std::random_device rd;
-            static std::mt19937 gen(rd());
-            std::uniform_int_distribution<> distrib(0, numRooms - 1);
-            targetRoom = distrib(gen);
-        }
-    }
-
-    // Ensure we don't pick an entrance that leads back to the current scene.
-    // Loop until we find one that doesn't (or until a grotto can't be mapped, which is treated as "allow").
-    // for (;;) {
-    //     s16 entranceScene = GetSceneFromEntrance(static_cast<s16>(randomEntrance));
-    //     if (entranceScene != -1 && entranceScene == gPlayState->sceneNum) {
-    //         randomEntrance = Arcade_GetRandomEntrance();
-    //         continue;
-    //     }
-    //     break;
-    // }
+    s16 targetRoom = Arcade_GetSceneRoom(targetScene);
 
     // Set the targeted room.
     // Note: Entrance_Setup usually overwrites curRoom.num during transition,
@@ -1051,94 +1219,427 @@ void Arcade_UpdateLinkSpawn(s32 sceneNum, s8 curRoom) {
        // Room     posX   posY   posZ   rotY               Spawn Param    Requirement
         { 0x0, { { -4,    0,     554,   (s16)0x8000,       0x0DFF, },
                  { -390,  400,   389,   (s16)0x6062,       0x0DFF, },
-                 { -468,  800,   -5,    (s16)0x3f9a,       0x0DFF, } } },
+                 { -468,  800,   -5,    (s16)0x4000,       0x0DFF, } } },
 
         { 0x1, { { -519,  400,   522,   (s16)0xe062,       0x0DFF, },
                  { -872,  400,   870,   (s16)0x605c,       0x0DFF, } } },
 
         { 0x2, { { -1005, 400,   997,   (s16)0xe05c,       0x0DFF, } } },
 
-        { 0x3, { { -81,   -880,  488,   (s16)0x7f9a,       0x0DFF, } } },
+        { 0x3, { { -81,   -880,  488,   (s16)0x8000,       0x0DFF, } } },
 
         { 0x4, { { -75,   -880,  672,   (s16)0xff9a,       0x0DFF, },
-                 { -243,  -880,  965,   (s16)0x3f9a,       0x0DFF, } } },
+                 { -243,  -880,  965,   (s16)0x4000,       0x0DFF, } } },
 
-        { 0x5, { { -427,  -880,  967,   (s16)0xffffbf9a,   0x0DFF, },
-                 { -1443  -760,  1070,  (s16)0x3f9a,       0x0DFF, } } },
+        { 0x5, { { -427,  -880,  967,   (s16)0xffffc000,   0x0DFF, },
+                 { -1443  -760,  1070,  (s16)0x4000,       0x0DFF, } } },
 
-        { 0x6, { { -1627, -760,  1071,  (s16)0xffffbf9a,   0x0DFF, },
-                 { -1855, -760,  862,   (s16)0xffffff9a,   0x0DFF, } } },
+        { 0x6, { { -1627, -760,  1071,  (s16)0xffffc000,   0x0DFF, },
+                 { -1855, -760,  862,   (s16)0x0,   0x0DFF, } } },
 
-        { 0x7, { { -1856, -760,  678,   (s16)0x7f9a,       0x0DFF, } } },
+        { 0x7, { { -1856, -760,  678,   (s16)0x8000,       0x0DFF, } } },
 
         { 0x8, { { -2486, -760,  -517,  (s16)0xffffa062,   0x0DFF, } } },
 
         { 0x9, { { -850,  -1880, -894,  (s16)0xfa5,        0x0DFF, } } },
 
-        { 0xA, { { -652,  800,   1,     (s16)0xffffbf9a,   0x0DFF, } } },
+        { 0xA, { { -652,  800,   1,     (s16)0xffffc000,   0x0DFF, } } },
     };
 
     static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sDodongoCavernSpawns = {
        // Room     posX   posY   posZ   rotY               Param (0x0DFF is stationary)
         // Main Room
         { 0x0, { { -3,    0,     369,   (s16)0xffff8000,   0x0DFF },
-                 { -752,  0,     -1521, (s16)0x3f9a,       0x0DFF },
-                 { -1460, 531,   -320,  (s16)0x3f9a,       0x0DFF } } },
+                 { -752,  0,     -1521, (s16)0x4000,       0x0DFF },
+                 { -1460, 531,   -320,  (s16)0x4000,       0x0DFF } } },
         
         // Right Scarecrow Room + Keese Pot Hallway
-        { 0x1, { { 3560,  100,   -472,  (s16)0xffffff9a,   0x0DFF },
-                 { 3560,  100,   -648,  (s16)0x7f9a,       0x0DFF },
-                 { 3560,  100,   -1188, (s16)0xffffff9a,   0x0DFF } } },
+        { 0x1, { { 3560,  100,   -472,  (s16)0x0,   0x0DFF },
+                 { 3560,  100,   -648,  (s16)0x8000,       0x0DFF },
+                 { 3560,  100,   -1188, (s16)0x0,   0x0DFF } } },
 
         // Staircase Room
-        { 0x2, { { -928,  0,     -1520, (s16)0xffffbf9a,   0x0DFF },
-                 { -1960, 0,     -828,  (s16)0x7f9a,       0x0DFF },
-                 { -1960, 531,   -820,  (s16)0x7f9a,       0x0DFF } } },
+        { 0x2, { { -928,  0,     -1520, (s16)0xffffc000,   0x0DFF },
+                 { -1960, 0,     -828,  (s16)0x8000,       0x0DFF },
+                 { -1960, 531,   -820,  (s16)0x8000,       0x0DFF } } },
 
         // Lizalfos Battle Room
-        { 0x3, { { 3560,  100,   -1364, (s16)0x7f9a,       0x0DFF },
+        { 0x3, { { 3560,  100,   -1364, (s16)0x8000,       0x0DFF },
                  { 2860,  100,   -2387, (s16)0x2af9,       0x0DFF },
-                 { 4337,  531,   -688,  (s16)0x7f9a,       0x0DFF },
-                 { 3868,  531,   -921,  (s16)0x3f9a,       0x0DFF } } },
+                 { 4337,  531,   -688,  (s16)0x8000,       0x0DFF },
+                 { 3868,  531,   -921,  (s16)0x4000,       0x0DFF } } },
 
         // Blue Dodongo Room
         { 0x4, { { 2710,  100,   -2474, (s16)0xffffaaf9,   0x0DFF },
-                 { 1548,  80,    -922,  (s16)0x3f9a,       0x0DFF } } },
+                 { 1548,  80,    -922,  (s16)0x4000,       0x0DFF } } },
 
         // Pillar Switch Room
-        { 0x5, { { -1960, -531,  -644,  (s16)0xffffff9a,   0x0DFF },
-                 { -1635, 531,   -318,  (s16)0xffffbf9a,   0x0DFF } } },
+        { 0x5, { { -1960, 531,  -644,  (s16)0x0,   0x0DFF },
+                 { -1635, 531,   -318,  (s16)0xffffc000,   0x0DFF } } },
 
         // Near Bombs Scrubs Room
-        { 0x6, { { 1837,  411,   -1568, (s16)0x7f9a,       0x0DFF } } },
+        { 0x6, { { 1837,  411,   -1568, (s16)0x8000,       0x0DFF } } },
 
         // Push Block Boss Door Room
         { 0x7, { { -245,  16,    -2783, (s16)0x4000,       0x0DFF },
-                 { -2,    76,    -2058, (s16)0x7f9a,       0x0DFF } } },
+                 { -2,    76,    -2058, (s16)0x8000,       0x0DFF } } },
 
         // Fire Keese Back Room
         { 0x8, { { 1472,  16,    -3871, (s16)0x0,          0x0DFF } } },
 
         // Bomb Bag Chest Room
-        { 0x9, { { 1840,  411,   -1230, (s16)0xffffff9a,   0x0DFF } } },
+        { 0x9, { { 1840,  411,   -1230, (s16)0x0,   0x0DFF } } },
 
         // First Flame Pillar Room
-        { 0xA, { { 4341,  531,   -512,  (s16)0xffffff9a,   0x0DFF } } },
+        { 0xA, { { 4341,  531,   -512,  (s16)0x0,   0x0DFF } } },
 
         // Gold Skulltula Torch Room
-        { 0xB, { { 2560,  0,     208,   (s16)0xffffff9a,   0x0DFF } } },
+        { 0xB, { { 2560,  0,     208,   (s16)0x0,   0x0DFF } } },
 
         // Second Flame Pillar Room
-        { 0xC, { { 3692,  531,  -918,   (s16)0xffffbf9a,   0x0DFF } } },
+        { 0xC, { { 3692,  531,  -918,   (s16)0xffffc000,   0x0DFF } } },
 
         // Blue Dodongo Scrub Room
-        { 0xD, { { 2430,  100,  -2980,  (s16)0x7f9a,       0x0DFF } } },
+        { 0xD, { { 2430,  100,  -2980,  (s16)0x8000,       0x0DFF } } },
 
         // Back Gold Skulltula Room
-        { 0xE, { { 1470,  76,   -4317,  (s16)0x7f9a,       0x0DFF } } },
+        { 0xE, { { 1470,  76,   -4317,  (s16)0x8000,       0x0DFF } } },
 
         // Compass Chest Room
-        { 0xF, { { -1958, 0,    -652,   (s16)0xffffff9a, 0x0DFF } } },
+        { 0xF, { { -1958, 0,    -652,   (s16)0x0, 0x0DFF } } },
+    };
+
+    static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sJabuJabuSpawns = {
+        // Room     posX   posY   posZ   rotY               Param (0x0DFF is stationary)
+        // Entrance
+        { 0x0,
+          { { -18, -244, 274, (s16)0xffff8000, 0x0DFF },
+            { 0, -320, -1035, (s16)0x0, 0x0DFF } } },
+
+        // Elevator Room
+        { 0x1,
+          { { 0, -320, -1218, (s16)0x8000, 0x0DFF },
+            { 0, -340, -2351, (s16)0x0, 0x0DFF },
+            { 528, -320, -1705, (s16)0xffffc000, 0x0DFF },
+            { -528, 80, -1705, (s16)0x4000, 0x0DFF },
+            { 221, -1233, -1700, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // Holes Room
+        { 0x2,
+          { { 0, -340, -2535, (s16)0x8000, 0x0DFF },
+            { 0, -340, -3891, (s16)0x0, 0x0DFF },
+          } },
+
+        // Ruto Pickup Room
+        { 0x3,
+          { { -512, -1113, -2803, (s16)0x5cd5, 0x0DFF },
+            { 368, -1113, -3225, (s16)0xffffc000, 0x0DFF },
+            { -909, -1015, -3342, (s16)0x4000, 0x0DFF },
+          } },
+
+        // Lone Octo Room
+        { 0x4,
+          { { -1360, 80, -2196, (s16)0xfffffff9, 0x0DFF, REQ_BOOMERANG},
+            { -712, 80, -1704, (s16)0xffffc000, 0x0DFF},
+          } },
+
+        // Boss Door Room
+        { 0x5,
+          { { 712, -320, -1702, (s16)0x4000, 0x0DFF },
+            { 1364, -320, -1999, (s16)0x207, 0x0DFF },
+          } },
+
+        // Big Octo
+        { 0x6,
+          { { -1093, -1025, -3345, (s16)0xffffc000, 0x0DFF },
+            { -1361, 80, -2376, (s16)0x8000, 0x0DFF },
+          } },
+
+        // Fork Room
+        { 0x7,
+          { { 0, -340, -4075, (s16)0x8000, 0x0DFF },
+            { -968, -340, -4683, (s16)0x4000, 0x0DFF },
+            { 0, -340, -5211, (s16)0x0, 0x0DFF },
+            { 662, -340, -5091, (s16)0x0, 0x0DFF },
+            { 968, -340, -4684, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // Middle Tentacle
+        { 0x8, { { 0, -340, -5395, (s16)0x8000, 0x0DFF, REQ_BOOMERANG } } },
+
+        // Stingray Room
+        { 0x9, { { 1152, -340, -4684, (s16)0x4000, 0x0DFF } } },
+
+        // Left Tentacle
+        { 0xA, { { -1152, -340, -4682, (s16)0xffffc000, 0x0DFF } } },
+
+        // Right Tentacle
+        { 0xB, { { 663, -340, -5275, (s16)0x8000, 0x0DFF, REQ_BOOMERANG } } },
+
+        // Bubble Room
+        { 0xC, { { -659, -340, -5275, (s16)0x8000, 0x0DFF } } },
+
+        // 5 Pot Room
+        { 0xD, { { -650, -1113, -2682, (s16)0xffffdcd5, 0x0DFF } } },
+
+        // Drown Ruto Room
+        { 0xE,
+          { { 552, -1114, -3225, (s16)0x4000, 0x0DFF },
+            { 405, -1233, -1702, (s16)0x4000, 0x0DFF },
+          } },
+    };
+
+    static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sForestTempleSpawns = {
+        // Room     posX   posY   posZ   rotY               Param (0x0DFF is stationary)
+        // Entrance
+        { 0x0, { { 110, 309, 778, (s16)0xffff8000, 0x0DFF },
+                 { 120, 359, 140, (s16)0x0, 0x0DFF }
+               } },
+
+        // Entrance Skulltula
+        { 0x1, { { 118, 359, -21, (s16)0xffff8000, 0x0DFF },
+                 { 120, 383, -500, (s16)0x0, 0x0DFF } 
+               } },
+
+        // Lobby
+        { 0x2,
+          {
+              { 118, 383, -661, (s16)0xffff8000, 0x0DFF },
+              { 120, 467, -2436, (s16)0x0, 0x0DFF },
+              { -510, 243, -2070, (s16)0x2000, 0x0DFF },
+              { 847, 243, -2164, (s16)0xffffe000, 0x0DFF },
+              { 919, 463, -1439, (s16)0xffffc000, 0x0DFF },
+              { -681, 383, -1441, (s16)0x4000, 0x0DFF },
+          } },
+
+        // Amy Poe Hallway
+        { 0x3,
+          {
+              { 1517, 463, -1440, (s16)0xffffc000, 0x0DFF },
+              { 1080, 463, -1440, (s16)0x4000, 0x0DFF },
+          } },
+
+        // Blue Bubble Hallway
+        { 0x4, { { 118, 467, -2597, (s16)0xffff8000, 0x0DFF },
+                 { 118, 467, -2922, (s16)0xffff9a, 0x0DFF }
+               } },
+
+        // West Skulltula Hallway
+        { 0x5, { { -1287, 383, -1441, (s16)0x4000, 0x0DFF },
+                 { -842, 383, -1439, (s16)0xffffc000, 0x0DFF }
+               } },
+
+        // Stalfos Room
+        { 0x6,
+          {
+              { 117, 467, -3098, (s16)0x8000, 0x0DFF },
+              { -293, 827, -3322, (s16)0x4000, 0x0DFF },    // TODO: Set clear flag 7
+              { 411, 827, -3318, (s16)0xffffc000, 0x0DFF }, // TODO: Set clear flag 7
+          } },
+
+        // East Courtyard
+        { 0x7,
+          {
+              { 447, 800, -2808, (s16)0x4000, 0x0DFF },
+              { 966, 243, -2293, (s16)0x6000, 0x0DFF },
+              { 1664, 523, -2796, (s16)0x0, 0x0DFF },
+          } },
+
+        // West Courtyard
+        { 0x8,
+          {
+              { -726, 243, -2284, (s16)0xffffa000, 0x0DFF },
+              { -209, 800, -2809, (s16)0xffffc000, 0x0DFF },
+              { -1642, 523, -2706, (s16)0x0, 0x0DFF },
+              { -1657, 523, -2047, (s16)0x4000, 0x0DFF },
+              { -1503, 523, -1944, (s16)0xffff8000, 0x0DFF },
+          } },
+
+        // Map Room
+        { 0xA, { { -33, 800, -2812, (s16)0x4000, 0x0DFF },
+                 { 271, 800, -2809, (s16)0xffffc000, 0x0DFF }
+               } },
+
+        // Push Block Room
+        { 0xB,
+          {
+              { -1501, 523, -1783, (s16)0x0, 0x0DFF, REQ_STRENGTH },
+              { -1448, 383, -1439, (s16)0xffffc000, 0x0DFF, REQ_STRENGTH },
+              { -1761, 1228, -1732, (s16)0x0, 0x0DFF },
+          } },
+
+        // Joelle
+        { 0xC, { { -1328, 1228, -3322, (s16)0x4000, 0x0DFF },
+                 { -469, 827, -3318, (s16)0xffffc000, 0x0DFF }
+               } },
+
+        // Beth
+        { 0xD, { { 587, 827, -3321, (s16)0x4000, 0x0DFF },
+                 { 1566, 1228, -3319, (s16)0xffffc000, 0x0DFF }
+               } },
+
+        // Spinning Platforms Room
+        { 0xE, { { 2001, 1228, -1732, (s16)0x0, 0x0DFF } } },
+
+        // Falling Ceiling
+        { 0xF, { { 1662, 523, -2957, (s16)0xffff8000, 0x0DFF },
+                 { 1989, 403, -1902, (s16)0x8000, 0x0DFF }
+               } },
+
+        // Amy Poe
+        { 0x10,
+          {
+              { 1994, 403, -1732, (s16)0x0, 0x0DFF },
+              { 1693, 463, -1442, (s16)0x4000, 0x0DFF },
+          } },
+
+        // Basement
+        { 0x11, { { 119, -779, -1665, (s16)0xffff8000, 0x0DFF } } },
+
+        // Floormaster
+        { 0x12, { { -1833, 523, -2042, (s16)0xffffc000, 0x0DFF } } },
+
+        // Twisted Hallway 1
+        { 0x13,
+          {
+              { -1762, 1236, -1908, (s16)0x8000, 0x0DFF },
+              { -1504, 1228, -3320, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // Twisted Hallway 2
+        { 0x14,
+          {
+              { 1742, 1228, -3321, (s16)0x4000, 0x0DFF },
+              { 1999, 1228, -1908, (s16)0x8000, 0x0DFF },
+          } },
+
+        // Double Bubble
+        { 0x15, { { -1646, 523, -2882, (s16)0x8000, 0x0DFF } } },
+    };
+
+    static const std::unordered_map<s8, std::vector<ArcadeSpawn>> sFireTempleSpawns = {
+        // Room     posX   posY   posZ   rotY               Param (0x0DFF is stationary)
+        // Entrance
+        { 0x0,
+          {
+              { 5, 0, 980, (s16)0xffff8000, 0x0DFF },
+              { 281, 0, 316, (s16)0x0, 0x0DFF },
+              { -280, 0, 220, (s16)0x0, 0x0DFF },
+              { -340, 200, -1, (s16)0x0, 0x0DFF },
+              { 340, 200, 1, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // Big Lava Room
+        { 0x1,
+          {
+              { 501, 200, -1, (s16)0x4000, 0x0DFF },
+              { 1561, 100, -1480, (s16)0x0, 0x0DFF },
+              { 1561, 240, -1458, (s16)0x0, 0x0DFF },
+              { 2620, 200, 1, (s16)0xffffc000, 0x0DFF },
+              { 1560, 200, 1404, (s16)0xffff8000, 0x0DFF },
+          } },
+
+        // Darunia Room
+        { 0x2, { { -500, 200, 1, (s16)0xffffc000, 0x0DFF },
+                 { -1478, 200, -5, (s16)0x4000, 0x0DFF }
+               } },
+
+        // BK Loop Flare Dancer
+        { 0x3, { { -280, 0, -988, (s16)0xffff8000, 0x0DFF /* REQ */ },
+                 { -88, 0, -1240, (s16)0xffffc000, 0x0DFF /* REQ */ }
+               } },
+
+        // Goron Shortcut
+        { 0x4,
+          {
+              { 2990, 2060, 1, (s16)0xffffc000, 0x0DFF },
+              { 2087, 2080, -628, (s16)0x0, 0x0DFF },
+              { 2500, 2800, 1, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // Boulder Maze
+        { 0x5,
+          {
+              { 2661, 2800, -1, (s16)0x4000, 0x0DFF },
+              { 1781, 2800, -1420, (s16)0x0, 0x0DFF },
+              { 1549, 2800, -410, (s16)0xffff8000, 0x0DFF },
+              { 1540, 2940, -631, (s16)0x4000, 0x0DFF },
+              { 1580, 4000, -670, (s16)0xffff8000, 0x0DFF },
+          } },
+
+        // Freestanding Hearts Room
+        { 0x6,
+          {
+              { 1551, 2800, -250, (s16)0x0, 0x0DFF },
+              { 1313, 2800, 60, (s16)0x4000, 0x0DFF },
+              { 1579, 2800, 250, (s16)0xffff8000, 0x0DFF },
+          } },
+
+        // Hookshot Elevator GS
+        { 0x7,
+          {
+              { 1581, 4000, -510, (s16)0x0, 0x0DFF },
+              { 1579, 4400, -671, (s16)0xffff8000, 0x0DFF },
+          } },
+
+        // Gold Rupee Chest Room
+        { 0x8, { { 1581, 4400, -510, (s16)0x0, 0x0DFF } } },
+
+        // Flame Wall Maze
+        { 0xA,
+          {
+              { -641, 2940, 192, (s16)0xffffc000, 0x0DFF },
+              { -1779, 2800, 410, (s16)0x0, 0x0DFF },
+              { -1367, 2980, 0, (s16)0x4000, 0x0DFF },
+              { -1781, 2800, -411, (s16)0xffff8000, 0x0DFF, REQ_BOMBS },
+              { -2514, 2840, -307, (s16)0x6000, 0x0DFF },
+          } },
+
+        // Highest Goron
+        { 0xB, { { -1538, 2980, 2, (s16)0xffffc000, 0x0DFF, REQ_HAMMER } } },
+
+        // Hammer Chest Room
+        { 0xD, { { -2289, 4400, 19, (s16)0x4000, 0x0DFF } } },
+
+        // Hammer Shortcut to Maze
+        { 0xE, { { -2266, 4180, -822, (s16)0x6000, 0x0DFF, REQ_HAMMER } } },
+
+        // BK Loop Torchslugs
+        { 0xF, { { 240, 0, -788, (s16)0x0, 0x0DFF },
+                 { 279, 0, 59, (s16)0xffff8000, 0x0DFF }
+               } },
+
+        // Flame Wall Chase Room
+        { 0x10,
+          {
+              { 1581, 2800, 411, (s16)0x0, 0x0DFF },
+              { 420, 2940, 189, (s16)0x4000, 0x0DFF },
+              { 1380, 2940, -629, (s16)0xffffc000, 0x0DFF },
+          } },
+
+        // BK Chest
+        { 0x11, { { -281, 0, 59, (s16)0xffff8000, 0x0DFF, TRICK_WEIRDSHOT },
+                  { -280, 0, -812, (s16)0x0, 0x0DFF, REQ_HAMMER }
+                } },
+
+        // BK Loop GS
+        { 0x12, { { 88, 0, -1242, (s16)0x4000, 0x0DFF },
+                  { 238, 0, -964, (s16)0xffff8000, 0x0DFF }
+                } },
+
+        // SoT Block GS
+        { 0x13, { { 1560, 240, -1601, (s16)0xffff8000, 0x0DFF } } },
+
+        // Push Block Elevator
+        { 0x15, { { 2781, 200, -1, (s16)0x4000, 0x0DFF },
+                  { 3150, 2060, -1, (s16)0x4000, 0x0DFF }
+                } },
+
+        // Highest Flare Dancer
+        { 0x18, { { -2731, 2840, -88, (s16)0xffffe000, 0x0DFF },
+                  { -2778, 4000, 160, (s16)0xffffc000, 0x0DFF }
+                } },
     };
 
     const std::vector<ArcadeSpawn>* availableSpawns = nullptr;
@@ -1150,6 +1651,18 @@ void Arcade_UpdateLinkSpawn(s32 sceneNum, s8 curRoom) {
     } else if (sceneNum == SCENE_DODONGOS_CAVERN) {
         if (sDodongoCavernSpawns.contains(curRoom)) {
             availableSpawns = &sDodongoCavernSpawns.at(curRoom);
+        }
+    } else if (sceneNum == SCENE_JABU_JABU) {
+        if (sJabuJabuSpawns.contains(curRoom)) {
+            availableSpawns = &sJabuJabuSpawns.at(curRoom);
+        }
+    } else if (sceneNum == SCENE_FOREST_TEMPLE) {
+        if (sForestTempleSpawns.contains(curRoom)) {
+            availableSpawns = &sForestTempleSpawns.at(curRoom);
+        }
+    } else if (sceneNum == SCENE_FIRE_TEMPLE) {
+        if (sFireTempleSpawns.contains(curRoom)) {
+            availableSpawns = &sFireTempleSpawns.at(curRoom);
         }
     }
 
@@ -1175,7 +1688,7 @@ extern "C" void Arcade_InitSave() {
         gSaveContext.playerName[i] = amPlayerName[i];
     }
 
-    sArcadeScore = 0;
+    sArcadeScore = -5; // Offset by -5 so that the player starts at 0 points
     sArcadeTransitionsMade = 0;
 
     gSaveContext.ship.quest.id = QUEST_ARCADE;
@@ -1183,6 +1696,10 @@ extern "C" void Arcade_InitSave() {
     gSaveContext.entranceIndex = Arcade_GetRandomEntrance();
     gSaveContext.cutsceneIndex = 0x8000;
     gSaveContext.isMagicAcquired = 1;
+    
+    // Glitch Handling
+    gSaveContext.ship.quest.data.arcade.canEquipSwap = false;
+    gSaveContext.ship.quest.data.arcade.canISG = false;
 
     // Set magic
     if (gSaveContext.ship.quest.data.arcade.options[AM_OPTIONS_MAGIC] == AM_CHOICE_MAGIC_SINGLE) {
@@ -1231,6 +1748,9 @@ extern "C" void Arcade_InitSave() {
     gSaveContext.eventChkInf[7] |= 0x20; // twinrova
     gSaveContext.eventChkInf[7] |= 0x40; // barinade
     gSaveContext.eventChkInf[7] |= 0x80; // bongo bongo
+
+    // Entered DC
+    SET_EVENTCHKINF(EVENTCHKINF_ENTERED_DODONGOS_CAVERN);
 
     // Sets all rando flags to false
     // Boss Rush currently uses 2 randomizer flags (RAND_INF_DUNGEONS_DONE_SPIRIT_TEMPLE &
@@ -1455,11 +1975,6 @@ void Arcade_OnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_list
             *should = false;
             break;
         }
-        // Break the dodongo breakable floor immediately so the player can jump in the hole immediately.
-        case VB_BG_BREAKWALL_BREAK: {
-            *should = true;
-            break;
-        }
         // Skip past the "Save?" window when dying and go to the "Continue?" screen immediately.
         case VB_TRANSITION_TO_SAVE_SCREEN_ON_DEATH: {
             PauseContext* pauseCtx = va_arg(args, PauseContext*);
@@ -1500,15 +2015,108 @@ void Arcade_OnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_list
     va_end(args);
 }
 
+void Arcade_GlitchLogicHandling() {
+    if (gPlayState == nullptr) {
+        return;
+    }
+
+    // ISG handling
+    Player* player = GET_PLAYER(gPlayState);
+    if (player != nullptr) {
+        bool isPaused = gPlayState->pauseCtx.state;
+        bool swordActive = player->meleeWeaponState;
+        static int32_t isgFrameCount = 0;
+
+        if (gSaveContext.ship.quest.data.arcade.canISG == false) {
+            if ((player->stateFlags3 == PLAYER_STATE3_MIDAIR) || !swordActive) {
+                isgFrameCount = 0;
+            } else if (!isPaused) {
+                isgFrameCount++;
+                if (isgFrameCount > 20) {
+                    gSaveContext.ship.quest.data.arcade.canISG = true;
+                }
+            }
+        }
+    }
+
+    // Equip Swap handling
+    if (gSaveContext.ship.quest.data.arcade.canEquipSwap == false) {
+        if (LINK_IS_ADULT) {
+            for (int button = 1; button < ARRAY_COUNT(gSaveContext.equips.buttonItems); button++) {
+                switch (gSaveContext.equips.buttonItems[button]) {
+                    case ITEM_BOOMERANG:
+                    case ITEM_STICK:
+                    case ITEM_SLINGSHOT:
+                    case ITEM_BEAN:
+                        gSaveContext.ship.quest.data.arcade.canEquipSwap = true;
+                        return;
+                    default:
+                        break;
+                }
+            }
+        } else {
+            for (int button = 1; button < ARRAY_COUNT(gSaveContext.equips.buttonItems); button++) {
+                switch (gSaveContext.equips.buttonItems[button]) {
+                    case ITEM_HAMMER:
+                    case ITEM_HOOKSHOT:
+                    case ITEM_LONGSHOT:
+                    case ITEM_BOW:
+                    case ITEM_ARROW_FIRE:
+                    case ITEM_ARROW_ICE:
+                    case ITEM_ARROW_LIGHT:
+                        gSaveContext.ship.quest.data.arcade.canEquipSwap = true;
+                        return;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+}
+
+bool Arcade_IsDungeonScene(int16_t sceneNum) {
+    switch (sceneNum) {
+        case SCENE_DEKU_TREE:
+        case SCENE_DODONGOS_CAVERN:
+        case SCENE_JABU_JABU:
+        case SCENE_FOREST_TEMPLE:
+        case SCENE_FIRE_TEMPLE:
+        case SCENE_WATER_TEMPLE:
+        case SCENE_SPIRIT_TEMPLE:
+        case SCENE_SHADOW_TEMPLE:
+        case SCENE_BOTTOM_OF_THE_WELL:
+        case SCENE_ICE_CAVERN:
+        case SCENE_GERUDO_TRAINING_GROUND:
+        case SCENE_INSIDE_GANONS_CASTLE:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void Arcade_OnSceneInitHandler(s16 sceneNum) {
+    ActorContext* act = &gPlayState->actorCtx;
+    bool canEquipSwap = gSaveContext.ship.quest.data.arcade.canEquipSwap;
+
     // Unpause the timer when the scene loaded isn't the Chamber of Sages.
     if (sceneNum != SCENE_CHAMBER_OF_THE_SAGES) {
         gSaveContext.ship.quest.data.arcade.isPaused = false;
     }
-    Arcade_UpdateScore(9);
+
+    //if (!canEquipSwap) Arcade_GlitchLogicHandling(gPlayState);
+    Arcade_UpdateScore(5);
+
+    // Unset all scene flags and saved flags
+    if (gPlayState != nullptr) {
+        ActorContext* act = &gPlayState->actorCtx;
+        act->flags.swch = 0;
+        act->flags.clear = 0;
+        gSaveContext.sceneFlags[gPlayState->sceneNum].swch = act->flags.swch;
+        gSaveContext.sceneFlags[gPlayState->sceneNum].clear = act->flags.clear;
+    }
 
     if (gSaveContext.respawnFlag <= 0 && sArcadeOverrideRoom != -1) {
-        s8 origRoom = gPlayState->roomCtx.curRoom.num;
+        int8_t origRoom = gPlayState->roomCtx.curRoom.num;
 
         if (origRoom != sArcadeOverrideRoom) {
             // Reset room ctx back to prev room and then load the new room
@@ -1518,15 +2126,29 @@ void Arcade_OnSceneInitHandler(s16 sceneNum) {
         }
     }
 
-    s8 currentRoom = (sArcadeOverrideRoom != -1) ? sArcadeOverrideRoom : gPlayState->roomCtx.curRoom.num;
-    Arcade_UpdateLinkSpawn(sceneNum, currentRoom);
+    if (gPlayState->sceneNum == SCENE_JABU_JABU && gPlayState->roomCtx.curRoom.num == 0x6) {
+        Flags_SetInfTable(0x145); // Fight Big Octo
+    }
 
+    int8_t currentRoom = (sArcadeOverrideRoom != -1) ? sArcadeOverrideRoom : gPlayState->roomCtx.curRoom.num;
+    Arcade_UpdateLinkSpawn(sceneNum, currentRoom);
     Arcade_ChooseRandomEntrance(gPlayState);
-    SPDLOG_INFO("[Arcade] SceneInit curRoom.num {}", gPlayState->roomCtx.curRoom.num);
+
+    sArcadeLockClosestDoor = true;
 }
 
 void Arcade_OnBossDefeatHandler(void* refActor) {
     Arcade_HandleCompleteBoss(gPlayState);
+}
+
+void Arcade_OnEnemyDefeatedHandler(void* actorPtr) {
+    Actor* actor = static_cast<Actor*>(actorPtr);
+    Arcade_HandleEnemyDefeated(actor);
+}
+
+void Arcade_OnWonderCollectHandler(void* actorPtr) {
+    Actor* actor = static_cast<Actor*>(actorPtr);
+    Arcade_HandleWonderCollect(actor);
 }
 
 void Arcade_OnBlueWarpUpdate(void* actor) {
@@ -1537,24 +2159,203 @@ void Arcade_OnBlueWarpUpdate(void* actor) {
     }
 }
 
-void Arcade_HandleDoorWarping(PlayState* play, bool doorIsOpening) {
-    Player* player = GET_PLAYER(gPlayState);
-    if (player->stateFlags1 == PLAYER_STATE1_IN_CUTSCENE && doorIsOpening) {
-        play->nextEntranceIndex = sArcadeOverrideEntrance;
+void Arcade_TransitionInterceptor() {
+    if (sArcadeOverrideEntrance == -1 || gPlayState == nullptr || !Arcade_IsDungeonScene(gPlayState->sceneNum)) {
+        return;
+    }
+
+    bool isTransitioning = false;
+
+    // Catch Native Room Transitions (e.g., walking through an unlocked Jabu door or hallway)
+    if (gPlayState->roomCtx.status == 1) {
+        gPlayState->roomCtx.status = 0; // Abort the native room transition
+        isTransitioning = true;
+    }
+    // Catch Native Scene Transitions (e.g., doors that go between distinct scenes)
+    else if (gPlayState->transitionTrigger == TRANS_TRIGGER_START) {
+        // Ensure we don't accidentally override the Chamber of Sages/Credits warp
+        if (gPlayState->nextEntranceIndex != ENTR_CHAMBER_OF_THE_SAGES_0 && gPlayState->nextEntranceIndex != 0xFFF2) {
+            isTransitioning = true;
+        }
+    }
+
+    if (isTransitioning) {
+        // Force the Arcade scene transition
+        gPlayState->nextEntranceIndex = sArcadeOverrideEntrance;
         gSaveContext.nextCutsceneIndex = 0x8000;
-        play->transitionTrigger = TRANS_TRIGGER_START;
-        play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
+        gPlayState->transitionTrigger = TRANS_TRIGGER_START;
+        gPlayState->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
+
+        SPDLOG_INFO("[Arcade] Transition intercepted. Forcing scene warp to {}", sArcadeOverrideEntrance);
+
+        // CONSUME the override so we don't trap the player in an infinite loop
+        sArcadeOverrideEntrance = -1;
     }
 }
 
-void Arcade_OnShutterDoorOpen(void* actor) {
-    DoorShutter* shutterDoor = static_cast<DoorShutter*>(actor);
-    Arcade_HandleDoorWarping(gPlayState, shutterDoor->unk_164);
+void Arcade_EnHoll_Draw(Actor* thisx, PlayState* play) {
+    EnHoll* enHoll = reinterpret_cast<EnHoll*>(thisx);
+    u8 originalSide = enHoll->side;
+
+    // Extract the action type index exactly as EnHoll_ChooseAction does
+    s32 action = (thisx->params >> 6) & 7;
+
+    // Push the matrix to protect the global state
+    Matrix_Push();
+
+    // If the action type is a hole transition (1, 2, or 5), pitch it 90 degrees
+    // so the visual plane lies flat on the floor or ceiling.
+    if (action == 1 || action == 2 || action == 5) {
+        Matrix_RotateX(M_PI / 2.0f, MTXMODE_APPLY);
+    }
+
+    // Draw both sides of actor
+    enHoll->side = 1;
+    EnHoll_Draw(thisx, play);
+    enHoll->side = 0;
+    EnHoll_Draw(thisx, play);
+
+    // Pop the matrix to erase both our X-rotation and the Y-rotation
+    // caused by the second EnHoll_Draw call.
+    Matrix_Pop();
+
+    enHoll->side = originalSide;
 }
 
-void Arcade_OnEnDoorOpen(void* actor) {
-    EnDoor* enDoor = static_cast<EnDoor*>(actor);
-    Arcade_HandleDoorWarping(gPlayState, enDoor->playerIsOpening);
+void Arcade_HandleDoors(void* actor) {
+    Actor* doorActor = static_cast<Actor*>(actor);
+    Player* player = GET_PLAYER(gPlayState);
+    int32_t numDoors = gPlayState->actorCtx.actorLists[ACTORCAT_DOOR].length;
+    int32_t numEnemies = gPlayState->actorCtx.actorLists[ACTORCAT_ENEMY].length;
+    Actor* enemyName = gPlayState->actorCtx.actorLists[ACTORCAT_ENEMY].head;
+    bool canClear = true;
+    bool flippedDoor = false;
+    int32_t curFrames = gPlayState->state.frames;
+    int32_t doorLockoutTimer = 20;
+
+    // Unkillable enemies that would prevent SHUTTER_FRONT_CLEAR from working
+    if (enemyName != nullptr) {
+        switch (enemyName->id) {
+            case ACTOR_EN_BROB:
+                canClear = false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (gPlayState->sceneNum == SCENE_JABU_JABU) {
+        switch (gPlayState->roomCtx.curRoom.num) {
+            case 0x9:
+                flippedDoor = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (doorActor->id == ACTOR_DOOR_SHUTTER) {
+        DoorShutter* shutterDoor = static_cast<DoorShutter*>(actor);
+
+        if (shutterDoor->doorType == SHUTTER_KEY_LOCKED) {
+            shutterDoor->unlockTimer = 0;
+        }
+
+        if (shutterDoor->dyna.actor.xyzDistToPlayerSq <= SQ(200.0f) && numDoors > 1 && sArcadeLockClosestDoor) {
+            shutterDoor->doorType = SHUTTER_FRONT_SWITCH_BACK_CLEAR;
+            DoorShutter_SetupAction(shutterDoor, DoorShutter_SetupType);
+
+            SPDLOG_INFO("[Arcade]: Locked door behind player dynamically at distance squared {}",
+                        doorActor->xyzDistToPlayerSq);
+            sArcadeLockClosestDoor = false;
+        } else if (numDoors == 1 && numEnemies >= 1 && sArcadeLockClosestDoor && canClear) {
+            if (flippedDoor) {
+                shutterDoor->doorType = SHUTTER_FRONT_SWITCH_BACK_CLEAR;
+                DoorShutter_SetupAction(shutterDoor, DoorShutter_SetupType);
+
+                SPDLOG_INFO("[Arcade] Flipped Door: 'Back' set to clear");
+                sArcadeLockClosestDoor = false;
+            } else {
+                shutterDoor->doorType = SHUTTER_FRONT_CLEAR;
+                DoorShutter_SetupAction(shutterDoor, DoorShutter_SetupType);
+
+                SPDLOG_INFO("[Arcade]: 1 door in room with enemies, set door to open on clear");
+                sArcadeLockClosestDoor = false;
+            }
+        }
+    } else if (doorActor->id == ACTOR_EN_HOLL) {
+        EnHoll* enHoll = static_cast<EnHoll*>(actor);
+        enHoll->planeAlpha = 255;
+        enHoll->actor.draw = (ActorFunc)Arcade_EnHoll_Draw;
+
+        f32 posX = enHoll->actor.world.pos.x;
+        f32 posY = enHoll->actor.world.pos.y;
+        f32 posZ = enHoll->actor.world.pos.z;
+        int16_t rotX = enHoll->actor.shape.rot.x;
+        int16_t rotY = enHoll->actor.shape.rot.y;
+        int16_t rotZ = enHoll->actor.shape.rot.z;
+
+        if (enHoll->actor.xyzDistToPlayerSq <= SQ(200.0f) && numDoors > 1 && sArcadeLockClosestDoor) {
+            // Replace En_Holl load planes with gold gaunts block to force the player to go through the room
+            Actor_Delete(&gPlayState->actorCtx, doorActor, gPlayState);
+            BgHeavyBlock* heavyBlock = (BgHeavyBlock*)Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_BG_HEAVY_BLOCK, posX, posY, posZ, rotX, rotY, rotZ, 0);
+            if (heavyBlock == NULL) {
+                return;
+            } else {
+                heavyBlock->dyna.actor.scale.x = 2.0f;
+                heavyBlock->dyna.actor.scale.y = 0.5f;
+            }
+
+            SPDLOG_INFO("[Arcade]: Successfully spawned Heavy Block behind player at {}, {}, {}, rotation: {}", posX, posY, posZ, rotY);
+            sArcadeLockClosestDoor = false;
+        }
+    } else if (doorActor->id == ACTOR_EN_DOOR) {
+        EnDoor* enDoor = static_cast<EnDoor*>(actor);
+        enDoor->lockTimer = 0;
+
+        f32 posX = enDoor->actor.world.pos.x;
+        f32 posY = enDoor->actor.world.pos.y;
+        f32 posZ = enDoor->actor.world.pos.z;
+        int16_t rotX = enDoor->actor.shape.rot.x;
+        int16_t rotY = enDoor->actor.shape.rot.y;
+        int16_t rotZ = enDoor->actor.shape.rot.z;
+
+        if (enDoor->actor.xyzDistToPlayerSq <= SQ(200.0f) && numDoors > 1 && sArcadeLockClosestDoor) {
+            int16_t yawDiff = (int16_t)(rotY - enDoor->actor.yawTowardsPlayer);
+            if (yawDiff > 0x4000 || yawDiff < -0x4000) {
+                rotY += 0x8000;
+            }
+            uint16_t shutterParams = enDoor->actor.params & 0xFC3F;
+
+            Actor_Delete(&gPlayState->actorCtx, doorActor, gPlayState);
+            DoorShutter* replaceShutter = (DoorShutter*)Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_DOOR_SHUTTER, posX, posY, posZ, rotX, rotY, rotZ, 0);
+
+            replaceShutter->doorType = SHUTTER_FRONT_SWITCH_BACK_CLEAR;
+
+            SPDLOG_INFO("[Arcade]: Successfully locked door behind player at {}, {}, {}, rotation: {}", posX, posY, posZ, rotY);
+            sArcadeLockClosestDoor = false;
+        }
+    } else if ((curFrames - doorLockoutTimer) > 0 && sArcadeLockClosestDoor) { // if no door found within a 20 game frames, then stop searching for door
+        sArcadeLockClosestDoor = false;
+        SPDLOG_INFO("[Arcade]: No door found to lock within 20 frames, aborting");
+    }
+
+    if (sArcadeLockClosestDoor) {
+        SPDLOG_INFO("[Arcade]: Number of Doors {}", numDoors);
+    }
+}
+
+void Arcade_LogDoorPos(void* actor) {
+    Actor* doorPos = static_cast<Actor*>(actor);
+    Player* player = GET_PLAYER(gPlayState);
+
+    int32_t doorYaw = std::abs(doorPos->yawTowardsPlayer - doorPos->world.rot.y);
+    int32_t playerYaw = std::abs(player->yaw);
+    int32_t yawDifference = doorYaw - playerYaw;
+    SPDLOG_INFO("Door Pos: {}, {}, {}", doorPos->world.pos.x, doorPos->world.pos.y,
+                doorPos->world.pos.z);
+    SPDLOG_INFO("Door YAW: {}, Player YAW: {}", doorYaw, playerYaw);
+    SPDLOG_INFO("YAW Difference: {}", yawDifference);
 }
 
 void RegisterArcadeMode() {
@@ -1567,13 +2368,13 @@ void RegisterArcadeMode() {
         });
 
         // Remove bushes, used in Gohma's arena
-        COND_ID_HOOK(OnActorInit, ACTOR_EN_KUSA, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
+        // COND_ID_HOOK(OnActorInit, ACTOR_EN_KUSA, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
 
         // Remove pots, used in Barinade's and Ganondorf's arenas
-        COND_ID_HOOK(OnActorInit, ACTOR_OBJ_TSUBO, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
+        // COND_ID_HOOK(OnActorInit, ACTOR_OBJ_TSUBO, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
 
         // Remove chests, mainly for the chest in King Dodongo's boss room
-        COND_ID_HOOK(OnActorInit, ACTOR_EN_BOX, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
+        // COND_ID_HOOK(OnActorInit, ACTOR_EN_BOX, IS_ARCADE_MODE, [](void* actorPtr) { Actor_Kill((Actor*)actorPtr); });
 
         COND_HOOK(OnVanillaBehavior, IS_ARCADE_MODE, Arcade_OnVanillaBehaviorHandler);
 
@@ -1583,16 +2384,15 @@ void RegisterArcadeMode() {
 
         COND_ID_HOOK(OnActorUpdate, ACTOR_DOOR_WARP1, IS_ARCADE_MODE, Arcade_OnBlueWarpUpdate);
 
-        COND_ID_HOOK(OnActorUpdate, ACTOR_DOOR_SHUTTER, IS_ARCADE_MODE, Arcade_OnShutterDoorOpen);
-        COND_ID_HOOK(OnActorUpdate, ACTOR_EN_DOOR, IS_ARCADE_MODE, Arcade_OnEnDoorOpen);
+        COND_HOOK(OnEnemyDefeat, IS_ARCADE_MODE, Arcade_OnEnemyDefeatedHandler);
 
-        // Re-apply the arcade one-shot override during actor updates while a transition is active.
-        COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, [](void* actorPtr) {
-            if (sArcadeOverrideEntrance != -1 && gPlayState != NULL &&
-                gPlayState->transitionTrigger == TRANS_TRIGGER_START) {
-                gPlayState->nextEntranceIndex = sArcadeOverrideEntrance;
-            }
-        });
+        COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, Arcade_HandleDoors);
+        COND_HOOK(OnGameFrameUpdate, IS_ARCADE_MODE, Arcade_TransitionInterceptor);
+        COND_HOOK(OnGameFrameUpdate, IS_ARCADE_MODE, Arcade_GlitchLogicHandling);
+
+        COND_ID_HOOK(OnActorDestroy, ACTOR_EN_WONDER_ITEM, IS_ARCADE_MODE, Arcade_OnWonderCollectHandler);
+
+        COND_ID_HOOK(OnActorInit, ACTOR_DOOR_SHUTTER, IS_ARCADE_MODE, Arcade_LogDoorPos)
     });
 }
 

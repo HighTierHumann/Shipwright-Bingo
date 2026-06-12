@@ -738,11 +738,34 @@ void DoorShutter_Draw(Actor* thisx, PlayState* play) {
 
                 Gfx_SetupDL_25Opa(play->state.gfxCtx);
                 gDPSetEnvColor(POLY_OPA_DISP++, 0, 0, 0, 255.0f * sp58);
+
+                if (CVarGetInteger(CVAR_ENHANCEMENT("ShowDoorLocksOnBothSides"), 0)) {
+                    Matrix_Push();
+                }
+
                 Matrix_Translate(0, 0, sp70->translateZ, MTXMODE_APPLY);
                 Matrix_Scale(sp58, sp58, sp58, MTXMODE_APPLY);
                 gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx),
                           G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
                 gSPDisplayList(POLY_OPA_DISP++, sp70->b);
+
+                if (CVarGetInteger(CVAR_ENHANCEMENT("ShowDoorLocksOnBothSides"), 0)) {
+                    Matrix_Pop();  // Restore base matrix
+                    Matrix_Push(); // Save it again
+
+                    Matrix_RotateZYX(0, 0x8000, 0, MTXMODE_APPLY); // Rotate 180 degrees
+                    Matrix_Translate(0, 0, sp70->translateZ, MTXMODE_APPLY);
+                    Matrix_Scale(sp58, sp58, sp58, MTXMODE_APPLY);
+                    gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx),
+                              G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+                    gSPDisplayList(POLY_OPA_DISP++, sp70->b);
+
+                    Matrix_Pop(); // Restore base matrix
+
+                    // Re-apply vanilla transformations so the matrix state isn't broken for subsequent code
+                    Matrix_Translate(0, 0, sp70->translateZ, MTXMODE_APPLY);
+                    Matrix_Scale(sp58, sp58, sp58, MTXMODE_APPLY);
+                }
             }
         } else {
             if (sp70->b != NULL) {
@@ -764,10 +787,31 @@ void DoorShutter_Draw(Actor* thisx, PlayState* play) {
             gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
             gSPDisplayList(POLY_OPA_DISP++, sp70->a);
             if (this->barsClosedAmount != 0.0f && sp70->b != NULL) {
+
+                if (CVarGetInteger(CVAR_ENHANCEMENT("ShowDoorLocksOnBothSides"), 0)) {
+                    Matrix_Push();
+                }
+
                 Matrix_Translate(0, sp70->c * (1.0f - this->barsClosedAmount), sp70->translateZ, MTXMODE_APPLY);
                 gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx),
                           G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
                 gSPDisplayList(POLY_OPA_DISP++, sp70->b);
+
+                if (CVarGetInteger(CVAR_ENHANCEMENT("ShowDoorLocksOnBothSides"), 0)) {
+                    Matrix_Pop();  // Restore base matrix
+                    Matrix_Push(); // Save it again
+
+                    Matrix_RotateZYX(0, 0x8000, 0, MTXMODE_APPLY); // Rotate 180 degrees
+                    Matrix_Translate(0, sp70->c * (1.0f - this->barsClosedAmount), sp70->translateZ, MTXMODE_APPLY);
+                    gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx),
+                              G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+                    gSPDisplayList(POLY_OPA_DISP++, sp70->b);
+
+                    Matrix_Pop(); // Restore base matrix
+
+                    // Re-apply vanilla transformations
+                    Matrix_Translate(0, sp70->c * (1.0f - this->barsClosedAmount), sp70->translateZ, MTXMODE_APPLY);
+                }
             }
         }
 

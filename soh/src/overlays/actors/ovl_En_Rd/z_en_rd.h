@@ -8,6 +8,15 @@ struct EnRd;
 
 typedef void (*EnRdActionFunc)(struct EnRd*, PlayState*);
 
+typedef enum EnRdType {
+    /* -2  */ EN_RD_GIBDO = -2,
+    /* -1  */ EN_RD_REDEAD_CASTLE = -1,
+    /*  0  */ EN_RD_REDEAD_NORMAL,
+    /*  1  */ EN_RD_REDEAD_STAND, // Seemingly identical to NORMAL?
+    /*  2  */ EN_RD_REDEAD_CROUCH,
+    /*  3  */ EN_RD_REDEAD_INVIS
+} EnRdType;
+
 typedef struct EnRd {
     /* 0x0000 */ Actor actor;
     /* 0x014C */ Vec3s firePos[10];

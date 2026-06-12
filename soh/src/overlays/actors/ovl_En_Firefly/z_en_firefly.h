@@ -25,11 +25,14 @@ typedef struct EnFirefly {
 } EnFirefly; // size = 0x0374
 
 typedef enum {
-    /* 0 */ KEESE_FIRE_FLY,
-    /* 1 */ KEESE_FIRE_PERCH,
-    /* 2 */ KEESE_NORMAL_FLY,
-    /* 3 */ KEESE_NORMAL_PERCH,
-    /* 4 */ KEESE_ICE_FLY
+    /* -4  */ KEESE_ICE_INVIS = -4,
+    /* -2  */ KEESE_NORMAL_INVIS = -2,
+    /* -1  */ KEESE_FIRE_INVIS = -1,
+    /*  0  */ KEESE_FIRE_FLY,
+    /*  1  */ KEESE_FIRE_PERCH,
+    /*  2  */ KEESE_NORMAL_FLY,
+    /*  3  */ KEESE_NORMAL_PERCH,
+    /*  4  */ KEESE_ICE_FLY
 } KeeseType;
 
 #endif

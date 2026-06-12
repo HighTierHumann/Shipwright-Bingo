@@ -8,6 +8,13 @@ struct EnIk;
 
 typedef void (*EnIkActionFunc)(struct EnIk*, PlayState*);
 
+typedef enum EnIkType {
+    /* 0 */ EN_IK_NABOORU,
+    /* 1 */ EN_IK_WHITE_CHAIR,
+    /* 2 */ EN_IK_BLACK,
+    /* 3 */ EN_IK_WHITE
+} EnIkType;
+
 typedef struct EnIk {
     /* 0x0000 */ Actor actor;
     /* 0x014C */ SkelAnime skelAnime;

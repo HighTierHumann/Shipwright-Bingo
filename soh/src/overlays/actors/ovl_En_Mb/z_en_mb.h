@@ -9,6 +9,12 @@ struct EnMb;
 typedef void (*EnMbActionFunc)(struct EnMb*, PlayState*);
 
 typedef enum {
+    /* -1 */ ENMB_TYPE_SPEAR_GUARD = -1,
+    /*  0 */ ENMB_TYPE_CLUB,
+    /*  1 */ ENMB_TYPE_SPEAR_PATROL
+} EnMbType;
+
+typedef enum {
     /*  0 */ ENMB_STATE_SPEAR_SPEARPATH_DAMAGED,
     /*  1 */ ENMB_STATE_CLUB_DEAD,
     /*  2 */ ENMB_STATE_CLUB_KNEELING_DAMAGED,

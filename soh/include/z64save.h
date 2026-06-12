@@ -217,6 +217,8 @@ typedef struct ShipBossRushSaveContextData {
 } ShipBossRushSaveContextData;
 
 typedef struct ShipArcadeModeSaveContextData {
+    bool canEquipSwap;
+    bool canISG;
     u32 isPaused;
     u8 options[AM_OPTIONS_MAX];
 } ShipArcadeModeSaveContextData;
