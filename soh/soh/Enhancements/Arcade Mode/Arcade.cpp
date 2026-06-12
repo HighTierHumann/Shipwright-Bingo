@@ -195,7 +195,6 @@ static const std::vector<std::pair<s16, ArcadeEnemyTable>> sEnemyScoreTable = {
     { ACTOR_EN_FD,          {200 ,     "Flare Dancer"         ,                                }}, // Flare Dancer
     { ACTOR_EN_FLOORMAS,    {50  ,     "Floormaster"          ,       0                        }}, // Floormaster
     { ACTOR_EN_FLOORMAS,    {10  ,     "Invisible Floormaster",      -1                        }}, // Floormaster (invisible)
-    { ACTOR_EN_YUKABYUN,    {0   ,     "Flying Floor Tile"    ,                                }}, // Flying Floor Tile
     { ACTOR_EN_PEEHAT,      {30  ,     "Peahat"               ,  PEAHAT_TYPE_FLYING            }}, // Flying Peahat
     { ACTOR_EN_PEEHAT,      {10  ,     "Peahat Larva"         ,  PEAHAT_TYPE_LARVA             }}, // Flying Peahat Larva
     { ACTOR_EN_TUBO_TRAP,   {0   ,     "Flying Pot"           ,                                }}, // Flying pot
@@ -209,7 +208,7 @@ static const std::vector<std::pair<s16, ArcadeEnemyTable>> sEnemyScoreTable = {
     { ACTOR_EN_FIREFLY,     {10  ,     "Keese"                ,  KEESE_NORMAL_FLY              }}, // Keese
     { ACTOR_EN_FIREFLY,     {10  ,     "Keese"                ,  KEESE_NORMAL_PERCH            }}, // Keese
     { ACTOR_EN_FIREFLY,     {15  ,     "Invisible Keese"      ,  KEESE_NORMAL_INVIS            }}, // Keese (invisible)
-    { ACTOR_EN_FIREFLY,     {15  ,     "Fire Keese"           ,  KEESE_FIRE_FLY                }}, // Keese (Fire)
+    { ACTOR_EN_FIREFLY,     {15  ,     "Fire Keese"           ,                                }}, // Keese (Fire)
     { ACTOR_EN_FIREFLY,     {15  ,     "Fire Keese"           ,  KEESE_FIRE_PERCH              }}, // Keese (Fire)
     { ACTOR_EN_FIREFLY,     {20  ,     "Invisible Fire Keese" ,  KEESE_FIRE_INVIS              }}, // Keese (Fire invisible)
     { ACTOR_EN_FIREFLY,     {15  ,     "Ice Keese"            ,  KEESE_ICE_FLY                 }}, // Keese (Ice)
@@ -234,9 +233,11 @@ static const std::vector<std::pair<s16, ArcadeEnemyTable>> sEnemyScoreTable = {
     { ACTOR_EN_BUBBLE,      {5   ,     "Bubble (Literal)"     ,                                }}, // Shabom (bubble)
     { ACTOR_EN_SB,          {10  ,     "Shell Blade"          ,                                }}, // Shell Blade
     { ACTOR_EN_SKJ,         {10  ,     "Skull Kid"            ,                                }}, // Skull Kid
-    { ACTOR_EN_ST,          {10  ,     "Skulltula"            ,       0                        }}, // Skulltula
+    { ACTOR_EN_ST,          {10  ,     "Skulltula"            ,                                }}, // Skulltula
     { ACTOR_EN_ST,          {10  ,     "Large Skulltula"      ,       1                        }}, // Skulltula (big)
     { ACTOR_EN_ST,          {10  ,     "Invisible Skulltula"  ,       2                        }}, // Skulltula (invisible)
+    { ACTOR_EN_SW,          {10  ,     "Wall Skulltula"       ,                                }}, // Skulltula (wall)
+    { ACTOR_EN_SW,          {75  ,     "Wall Skulltula"       ,     8196                       }}, // Skulltula (gold)
     { ACTOR_EN_NY,          {10  ,     "Spike"                ,                                }}, // Spike (rolling enemy)
     { ACTOR_EN_SKB,         {10  ,     "Stalchild"            ,                                }}, // Stalchild
     { ACTOR_EN_TEST,        {100 ,     "Stalfos"              ,                                }}, // Stalfos (cannot differentiate between normal and invisible, so award same score)
@@ -792,6 +793,14 @@ void Arcade_HandleWonderCollect(Actor* wonderActor) {
     }
 }
 
+void Arcade_HandleNoDamage(int16_t damage) {
+    bool wasDamaged = gSaveContext.ship.quest.data.arcade.takenDamage;
+    if (!wasDamaged && damage < 0) {
+        gSaveContext.ship.quest.data.arcade.takenDamage = true;
+        SPDLOG_INFO("Player took damage");
+    }
+}
+
 int Arcade_GetRandomEntrance() {
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -805,9 +814,9 @@ int Arcade_GetRandomEntrance() {
         //ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN,
         //ENTR_JABU_JABU_ENTRANCE,
         //ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU,
-        //ENTR_FOREST_TEMPLE_ENTRANCE,
+        ENTR_FOREST_TEMPLE_ENTRANCE,
         //ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE,
-        ENTR_FIRE_TEMPLE_ENTRANCE,
+        //ENTR_FIRE_TEMPLE_ENTRANCE,
         //ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE,
         //ENTR_WATER_TEMPLE_ENTRANCE,
         //ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,
@@ -1619,7 +1628,7 @@ void Arcade_UpdateLinkSpawn(s32 sceneNum, s8 curRoom) {
           } },
 
         // BK Chest
-        { 0x11, { { -281, 0, 59, (s16)0xffff8000, 0x0DFF, TRICK_WEIRDSHOT },
+        { 0x11, { { -281, 0, 59, (s16)0xffff8000, 0x0DFF, REQ_NONE, TRICK_WEIRDSHOT },
                   { -280, 0, -812, (s16)0x0, 0x0DFF, REQ_HAMMER }
                 } },
 
@@ -1701,6 +1710,9 @@ extern "C" void Arcade_InitSave() {
     gSaveContext.ship.quest.data.arcade.canEquipSwap = false;
     gSaveContext.ship.quest.data.arcade.canISG = false;
 
+    // Avoid awarding bonus on load
+    gSaveContext.ship.quest.data.arcade.takenDamage = true;
+
     // Set magic
     if (gSaveContext.ship.quest.data.arcade.options[AM_OPTIONS_MAGIC] == AM_CHOICE_MAGIC_SINGLE) {
         gSaveContext.magicLevel = 1;
@@ -1749,8 +1761,8 @@ extern "C" void Arcade_InitSave() {
     gSaveContext.eventChkInf[7] |= 0x40; // barinade
     gSaveContext.eventChkInf[7] |= 0x80; // bongo bongo
 
-    // Entered DC
-    SET_EVENTCHKINF(EVENTCHKINF_ENTERED_DODONGOS_CAVERN);
+    SET_EVENTCHKINF(EVENTCHKINF_ENTERED_DODONGOS_CAVERN); // Entered DC
+    SET_INFTABLE(0x145); // Fight Big Octo
 
     // Sets all rando flags to false
     // Boss Rush currently uses 2 randomizer flags (RAND_INF_DUNGEONS_DONE_SPIRIT_TEMPLE &
@@ -2097,6 +2109,7 @@ bool Arcade_IsDungeonScene(int16_t sceneNum) {
 void Arcade_OnSceneInitHandler(s16 sceneNum) {
     ActorContext* act = &gPlayState->actorCtx;
     bool canEquipSwap = gSaveContext.ship.quest.data.arcade.canEquipSwap;
+    bool wasDamaged = gSaveContext.ship.quest.data.arcade.takenDamage;
 
     // Unpause the timer when the scene loaded isn't the Chamber of Sages.
     if (sceneNum != SCENE_CHAMBER_OF_THE_SAGES) {
@@ -2105,11 +2118,29 @@ void Arcade_OnSceneInitHandler(s16 sceneNum) {
 
     //if (!canEquipSwap) Arcade_GlitchLogicHandling(gPlayState);
     Arcade_UpdateScore(5);
+    
+    if (!wasDamaged) {
+        Arcade_UpdateScore(200);
+
+        Notification::Emit({
+            .prefix = "+200",
+            .prefixColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f),
+            .message = "score bonus for",
+            .suffix = "No Damage Taken!",
+            .suffixColor = ImVec4(0.0f, 0.5f, 1.0f, 1.0f),
+        });
+    }
+
+    gSaveContext.ship.quest.data.arcade.takenDamage = false;
 
     // Unset all scene flags and saved flags
     if (gPlayState != nullptr) {
         ActorContext* act = &gPlayState->actorCtx;
-        act->flags.swch = 0;
+        if (gPlayState->sceneNum == SCENE_FOREST_TEMPLE) {
+            act->flags.swch = (1 << 0x1B); // Prevent the sunken elevator from resetting
+        } else {
+            act->flags.swch = 0;
+        }
         act->flags.clear = 0;
         gSaveContext.sceneFlags[gPlayState->sceneNum].swch = act->flags.swch;
         gSaveContext.sceneFlags[gPlayState->sceneNum].clear = act->flags.clear;
@@ -2126,12 +2157,15 @@ void Arcade_OnSceneInitHandler(s16 sceneNum) {
         }
     }
 
-    if (gPlayState->sceneNum == SCENE_JABU_JABU && gPlayState->roomCtx.curRoom.num == 0x6) {
-        Flags_SetInfTable(0x145); // Fight Big Octo
-    }
-
     int8_t currentRoom = (sArcadeOverrideRoom != -1) ? sArcadeOverrideRoom : gPlayState->roomCtx.curRoom.num;
     Arcade_UpdateLinkSpawn(sceneNum, currentRoom);
+
+    if (gPlayState->sceneNum == SCENE_FOREST_TEMPLE && gPlayState->roomCtx.curRoom.num == 0x6 && gPlayState->linkActorEntry->pos.y >= 827) {
+        gSaveContext.sceneFlags[gPlayState->sceneNum].clear = (1 << 0x6); // Fight F2 Stalfos
+    } else if (gPlayState->sceneNum == SCENE_FOREST_TEMPLE && gPlayState->roomCtx.curRoom.num == 0x11) {
+        gSaveContext.sceneFlags[gPlayState->sceneNum].swch = (1 << 0x1B); // Enable elevator in the basement
+    }
+
     Arcade_ChooseRandomEntrance(gPlayState);
 
     sArcadeLockClosestDoor = true;
@@ -2207,6 +2241,7 @@ void Arcade_EnHoll_Draw(Actor* thisx, PlayState* play) {
     // so the visual plane lies flat on the floor or ceiling.
     if (action == 1 || action == 2 || action == 5) {
         Matrix_RotateX(M_PI / 2.0f, MTXMODE_APPLY);
+        Matrix_Scale(1.5f, 1.5f, 1.0f, MTXMODE_APPLY);
     }
 
     // Draw both sides of actor
@@ -2233,7 +2268,7 @@ void Arcade_HandleDoors(void* actor) {
     int32_t curFrames = gPlayState->state.frames;
     int32_t doorLockoutTimer = 20;
 
-    // Unkillable enemies that would prevent SHUTTER_FRONT_CLEAR from working
+    // Unkillable "enemies" that would prevent SHUTTER_FRONT_CLEAR from working
     if (enemyName != nullptr) {
         switch (enemyName->id) {
             case ACTOR_EN_BROB:
@@ -2392,7 +2427,9 @@ void RegisterArcadeMode() {
 
         COND_ID_HOOK(OnActorDestroy, ACTOR_EN_WONDER_ITEM, IS_ARCADE_MODE, Arcade_OnWonderCollectHandler);
 
-        COND_ID_HOOK(OnActorInit, ACTOR_DOOR_SHUTTER, IS_ARCADE_MODE, Arcade_LogDoorPos)
+        COND_ID_HOOK(OnActorInit, ACTOR_DOOR_SHUTTER, IS_ARCADE_MODE, Arcade_LogDoorPos);
+
+        COND_HOOK(OnPlayerHealthChange, IS_ARCADE_MODE, Arcade_HandleNoDamage);
     });
 }
 
