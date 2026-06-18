@@ -5,6 +5,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern f32 gArcadeDamageMult;
+
 struct GameState;
 struct FileChooseContext;
 

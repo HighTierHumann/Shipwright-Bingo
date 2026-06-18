@@ -29,6 +29,7 @@
 #include "soh/Enhancements/enhancementTypes.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/Enhancements/randomizer/randomizer_grotto.h"
+#include "soh/Enhancements/Arcade Mode/Arcade.h"
 #include "soh/frame_interpolation.h"
 #include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
@@ -4508,6 +4509,10 @@ s32 func_80837B18_modified(PlayState* play, Player* this, s32 damage, u8 modifie
     s32 modifiedDamage = damage;
     if (modified) {
         modifiedDamage *= (1 << CVarGetInteger(CVAR_ENHANCEMENT("DamageMult"), 0));
+    }
+
+    if (IS_ARCADE_MODE) {
+        modifiedDamage *= gArcadeDamageMult;
     }
 
     return Health_ChangeBy(play, modifiedDamage);

@@ -54,6 +54,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Crow/z_en_crow.h"
 #include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
 #include "src/overlays/actors/ovl_En_Bom/z_en_bom.h"
+#include "src/overlays/actors/ovl_Bg_Mori_Elevator/z_bg_mori_elevator.h"
 
 extern PlayState* gPlayState;
 
@@ -78,6 +79,8 @@ extern "C" {
     extern s16 Right_HUD_Margin;
     extern s16 Bottom_HUD_Margin;
 
+    f32 gArcadeDamageMult;
+
     float OTRGetRectDimensionFromLeftEdge(float v);
     float OTRGetRectDimensionFromRightEdge(float v);
     s16 Grotto_GetEntranceValueHandlingGrottoRando(s16 nextEntranceIndex);
@@ -85,7 +88,7 @@ extern "C" {
     void DoorShutter_SetupAction(DoorShutter*, DoorShutterActionFunc);
     void DoorShutter_SetupType(DoorShutter*, PlayState*);
     void EnHoll_Draw(Actor* thisx, PlayState* play);
-    }
+}
 
 typedef enum {
     AM_CHOICE_BOSSES_ALL,
@@ -735,7 +738,7 @@ void Arcade_HandleEnemyDefeated(Actor* killedActor) {
 
                 std::string messagePrefix = "+" + std::to_string(scoreReward);
                 std::string messageSuffix = enemyData.enemyName;
-                
+
                 Notification::Emit({
                     .prefix = messagePrefix,
                     .prefixColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f),
@@ -743,7 +746,7 @@ void Arcade_HandleEnemyDefeated(Actor* killedActor) {
                     .suffix = messageSuffix,
                     .suffixColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f),
                     .mute = true
-                });
+                    });
             }
         }
     }
@@ -754,7 +757,8 @@ void Arcade_HandleEnemyDefeated(Actor* killedActor) {
         int32_t distanceFromPlayerBonus = 0;
         if (player->heldItemId == ITEM_SLINGSHOT) {
             distanceFromPlayerBonus = ((distanceFromPlayer - 800) / 10) * 10;
-        } else if (player->heldItemId == ITEM_BOW) {
+        }
+        else if (player->heldItemId == ITEM_BOW) {
             distanceFromPlayerBonus = ((distanceFromPlayer - 800) / 20) * 10; // Currently, actors thats position is changed when struck by an arrow (Keese in particular) can award HUGE points when they finally die, so only award half the points
         }
 
@@ -771,9 +775,9 @@ void Arcade_HandleEnemyDefeated(Actor* killedActor) {
             .suffix = messageSuffix,
             .suffixColor = ImVec4(0.0f, 0.5f, 1.0f, 1.0f),
             .mute = true,
-        });
+            });
         Audio_PlaySoundGeneral(NA_SE_SY_GET_ITEM, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
-                               &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
 }
 
@@ -786,9 +790,11 @@ void Arcade_HandleWonderCollect(Actor* wonderActor) {
 
     if (wonder->itemDrop == WONDERITEM_DROP_GREEN_RUPEE) {
         Arcade_UpdateScore(3);
-    } else if (wonder->itemDrop == WONDERITEM_DROP_BLUE_RUPEE) {
+    }
+    else if (wonder->itemDrop == WONDERITEM_DROP_BLUE_RUPEE) {
         Arcade_UpdateScore(10);
-    } else if (wonder->itemDrop == WONDERITEM_DROP_RED_RUPEE) {
+    }
+    else if (wonder->itemDrop == WONDERITEM_DROP_RED_RUPEE) {
         Arcade_UpdateScore(40);
     }
 }
@@ -798,6 +804,73 @@ void Arcade_HandleNoDamage(int16_t damage) {
     if (!wasDamaged && damage < 0) {
         gSaveContext.ship.quest.data.arcade.takenDamage = true;
         SPDLOG_INFO("Player took damage");
+    }
+}
+
+void Arcade_UpdateEnemyScaling() {
+    int32_t timePlayed = (gSaveContext.ship.stats.playTimer / 2);
+    if (timePlayed >= 30000) {
+        gArcadeDamageMult = 7.0f;
+    }
+    else if (timePlayed >= 25000) {
+        gArcadeDamageMult = 6.0f;
+    }
+    else if (timePlayed >= 20000) {
+        gArcadeDamageMult = 5.0f;
+    }
+    else if (timePlayed >= 15000) {
+        gArcadeDamageMult = 4.0f;
+    }
+    else if (timePlayed >= 10000) {
+        gArcadeDamageMult = 3.0f;
+    }
+    else if (timePlayed >= 5000) {
+        gArcadeDamageMult = 2.0f;
+    }
+}
+
+static void Arcade_UpdateEnemySpeed(void* refActor) {
+    int32_t timePlayed = (gSaveContext.ship.stats.playTimer / 2);
+    bool updateActor = false;
+    bool twiceSpeed = false;
+    static float timeToAdd = 0.0f;
+
+    Player* player = GET_PLAYER(gPlayState);
+    Actor* actor = static_cast<Actor*>(refActor);
+
+    // Some enemies are not in the ACTORCAT_ENEMY category, and some are that aren't really enemies.
+    bool isEnemy = actor->category == ACTORCAT_ENEMY || actor->id == ACTOR_EN_TORCH2;
+    bool isExcludedEnemy = actor->id == ACTOR_EN_FIRE_ROCK || actor->id == ACTOR_EN_ENCOUNT2;
+
+    if (timePlayed >= 150) {
+        timeToAdd += 0.5f;
+
+        if (timeToAdd >= 1.0f) {
+            updateActor = true;
+            timeToAdd = 0.0f;
+        }
+        SPDLOG_INFO("timeToAdd, 2x Speed: {}", timeToAdd);
+    } else if (timePlayed >= 50 && !twiceSpeed) { // I cannot get this to work no matter what
+        timeToAdd += 0.5f;
+
+        if (timeToAdd >= 1.0f) {
+            updateActor = true;
+            timeToAdd = 0.0f;
+        }
+        SPDLOG_INFO("timeToAdd: {}", timeToAdd);
+    }
+
+    if (timePlayed >= 100) {
+        twiceSpeed = true;
+    }
+
+    // Don't apply during cutscenes because it causes weird behaviour and/or crashes on some cutscenes.
+    if (isEnemy && !isExcludedEnemy && !Player_InBlockingCsMode(gPlayState, player) && twiceSpeed) {
+        GameInteractor::RawAction::UpdateActor(actor);
+    }
+    if (isEnemy && !isExcludedEnemy && !Player_InBlockingCsMode(gPlayState, player) && updateActor) {
+        GameInteractor::RawAction::UpdateActor(actor);
+        updateActor = false;
     }
 }
 
@@ -1699,6 +1772,7 @@ extern "C" void Arcade_InitSave() {
 
     sArcadeScore = -5; // Offset by -5 so that the player starts at 0 points
     sArcadeTransitionsMade = 0;
+    gArcadeDamageMult = 1.0f;
 
     gSaveContext.ship.quest.id = QUEST_ARCADE;
     gSaveContext.ship.quest.data.arcade.isPaused = true;
@@ -2163,7 +2237,7 @@ void Arcade_OnSceneInitHandler(s16 sceneNum) {
     if (gPlayState->sceneNum == SCENE_FOREST_TEMPLE && gPlayState->roomCtx.curRoom.num == 0x6 && gPlayState->linkActorEntry->pos.y >= 827) {
         gSaveContext.sceneFlags[gPlayState->sceneNum].clear = (1 << 0x6); // Fight F2 Stalfos
     } else if (gPlayState->sceneNum == SCENE_FOREST_TEMPLE && gPlayState->roomCtx.curRoom.num == 0x11) {
-        gSaveContext.sceneFlags[gPlayState->sceneNum].swch = (1 << 0x1B); // Enable elevator in the basement
+        gSaveContext.sceneFlags[gPlayState->sceneNum].swch &= ~(1 << 0x1B); // Enable elevator in the basement
     }
 
     Arcade_ChooseRandomEntrance(gPlayState);
@@ -2241,7 +2315,7 @@ void Arcade_EnHoll_Draw(Actor* thisx, PlayState* play) {
     // so the visual plane lies flat on the floor or ceiling.
     if (action == 1 || action == 2 || action == 5) {
         Matrix_RotateX(M_PI / 2.0f, MTXMODE_APPLY);
-        Matrix_Scale(1.5f, 1.5f, 1.0f, MTXMODE_APPLY);
+        Matrix_Scale(1.5f, 1.0f, 1.5f, MTXMODE_APPLY);
     }
 
     // Draw both sides of actor
@@ -2422,8 +2496,10 @@ void RegisterArcadeMode() {
         COND_HOOK(OnEnemyDefeat, IS_ARCADE_MODE, Arcade_OnEnemyDefeatedHandler);
 
         COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, Arcade_HandleDoors);
+        COND_HOOK(OnActorUpdate, IS_ARCADE_MODE, Arcade_UpdateEnemySpeed);
         COND_HOOK(OnGameFrameUpdate, IS_ARCADE_MODE, Arcade_TransitionInterceptor);
         COND_HOOK(OnGameFrameUpdate, IS_ARCADE_MODE, Arcade_GlitchLogicHandling);
+        COND_HOOK(OnGameFrameUpdate, IS_ARCADE_MODE, Arcade_UpdateEnemyScaling);
 
         COND_ID_HOOK(OnActorDestroy, ACTOR_EN_WONDER_ITEM, IS_ARCADE_MODE, Arcade_OnWonderCollectHandler);
 
