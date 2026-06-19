@@ -540,6 +540,7 @@ void Settings::CreateOptionDescriptions() {
         "Shuffle fairy spots. These are spots where a big fairy is revealed by a song."
         "\n"
         "This excludes gossip stones and magic bean locations.";
+    mOptionDescriptions[RSK_SONG_FAIRY_PARTICLES] = "Spawn particles at Song Fairy spots corresponding to item category.";
     mOptionDescriptions[RSK_SHUFFLE_BUTTERFLY_FAIRIES] = "Shuffle fairies from butterfly locations.";
     mOptionDescriptions[RSK_SHUFFLE_GRASS] =
         "Grass will drop a randomized item the first time they're cut and collected. "

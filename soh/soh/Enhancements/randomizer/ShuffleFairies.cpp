@@ -125,11 +125,7 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
     ShotSun* superFairySpawner = static_cast<ShotSun*>(refActor);
 
     // If not a randomized item or too far, don't draw.
-    // If item is unshuffled or collected, kill wonder actor if switch flag is set.
-    if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState)) {
-        if (superFairySpawner->fairySpawnerState != 1) {
-            Actor_Kill(&superFairySpawner->actor);
-        }
+    if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState) || !(RAND_GET_OPTION(RSK_SONG_FAIRY_PARTICLES))) {
         return;
     } else if (superFairySpawner->actor.xzDistToPlayer > 1000.0f) {
         return;
