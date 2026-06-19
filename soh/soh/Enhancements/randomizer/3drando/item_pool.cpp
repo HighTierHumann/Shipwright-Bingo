@@ -791,7 +791,7 @@ void GenerateItemPool() {
     }
 
     // Don't add GBK to the pool at all for Triforce Hunt or if we start with it.
-    if (!(ctx->GetOption(RSK_GANONS_BOSS_KEY).Is(RO_GANON_BOSS_KEY_STARTWITH) || ctx->GetOption(RSK_TRIFORCE_HUNT).IsNot(RO_TRIFORCE_HUNT_GBK_SHUFFLED))) {
+    if (ctx->GetOption(RSK_GANONS_BOSS_KEY).IsNot(RO_GANON_BOSS_KEY_STARTWITH) && (ctx->GetOption(RSK_TRIFORCE_HUNT).Is(RO_TRIFORCE_HUNT_GBK_SHUFFLED) || ctx->GetOption(RSK_TRIFORCE_HUNT).Is(RO_TRIFORCE_HUNT_OFF))) {
         if (ctx->GetOption(RSK_GANONS_BOSS_KEY).Is(RO_GANON_BOSS_KEY_KAK_TOKENS)) {
             ctx->PlaceItemInLocation(RC_KAK_100_GOLD_SKULLTULA_REWARD, RG_GANONS_CASTLE_BOSS_KEY);
         } else if (ctx->GetOption(RSK_GANONS_BOSS_KEY).Get() >= RO_GANON_BOSS_KEY_LACS_VANILLA) {

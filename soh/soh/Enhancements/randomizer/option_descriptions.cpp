@@ -806,11 +806,11 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_OCARINA_HINT] =
         "Talking to the Lost Woods Gossip Stone will reveal the location of a Progressive Ocarina.";
     mOptionDescriptions[RSK_SCALE_HINT] =
-        "Talking to the Zora atop the waterfall after starting the Diving Minigame will tell you the location of a Progressive Scale.";
+        "Reading the sign near the exit to Zora's River in Domain will reveal the location of a Progressive Scale.";
     mOptionDescriptions[RSK_LULLABY_HINT] =
-        "Talking to Zelda as a child will tell you the location of Zelda's Lullaby.";
+        "Talking to Zelda as a child will reveal the location of Zelda's Lullaby.";
     mOptionDescriptions[RSK_STORMS_HINT] =
-        "Navi will tell you the location of the Song of Storms when targetting the rock near the Oasis in Desert Colossus and speaking to her.";
+        "Talking to the man in the Windmill as child will reveal the location of the Song of Storms.";
     mOptionDescriptions[RSK_EPONAS_HINT] =
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
     // end

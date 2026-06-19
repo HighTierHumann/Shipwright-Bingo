@@ -4309,6 +4309,10 @@ static std::unordered_map<RandomizerGet, GameplayStatTimestamp> randomizerGetToS
     { RG_BACK_TOWER_KEY, TIMESTAMP_FOUND_BACK_TOWER_KEY },
     { RG_HYLIA_LAB_KEY, TIMESTAMP_FOUND_HYLIA_LAB_KEY },
     { RG_FISHING_HOLE_KEY, TIMESTAMP_FOUND_FISHING_HOLE_KEY },
+
+    { RG_FOREST_TEMPLE_BOSS_KEY, TIMESTAMP_FOUND_FOREST_TEMPLE_BK },
+    { RG_FOREST_TEMPLE_SMALL_KEY, TIMESTAMP_FOUND_FOREST_TEMPLE_KEY_1 },
+    { RG_FOREST_TEMPLE_KEY_RING, TIMESTAMP_FOUND_FOREST_TEMPLE_KEY_RING },
 };
 
 // Gameplay stat tracking: Update time the item was acquired
@@ -4622,6 +4626,13 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             Flags_SetRandomizerInf(RAND_INF_GREG_FOUND);
             gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_GREG] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
             break;
+        // case RG_FOREST_TEMPLE_BOSS_KEY:
+        //     gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_FOREST_TEMPLE_BK] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
+        //     break;
+        // case RG_FOREST_TEMPLE_KEY_RING:
+        //     gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_FOUND_FOREST_TEMPLE_KEY_RING] =
+        //         static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
+        //     break;
         case RG_TRIFORCE_PIECE:
             gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected++;
             GameInteractor_SetTriforceHuntPieceGiven(true);

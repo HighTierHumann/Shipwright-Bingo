@@ -195,7 +195,7 @@ void BuildShadowSignMessage(uint16_t* textId, bool* loadFromMessageTable) {
     }
 }
 
-void BuildDivingGameMessage(uint16_t* textId, bool* loadFromMessageTable) {
+void BuildScaleHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_ZORAS_DOMAIN) {
         CustomMessage msg = RAND_GET_HINT(RH_SCALE_HINT)->GetHintMessage(MF_AUTO_FORMAT);
         msg.LoadIntoFont();
@@ -212,7 +212,7 @@ void BuildZeldaHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildStormsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (gPlayState->sceneNum == SCENE_DESERT_COLOSSUS) {
+    if (gPlayState->sceneNum == SCENE_WINDMILL_AND_DAMPES_GRAVE) {
         CustomMessage msg = RAND_GET_HINT(RH_STORMS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
@@ -583,16 +583,15 @@ void RegisterStaticHints() {
     COND_ID_HOOK(OnOpenText, TEXT_DMT_BOMBFLOWER_SIGN, RAND_GET_OPTION(RSK_STRENGTH_HINT), BuildStrengthHintMessage);
     // Shadow Temple Pit Sign
     COND_ID_HOOK(OnOpenText, TEXT_SHADOW_TEMPLE_TRUTHSPINNER_SIGN, RAND_GET_OPTION(RSK_HOVERS_HINT), BuildShadowSignMessage);
-    // Diving Minigame Zora
-    COND_ID_HOOK(OnOpenText, TEXT_DIVING_MINIGAME_SHORTCUT, RAND_GET_OPTION(RSK_SCALE_HINT), BuildDivingGameMessage);
+    // Scale Hint
+    COND_ID_HOOK(OnOpenText, TEXT_ZD_SIGN, RAND_GET_OPTION(RSK_SCALE_HINT), BuildScaleHintMessage);
     // Child Zelda
     COND_ID_HOOK(OnOpenText, TEXT_ZELDA_ATTENDANT, RAND_GET_OPTION(RSK_LULLABY_HINT), BuildZeldaHintMessage);
     COND_ID_HOOK(OnOpenText, TEXT_ZELDA_FOUND_IT, RAND_GET_OPTION(RSK_LULLABY_HINT), BuildZeldaHintMessage);
     // Windmill Guy
-    // COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
-    // COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_GRRR_2, RAND_GET_OPTION(RSK_STORMS_HINT), BuildWindmillGuyMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_AROUND_AND_AROUND, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
     // Oasis Song of Storms Hint
-    COND_ID_HOOK(OnOpenText, TEXT_COLOSSUS_OASIS_NAVI, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
+    // COND_ID_HOOK(OnOpenText, TEXT_COLOSSUS_OASIS_NAVI, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
     // Child Malon
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_FOND, RAND_GET_OPTION(RSK_EPONAS_HINT), BuildChildMalonMessage);
     // Boss C-Up Text

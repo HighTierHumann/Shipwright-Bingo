@@ -833,6 +833,11 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[ITEM_SINGLE_MAGIC],     "Magic:              ");
     strcpy(itemTimestampDisplayName[ITEM_DOUBLE_DEFENSE],   "Double Defense:     ");
 
+    // Keys
+    // strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_FOREST_TEMPLE_BK],       "Forest Boss Key:    ");
+    // strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_FOREST_TEMPLE_KEY_1],    "Forest Key #1:      ");
+    // strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_FOREST_TEMPLE_KEY_RING], "Forest Key Ring:    ");
+
     // Other events
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GOHMA],         "Gohma Defeated:     ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_KING_DODONGO],  "KD Defeated:        ");

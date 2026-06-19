@@ -2278,16 +2278,16 @@ void StaticData::HintTable_Init() {
     // Custom Hints
     hintTextTable[RHT_STRENGTH_HINT] = HintText(CustomMessage("%rDANGER! HANDLE WITH CARE!^%wYou must obtain the %gProgressive Strength Upgrade %wfrom %r[[1]] %wto transport this Bomb Flower!",
                                                               TODO_TRANSLATE,
-                                                              TODO_TRANSLATE));
+                                                              TODO_TRANSLATE, {}, {}, TEXTBOX_TYPE_WOODEN));
     hintTextTable[RHT_HOVERS_HINT] = HintText(CustomMessage("Only one who has acquired the %gHover Boots %wfrom %r[[1]] %wcan cross the valley of the dead.",
                                                             TODO_TRANSLATE,
                                                             TODO_TRANSLATE));
     hintTextTable[RHT_OCARINA_HINT] = HintText(CustomMessage("They say that a %gProgressive Ocarina %wcan be found in %r[[1]]%w.",
                                                             TODO_TRANSLATE,
                                                             TODO_TRANSLATE));
-    hintTextTable[RHT_SCALE_HINT] = HintText(CustomMessage("By the way, you can find a %gProgressive Scale %win %r[[1]]%w.",
+    hintTextTable[RHT_SCALE_HINT] = HintText(CustomMessage("Welcome to the home of the %bZoras%w!^You too can dive like us by acquiring one %gone of our scales %wfrom %r[[1]]%w!",
                                                             TODO_TRANSLATE,
-                                                            TODO_TRANSLATE));
+                                                            TODO_TRANSLATE, {}, {}, TEXTBOX_TYPE_WOODEN));
     hintTextTable[RHT_BOOMERANG_HINT] = HintText(CustomMessage("%c@! You need the %gBoomerang %cfrom %r[[1]]%c to defeat this boss!",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
@@ -2300,7 +2300,7 @@ void StaticData::HintTable_Init() {
     hintTextTable[RHT_LULLABY_HINT] = HintText(CustomMessage("Hiya @! Have you learned %gmy Lullaby %wfrom %r[[1]] %wyet?",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
-    hintTextTable[RHT_STORMS_HINT] = HintText(CustomMessage("%c@! You need to get the %gSong of Storms%c from %w[[1]]%c and play it here!",
+    hintTextTable[RHT_STORMS_HINT] = HintText(CustomMessage("Go around and around! I hear you can get my %gSong of Storms%w at %r[[1]]%w!",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
     hintTextTable[RHT_EPONAS_HINT] = HintText(CustomMessage("Epona is really fond of you! She might let you ride her around if you learn %gher song %win %r[[1]]%w!",

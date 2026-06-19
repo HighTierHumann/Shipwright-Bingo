@@ -2695,7 +2695,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
     if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0))) {
         switch (gPlayState->sceneNum) {
             case SCENE_ZORAS_FOUNTAIN:
-                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -164, 100, -1735, 0, 0, 0,
+                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -444, 100, -1735, 0, 0, 0,
                             static_cast<int16_t>(0x034B));
                 break;
             case SCENE_OUTSIDE_GANONS_CASTLE:
@@ -2761,16 +2761,16 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if (IS_RANDO && RAND_GET_OPTION(RSK_STORMS_HINT)) {
-        switch (gPlayState->sceneNum) {
-            case SCENE_DESERT_COLOSSUS:
-                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_ELF_MSG2, 1176, 83, 1959, 0, 0, 1,
-                            static_cast<int16_t>(0x01B4));
-                break;
-            default:
-                break;
-        }
-    }
+    // if (IS_RANDO && RAND_GET_OPTION(RSK_STORMS_HINT)) {
+    //     switch (gPlayState->sceneNum) {
+    //         case SCENE_DESERT_COLOSSUS:
+    //             Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_ELF_MSG2, 1176, 83, 1959, 0, 0, 1,
+    //                         static_cast<int16_t>(0x01B4));
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
 }
 
 void RandomizerOnPlayDestroyHandler() {

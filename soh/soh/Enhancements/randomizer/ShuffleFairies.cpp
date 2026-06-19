@@ -5,6 +5,9 @@
 #include "static_data.h"
 #include "soh/Enhancements/item-tables/ItemTableTypes.h"
 #include "soh/ObjectExtension/ObjectExtension.h"
+#include "soh/ObjectExtension/ActorListIndex.h"
+#include "item_category_adj.h"
+#include "particle_cmc.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_En_Elf/z_en_elf.h"
@@ -58,6 +61,7 @@ CheckIdentity ShuffleFairies_GetFairyIdentity(int32_t params, ActorID id) {
     CheckIdentity fairyIdentity;
     s16 sceneNum = gPlayState->sceneNum;
     fairyIdentity.randomizerInf = RAND_INF_MAX;
+    fairyIdentity.randomizerCheck = RC_UNKNOWN_CHECK;
 
     if (sceneNum == SCENE_TEMPLE_OF_TIME_EXTERIOR_NIGHT || sceneNum == SCENE_TEMPLE_OF_TIME_EXTERIOR_RUINS) {
         sceneNum = SCENE_TEMPLE_OF_TIME_EXTERIOR_DAY;
@@ -75,6 +79,89 @@ CheckIdentity ShuffleFairies_GetFairyIdentity(int32_t params, ActorID id) {
 
     return fairyIdentity;
 }
+
+uint8_t SuperFairy_RandomizerHoldsItem(ShotSun* spawnFairyActor, PlayState* play) {
+    const CheckIdentity* superFairyIdentity =
+        ObjectExtension::GetInstance().Get<CheckIdentity>(&spawnFairyActor->actor);
+    if (superFairyIdentity == nullptr) {
+        Actor* actor = &spawnFairyActor->actor;
+
+        int32_t songParams = TWO_ACTOR_PARAMS(0x1000, static_cast<int32_t>(actor->world.pos.z));
+        auto newIdentity = ShuffleFairies_GetFairyIdentity(songParams, ACTOR_EN_ELF);
+
+        ObjectExtension::GetInstance().Set<CheckIdentity>(actor, std::move(newIdentity));
+        superFairyIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(actor);
+        if (superFairyIdentity == nullptr) {
+            return false;
+        }
+    }
+    RandomizerCheck rc = superFairyIdentity->randomizerCheck;
+    if (!IS_RANDO || Flags_GetRandomizerInf(superFairyIdentity->randomizerInf) ||
+        superFairyIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static void SuperFairySpot_RandomizerDraw(ShotSun* spawnFairyActor, Color_RGBA8* primColor, Color_RGBA8* secColor,
+                                          Color_RGBA8* envColor, CheckIdentity* superFairyIdentity) {
+    Vec3f pos;
+    static Vec3f velocity = { 0.0f, 0.0f, 0.0f };
+    static Vec3f accel = { 0.0f, 0.0f, 0.0f };
+
+    velocity.y = -0.05f;
+    accel.y = -0.025f;
+
+    pos.x = Rand_CenteredFloat(1.0f) + spawnFairyActor->actor.world.pos.x;
+    pos.y = (Rand_ZeroOne() * 25.0f) + spawnFairyActor->actor.world.pos.y + 10;
+    pos.z = Rand_CenteredFloat(1.0f) + spawnFairyActor->actor.world.pos.z;
+    EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 2000, 100);
+    EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 2000, 100);
+}
+
+void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
+    GetItemCategory getItemCategory;
+    ShotSun* superFairySpawner = static_cast<ShotSun*>(refActor);
+
+    // If not a randomized item or too far, don't draw.
+    // If item is unshuffled or collected, kill wonder actor if switch flag is set.
+    if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState)) {
+        if (superFairySpawner->fairySpawnerState != 1) {
+            Actor_Kill(&superFairySpawner->actor);
+        }
+        return;
+    } else if (superFairySpawner->actor.xzDistToPlayer > 1000.0f) {
+        return;
+    }
+
+    bool cmc = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+    int requiresStoneAgony = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeDependsStoneOfAgony"), 0);
+
+    int isNotCMC = !cmc || (requiresStoneAgony && !CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY));
+
+    Color_RGBA8 primColor;
+    Color_RGBA8 secColor;
+    Color_RGBA8 envColor;
+
+    const auto superFairyIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(refActor);
+    if (superFairyIdentity == nullptr) {
+        return;
+    }
+
+    GetItemEntry superFairy =
+        Rando::Context::GetInstance()->GetFinalGIEntry(superFairyIdentity->randomizerCheck, true, GI_NONE);
+    getItemCategory = Randomizer_AdjustItemCategory(superFairy);
+
+    if (isNotCMC) {
+        getItemCategory = ITEM_CATEGORY_MAJOR;
+    }
+    primColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_PRIMARY);
+    secColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_SECONDARY);
+    envColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_FLARE);
+    SuperFairySpot_RandomizerDraw(superFairySpawner, &primColor, &secColor, &envColor, superFairyIdentity);
+}
+
 
 static bool SpawnFairy(f32 posX, f32 posY, f32 posZ, int32_t params, FairyType fairyType, ActorID id) {
     CheckIdentity fairyIdentity = ShuffleFairies_GetFairyIdentity(params, id);
@@ -96,6 +183,9 @@ void RegisterShuffleFairies() {
     bool shouldRegisterButterfly = IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_BUTTERFLY_FAIRIES);
     bool shouldRegister = shouldRegisterFountain || shouldRegisterStone || shouldRegisterBean || shouldRegisterSong ||
                           shouldRegisterButterfly;
+
+    // Draw particle effect in super fairy spot to indicate a randomized item
+    COND_ID_HOOK(OnActorUpdate, ACTOR_SHOT_SUN, shouldRegister, SuperFairySpot_RandomizerDrawSetup);
 
     // Grant item when picking up fairy.
     COND_VB_SHOULD(VB_FAIRY_HEAL, shouldRegister, {
