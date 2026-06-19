@@ -2692,12 +2692,19 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0))) {
+    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), 0))) {
         switch (gPlayState->sceneNum) {
             case SCENE_ZORAS_FOUNTAIN:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -444, 100, -1735, 0, 0, 0,
                             static_cast<int16_t>(0x034B));
                 break;
+            default:
+                break;
+        }
+    }
+
+    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), 0))) {
+        switch (gPlayState->sceneNum) {
             case SCENE_OUTSIDE_GANONS_CASTLE:
                 if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -433, 1623, 687, 0,
@@ -2710,35 +2717,64 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0))) {
+    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), 0))) {
         switch (gPlayState->sceneNum) {
             case SCENE_KOKIRI_FOREST:
                 if (gPlayState->roomCtx.curRoom.num == 1) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 3850, -161, -1030, 0,
-                                static_cast<int16_t>(0xffffdc76), 0,
-                                static_cast<int16_t>(0x0348));
+                                static_cast<int16_t>(0xffffdc76), 0, static_cast<int16_t>(0x0348));
                 }
                 break;
+            default:
+                break;
+        }
+    }
+
+    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
+        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), 0))) {
+        switch (gPlayState->sceneNum) {
             case SCENE_SACRED_FOREST_MEADOW:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -90, 480, -2902, 0, 0, 0,
                             static_cast<int16_t>(0x0349));
                 break;
+            default:
+                break;
+        }
+    }
+
+    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
+        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), 0))) {
+        switch (gPlayState->sceneNum) {
             case SCENE_DEATH_MOUNTAIN_CRATER:
                 if (gPlayState->roomCtx.curRoom.num == 1) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -59, 495, -1079, 0, 0, 0,
                                 static_cast<int16_t>(0x034A));
                 }
                 break;
+            default:
+                break;
+        }
+    }
+
+    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
+        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), 0))) {
+        switch (gPlayState->sceneNum) {
             case SCENE_DESERT_COLOSSUS:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1461, 48, -118, 0,
-                            static_cast<int16_t>(0x4000), 0,
-                            static_cast<int16_t>(0x034C));
+                            static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x034C));
                 break;
+            default:
+                break;
+        }
+    }
+
+    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
+        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), 0))) {
+        switch (gPlayState->sceneNum) {
             case SCENE_GRAVEYARD:
                 if (gPlayState->roomCtx.curRoom.num == 0) {
                     Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, 2500, 100, 150, 0,
-                                static_cast<int16_t>(0xffffc000), 0,
-                                static_cast<int16_t>(0x034D));
+                                static_cast<int16_t>(0xffffc000), 0, static_cast<int16_t>(0x034D));
                 }
                 break;
             default:
