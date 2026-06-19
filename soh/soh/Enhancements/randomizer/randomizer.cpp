@@ -4594,10 +4594,17 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             gSaveContext.ship.stats.itemTimestamp[TIMESTAMP_DOUBLE_MAGIC] = static_cast<u32>(GAMEPLAYSTAT_TOTAL_TIME);
             break;
         case RG_MAGIC_BEAN_PACK:
-            if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
-                INV_CONTENT(ITEM_BEAN) = ITEM_BEAN;
+            if (Rando::Context::GetInstance()->GetOption(RSK_INDIVIDUAL_BEANS)) {
+                if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
+                    INV_CONTENT(ITEM_BEAN) = ITEM_BEAN;
+                }
+                Inventory_ChangeAmmo(ITEM_BEAN, 1);
+            } else {
+                if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
+                    INV_CONTENT(ITEM_BEAN) = ITEM_BEAN;
+                    AMMO(ITEM_BEAN) = 10;
+                }
             }
-            Inventory_ChangeAmmo(ITEM_BEAN, 1);
             break;
         case RG_DOUBLE_DEFENSE:
             gSaveContext.isDoubleDefenseAcquired = true;

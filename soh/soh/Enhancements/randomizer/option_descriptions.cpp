@@ -472,6 +472,11 @@ void Settings::CreateOptionDescriptions() {
         "Granny's item will only be offered after you have traded in the Odd Mushroom when Shuffle Adult Trade is on. "
         "Otherwise when off, you will need to have found the Claim Check to buy her item (simulating the trade quest "
         "is complete).";
+    mOptionDescriptions[RSK_INDIVIDUAL_BEANS] = "More bean packs are added to the item pool, but only award 1 bean per pack.\n\n"
+        "Plentiful - 15 Packs\n"
+        "Balanced  - 10 Packs\n"
+        "Scarce    -  7 Packs\n"
+        "Minimal   -  3 Packs\n";
     mOptionDescriptions[RSK_MERCHANT_PRICES] =
         "Vanilla - The same price as the Check in vanilla, 60 for the Bean Salesman.\n"
         "Cheap Balanced - Prices will range between 0 to 95 rupees, favoring lower numbers.\n"

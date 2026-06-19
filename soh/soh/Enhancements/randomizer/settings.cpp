@@ -1438,6 +1438,15 @@ void Settings::CreateOptions() {
         }
     });
     OPT_BOOL(RSK_STARTING_BEANS, "Start with Magic Beans", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBeans"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
+    OPT_BOOL(RSK_INDIVIDUAL_BEANS, "Make bean packs 1 bean per pack", CVAR_RANDOMIZER_SETTING("IndividualBeans"), mOptionDescriptions[RSK_INDIVIDUAL_BEANS]);
+    OPT_CALLBACK(RSK_SHUFFLE_MERCHANTS, {
+        if ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_OFF) ||
+            (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_ALL_BUT_BEANS)) {
+            mOptions[RSK_INDIVIDUAL_BEANS].Hide();
+        } else {
+            mOptions[RSK_INDIVIDUAL_BEANS].Unhide();
+        }
+    });
     OPT_BOOL(RSK_FULL_WALLETS, "Full Wallets", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("FullWallets"), mOptionDescriptions[RSK_FULL_WALLETS], WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_BOOL(RSK_STARTING_ZELDAS_LULLABY, "Start with Zelda's Lullaby", CVAR_RANDOMIZER_SETTING("StartingZeldasLullaby"), "", IMFLAG_NONE);
     OPT_CALLBACK(RSK_STARTING_ZELDAS_LULLABY, {
@@ -2064,6 +2073,7 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SCRUBS_PRICES_TYCOON_WALLET_WEIGHT],
                                   &mOptions[RSK_SCRUBS_PRICES_AFFORDABLE],
                                   &mOptions[RSK_SHUFFLE_MERCHANTS],
+                                  &mOptions[RSK_INDIVIDUAL_BEANS],
                                   &mOptions[RSK_MERCHANT_PRICES],
                                   &mOptions[RSK_MERCHANT_PRICES_FIXED_PRICE],
                                   &mOptions[RSK_MERCHANT_PRICES_RANGE_1],
