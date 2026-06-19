@@ -571,7 +571,7 @@ void GenerateItemPool() {
         ctx->GetOption(RSK_SHUFFLE_MERCHANTS).IsNot(RO_SHUFFLE_MERCHANTS_ALL)) {
         ctx->PlaceItemInLocation(RC_ZR_MAGIC_BEAN_SALESMAN, RG_MAGIC_BEAN, false, true);
     } else if (!ctx->GetOption(RSK_STARTING_BEANS)) {
-        AddItemToPool(RG_MAGIC_BEAN_PACK, 2, 1, 1, 1);
+        AddItemToPool(RG_MAGIC_BEAN_PACK, 15, 10, 7, 3);
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_MERCHANTS).Is(RO_SHUFFLE_MERCHANTS_ALL_BUT_BEANS) ||

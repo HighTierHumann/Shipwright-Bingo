@@ -4596,8 +4596,8 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
         case RG_MAGIC_BEAN_PACK:
             if (INV_CONTENT(ITEM_BEAN) == ITEM_NONE) {
                 INV_CONTENT(ITEM_BEAN) = ITEM_BEAN;
-                AMMO(ITEM_BEAN) = 10;
             }
+            Inventory_ChangeAmmo(ITEM_BEAN, 1);
             break;
         case RG_DOUBLE_DEFENSE:
             gSaveContext.isDoubleDefenseAcquired = true;
