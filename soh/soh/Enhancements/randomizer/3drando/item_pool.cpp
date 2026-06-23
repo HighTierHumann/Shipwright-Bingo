@@ -572,7 +572,7 @@ void GenerateItemPool() {
         ctx->PlaceItemInLocation(RC_ZR_MAGIC_BEAN_SALESMAN, RG_MAGIC_BEAN, false, true);
     } else if (!ctx->GetOption(RSK_STARTING_BEANS)) {
         if (ctx->GetOption(RSK_INDIVIDUAL_BEANS)) {
-            AddItemToPool(RG_MAGIC_BEAN_PACK, 15, 10, 7, 3);
+            AddItemToPool(RG_MAGIC_BEAN, 15, 10, 7, 3);
         } else {
             AddItemToPool(RG_MAGIC_BEAN_PACK, 2, 1, 1, 1);
         }

@@ -470,7 +470,6 @@ extern "C" void Randomizer_InitSaveFile() {
         RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(loc);
         Flags_SetRandomizerInf(randInf);
     }
-    Rupees_ChangeBy(-999); // Set Rupees to 0 after collecting all junk
 
     SetStartingItems();
 
