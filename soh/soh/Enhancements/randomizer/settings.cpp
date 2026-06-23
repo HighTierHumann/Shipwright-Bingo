@@ -655,14 +655,6 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_SHOPSANITY_PRICES_TYCOON_WALLET_WEIGHT, "Shops Tycoon Wallet Weight", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShopsanityTycoonWalletWeight"), mOptionDescriptions[RSK_SHOPSANITY_PRICES_TYCOON_WALLET_WEIGHT], WIDGET_CVAR_SLIDER_INT, 10, true, nullptr, IMFLAG_NONE);
     OPT_BOOL(RSK_SHOPSANITY_PRICES_AFFORDABLE, "Shops Affordable Prices", CVAR_RANDOMIZER_SETTING("ShopsanityPricesAffordable"), mOptionDescriptions[RSK_SHOPSANITY_PRICES_AFFORDABLE]);
     OPT_U8(RSK_SHUFFLE_TOKENS, "Token Shuffle", {"Off", "Dungeons", "Overworld", "All Tokens"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleTokens"), mOptionDescriptions[RSK_SHUFFLE_TOKENS], WIDGET_CVAR_COMBOBOX, RO_TOKENSANITY_OFF);
-    OPT_BOOL(RSK_SKULLTULA_PARTICLES, "Soil GS Particles", CVAR_RANDOMIZER_SETTING("SoilGSParticles"), mOptionDescriptions[RSK_SKULLTULA_PARTICLES]);
-    OPT_CALLBACK(RSK_SHUFFLE_TOKENS, {
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleTokens"), RO_GENERIC_OFF) != RO_GENERIC_OFF) {
-            mOptions[RSK_SKULLTULA_PARTICLES].Enable();
-        } else {
-            mOptions[RSK_SKULLTULA_PARTICLES].Disable("If Gold Skulltulas aren't randomized, then particles aren't needed.");
-        }
-    });
     OPT_U8(RSK_SHUFFLE_SCRUBS, "Scrubs Shuffle", {"Off", "One-Time Only", "All"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleScrubs"), mOptionDescriptions[RSK_SHUFFLE_SCRUBS], WIDGET_CVAR_COMBOBOX, RO_SCRUBS_OFF);
     OPT_CALLBACK(RSK_SHUFFLE_SCRUBS, {
         bool isTycoon = CVarGetInteger(CVAR_RANDOMIZER_SETTING("IncludeTycoonWallet"), RO_GENERIC_OFF);
@@ -831,14 +823,11 @@ void Settings::CreateOptions() {
         }
     });
     OPT_BOOL(RSK_SHUFFLE_COWS, "Shuffle Cows", CVAR_RANDOMIZER_SETTING("ShuffleCows"), mOptionDescriptions[RSK_SHUFFLE_COWS]);
-    OPT_BOOL(RSK_COW_PARTICLES, "CMC Cow Particles", CVAR_RANDOMIZER_SETTING("CowParticles"), mOptionDescriptions[RSK_COW_PARTICLES]);
     OPT_CALLBACK(RSK_SHUFFLE_COWS, {
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCows"), RO_GENERIC_OFF)) {
             mOptions[RSK_MALON_HINT].Enable();
-            mOptions[RSK_COW_PARTICLES].Enable();
         } else {
             mOptions[RSK_MALON_HINT].Disable("Malon's hint points to a cow, so requires cows to be shuffled.");
-            mOptions[RSK_COW_PARTICLES].Disable("If cows aren't randomized, then particles aren't needed.");
         }
     });
     OPT_BOOL(RSK_SHUFFLE_KOKIRI_SWORD, "Shuffle Kokiri Sword", CVAR_RANDOMIZER_SETTING("ShuffleKokiriSword"), mOptionDescriptions[RSK_SHUFFLE_KOKIRI_SWORD]);
@@ -1092,15 +1081,6 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_SHUFFLE_STONE_FAIRIES, "Shuffle Gossip Stone Fairies", CVAR_RANDOMIZER_SETTING("ShuffleStoneFairies"), mOptionDescriptions[RSK_SHUFFLE_STONE_FAIRIES]);
     OPT_BOOL(RSK_SHUFFLE_BEAN_FAIRIES, "Shuffle Bean Fairies", CVAR_RANDOMIZER_SETTING("ShuffleBeanFairies"), mOptionDescriptions[RSK_SHUFFLE_BEAN_FAIRIES]);
     OPT_BOOL(RSK_SHUFFLE_SONG_FAIRIES, "Shuffle Fairy Spots", CVAR_RANDOMIZER_SETTING("ShuffleFairySpots"), mOptionDescriptions[RSK_SHUFFLE_SONG_FAIRIES]);
-    OPT_BOOL(RSK_SONG_FAIRY_PARTICLES, "Song Fairy Particles", CVAR_RANDOMIZER_SETTING("SongFairyParticles"), mOptionDescriptions[RSK_SONG_FAIRY_PARTICLES]);
-    OPT_CALLBACK(RSK_SHUFFLE_SONG_FAIRIES, {
-        if ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleFairySpots"), 0)) == 0) {
-            mOptions[RSK_SONG_FAIRY_PARTICLES].Disable(
-                "Disabled because Song Fairies aren't randomized.");
-        } else {
-            mOptions[RSK_SONG_FAIRY_PARTICLES].Enable();
-        }
-    });
     OPT_BOOL(RSK_SHUFFLE_BUTTERFLY_FAIRIES, "Shuffle Butterfly Fairies", CVAR_RANDOMIZER_SETTING("ShuffleButterflyFairies"), mOptionDescriptions[RSK_SHUFFLE_BUTTERFLY_FAIRIES]);
     OPT_U8(RSK_SHUFFLE_MAPANDCOMPASS, "Maps/Compasses", {"Start With", "Vanilla", "Own Dungeon", "Any Dungeon", "Overworld", "Anywhere"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingMapsCompasses"), mOptionDescriptions[RSK_SHUFFLE_MAPANDCOMPASS], WIDGET_CVAR_COMBOBOX, RO_DUNGEON_ITEM_LOC_OWN_DUNGEON);
     OPT_U8(RSK_KEYSANITY, "Small Key Shuffle", {"Start With", "Vanilla", "Own Dungeon", "Any Dungeon", "Overworld", "Anywhere"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("Keysanity"), mOptionDescriptions[RSK_KEYSANITY], WIDGET_CVAR_COMBOBOX, RO_DUNGEON_ITEM_LOC_OWN_DUNGEON);
@@ -2024,7 +2004,6 @@ void Settings::CreateOptions() {
                               {
                                   &mOptions[RSK_SHUFFLE_SONGS],
                                   &mOptions[RSK_SHUFFLE_TOKENS],
-                                  &mOptions[RSK_SKULLTULA_PARTICLES],
                                   &mOptions[RSK_SHUFFLE_KOKIRI_SWORD],
                                   &mOptions[RSK_SHUFFLE_MASTER_SWORD],
                                   &mOptions[RSK_SHUFFLE_OCARINA],
@@ -2037,7 +2016,6 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SHUFFLE_WONDER_ITEMS],
                                   &mOptions[RSK_SHUFFLE_BEEHIVES],
                                   &mOptions[RSK_SHUFFLE_COWS],
-                                  &mOptions[RSK_COW_PARTICLES],
                                   &mOptions[RSK_SHUFFLE_POTS],
                                   &mOptions[RSK_SHUFFLE_GRASS],
                                   &mOptions[RSK_SHUFFLE_CRATES],
@@ -2053,7 +2031,6 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SHUFFLE_STONE_FAIRIES],
                                   &mOptions[RSK_SHUFFLE_BEAN_FAIRIES],
                                   &mOptions[RSK_SHUFFLE_SONG_FAIRIES],
-                                  &mOptions[RSK_SONG_FAIRY_PARTICLES],
                                   &mOptions[RSK_SHUFFLE_BUTTERFLY_FAIRIES],
                               },
                               WidgetContainerType::SECTION);

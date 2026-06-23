@@ -43,25 +43,25 @@ Color_RGBA8 Randomizer_GetParticleCMCColor(GetItemCategory colorIndex, ParticleC
     Color_RGBA8 primary;
     switch (colorIndex) {
         case ITEM_CATEGORY_JUNK:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Junk.Value"), Color_RGBA8{ 255, 255, 255, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Junk.Value"), Color_RGBA8{ 255, 255, 255, 255 });
             break;
         case ITEM_CATEGORY_LESSER:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Lesser.Value"), Color_RGBA8{ 170, 50, 0, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Lesser.Value"), Color_RGBA8{ 170, 50, 0, 255 });
             break;
         case ITEM_CATEGORY_HEALTH:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Health.Value"), Color_RGBA8{ 250, 0, 0, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Health.Value"), Color_RGBA8{ 250, 0, 0, 255 });
             break;
         case ITEM_CATEGORY_BOSS_KEY:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.BossKey.Value"), Color_RGBA8{ 255, 255, 0, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.BossKey.Value"), Color_RGBA8{ 255, 255, 0, 255 });
             break;
         case ITEM_CATEGORY_SMALL_KEY:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.SmallKey.Value"), Color_RGBA8{ 85, 220, 255, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.SmallKey.Value"), Color_RGBA8{ 85, 220, 255, 255 });
             break;
         case ITEM_CATEGORY_SKULLTULA_TOKEN:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Skulltula.Value"), Color_RGBA8{ 0, 0, 0, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Skulltula.Value"), Color_RGBA8{ 0, 0, 0, 255 });
             break;
         case ITEM_CATEGORY_MAJOR:
-            primary = CVarGetColor(CVAR_COSMETIC("CSMC.Major.Value"), Color_RGBA8{ 250, 185, 40, 255 });
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Major.Value"), Color_RGBA8{ 250, 185, 40, 255 });
             break;
         default:
             primary = { 255, 255, 255, 255 };

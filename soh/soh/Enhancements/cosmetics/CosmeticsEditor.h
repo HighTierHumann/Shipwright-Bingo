@@ -15,7 +15,7 @@ typedef enum {
     COSMETICS_GROUP_BOSS_KEYS,
     COSMETICS_GROUP_SONGS,
     COSMETICS_GROUP_WARP_SONGS,
-    COSMETICS_GROUP_CSMC_PARTICLES,
+    COSMETICS_GROUP_CMC_PARTICLES,
     COSMETICS_GROUP_CONSUMABLE,
     COSMETICS_GROUP_HUD,
     COSMETICS_GROUP_KALEIDO,
@@ -72,7 +72,7 @@ class CosmeticsEditorWindow final : public Ship::GuiWindow {
     void DrawElement() override;
     void ApplyDungeonKeyColors();
     void ApplySongColors();
-    void ApplyCSMCParticleColors();
+    void ApplyCMCParticleColors();
     void UpdateElement() override{};
 };
 #endif //__cplusplus

@@ -182,6 +182,58 @@ void SohMenu::AddMenuEnhancements() {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
         })
         .Options(CheckboxOptions().Tooltip("Only change the texture of containers if you have the Stone of Agony."));
+    AddWidget(path, "Chest Size Affected by Contents", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("ChangeChestSize"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+        })
+        .Options(CheckboxOptions().Tooltip("Change the size of chests to reflect their contents."));
+    AddWidget(path, "CMC Soil GS Particles", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("CMCSoilGSParticles"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+            info.options->disabled =
+                IS_RANDO && OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_TOKENS).Is(RO_GENERIC_OFF);
+            info.options->disabledTooltip = "This setting is forcefully disabled because a randomizer savefile without "
+                                            "\"Token Shuffle\" is loaded.";
+        })
+        .Options(CheckboxOptions()
+            .Tooltip(
+                "When Containers Match Contents is enabled, soil patches will have particles above them indicating "
+                "what type of item the Gold Skulltula holds.\n\n"
+                "When CMC is disabled or when Container of Agony enabled *without* Stone of Agony, particles "
+                "will not be drawn."));
+    AddWidget(path, "CMC Cow Particles", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("CMCCowParticles"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+            info.options->disabled =
+                IS_RANDO && OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_COWS).Is(RO_GENERIC_OFF);
+            info.options->disabledTooltip = "This setting is forcefully disabled because a randomizer savefile without "
+                                            "\Shuffle Cows\" is loaded.";
+        })
+        .Options(
+            CheckboxOptions()
+                .Tooltip(
+                    "When Containers Match Contents is enabled, cows will have particles above them indicating "
+                    "what type of item they hold.\n\n"
+                    "When CMC is disabled or when Container of Agony enabled *without* Stone of Agony, particles "
+                    "will not be drawn."));
+    AddWidget(path, "CMC Song Fairy Particles", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("CMCSongFairyParticles"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0);
+            info.options->disabled =
+                IS_RANDO && OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_SONG_FAIRIES).Is(RO_GENERIC_OFF);
+            info.options->disabledTooltip = "This setting is forcefully disabled because a randomizer savefile without "
+                                            "\"Shuffle Fairy Spots\" is loaded.";
+        })
+        .Options(
+            CheckboxOptions()
+                .Tooltip("When Containers Match Contents is enabled, Song Fairy locations will have particles above them indicating "
+                         "what type of item they hold.\n\n"
+                         "When CMC is disabled or when Container of Agony enabled *without* Stone of Agony, particles "
+                         "will not be drawn."));
 
     AddWidget(path, "Time of Day", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Nighttime GS Always Spawn", WIDGET_CVAR_CHECKBOX)

@@ -125,7 +125,8 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
     ShotSun* superFairySpawner = static_cast<ShotSun*>(refActor);
 
     // If not a randomized item or too far, don't draw.
-    if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState) || !(RAND_GET_OPTION(RSK_SONG_FAIRY_PARTICLES))) {
+    if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState) ||
+        !CVarGetInteger(CVAR_ENHANCEMENT("CMCSongFairyParticles"), 0)) {
         return;
     } else if (superFairySpawner->actor.xzDistToPlayer > 1000.0f) {
         return;
@@ -181,7 +182,7 @@ void RegisterShuffleFairies() {
                           shouldRegisterButterfly;
 
     // Draw particle effect in super fairy spot to indicate a randomized item
-    COND_ID_HOOK(OnActorUpdate, ACTOR_SHOT_SUN, shouldRegister, SuperFairySpot_RandomizerDrawSetup);
+    COND_ID_HOOK(OnActorUpdate, ACTOR_SHOT_SUN, shouldRegisterSong, SuperFairySpot_RandomizerDrawSetup);
 
     // Grant item when picking up fairy.
     COND_VB_SHOULD(VB_FAIRY_HEAL, shouldRegister, {

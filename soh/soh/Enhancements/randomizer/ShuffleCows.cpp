@@ -93,7 +93,7 @@ void ShuffledCow_RandomizerDrawSetup(void* refActor) {
 
     // If not a randomized item or too far, don't draw.
     if (!ShuffledCow_RandomizerHoldsItem(enCow, gPlayState) ||
-        !(RAND_GET_OPTION(RSK_COW_PARTICLES))) {
+        !CVarGetInteger(CVAR_ENHANCEMENT("CMCCowParticles"), 0)) {
         return;
     } else if (enCow->actor.xzDistToPlayer > 1000.0f) {
         return;

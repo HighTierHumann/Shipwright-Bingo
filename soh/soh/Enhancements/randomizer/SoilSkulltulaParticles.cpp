@@ -44,7 +44,7 @@ static void SoilSkulltula_RandomizerDraw(ObjBean* beanActor, Color_RGBA8* primCo
 void SoilSkulltula_RandomizerDrawSetup(void* refActor) {
     ObjBean* beanActor = static_cast<ObjBean*>(refActor);
 
-    if (!RAND_GET_OPTION(RSK_SKULLTULA_PARTICLES)) {
+    if (!CVarGetInteger(CVAR_ENHANCEMENT("CMCSoilGSParticles"), 0)) {
         return;
     } else if (beanActor->dyna.actor.xzDistToPlayer > 1000.0f) {
         return;
@@ -94,7 +94,7 @@ void SoilSkulltula_RandomizerDrawSetup(void* refActor) {
 }
 
 void RegisterSoilSkulls() {
-    bool shouldRegister = IS_RANDO && RAND_GET_OPTION(RSK_SKULLTULA_PARTICLES);
+    bool shouldRegister = IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_TOKENS);
 
     COND_ID_HOOK(OnActorInit, ACTOR_OBJ_BEAN, shouldRegister, SoilSkulltula_CacheIdentity);
     COND_ID_HOOK(OnActorUpdate, ACTOR_OBJ_BEAN, shouldRegister, SoilSkulltula_RandomizerDrawSetup);
