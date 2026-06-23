@@ -95,7 +95,7 @@ uint8_t SuperFairy_RandomizerHoldsItem(ShotSun* spawnFairyActor, PlayState* play
             return false;
         }
     }
-    RandomizerCheck rc = superFairyIdentity->randomizerCheck;
+
     if (!IS_RANDO || Flags_GetRandomizerInf(superFairyIdentity->randomizerInf) ||
         superFairyIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
         return false;

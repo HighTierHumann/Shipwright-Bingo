@@ -229,6 +229,11 @@ void Settings::CreateOptionDescriptions() {
                                               "Overworld - Only shuffle GS tokens that are outside of dungeons.\n"
                                               "\n"
                                               "All Tokens - Shuffle all 100 GS tokens.";
+    mOptionDescriptions[RSK_SKULLTULA_PARTICLES] =
+        "When Containers Match Contents is enabled, soil patches will have particles above them indicating "
+        "what type of item the Gold Skulltula holds.\n\n"
+        "With CMC is disabled or when Container of Agony enabled *without* Stone of Agony, particles "
+        "will not be drawn.";
     mOptionDescriptions[RSK_SKULLS_SUNS_SONG] = "All Golden Skulltulas that require nighttime to appear will only be "
                                                 "expected to be collected after getting Sun's Song.";
     mOptionDescriptions[RSK_SHUFFLE_KOKIRI_SWORD] =
@@ -459,6 +464,11 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_SHUFFLE_BEEHIVES] = "Beehives give a randomized item from the pool when broken.";
     mOptionDescriptions[RSK_SHUFFLE_COWS] =
         "Cows give a randomized item from the pool upon performing Epona's Song in front of them.";
+    mOptionDescriptions[RSK_COW_PARTICLES] =
+        "When Containers Match Contents is enabled, cows will have particles above them indicating "
+        "what type of item they hold.\n\n"
+        "With CMC is disabled or when Container of Agony enabled *without* Stone of Agony, particles "
+        "will not be drawn.";
     mOptionDescriptions[RSK_SHUFFLE_MERCHANTS] =
         "This setting governs if the Bean Salesman, Medigoron, Granny and the Carpet Salesman "
         "sell a random item.\n"

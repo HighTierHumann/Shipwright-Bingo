@@ -1,5 +1,9 @@
 #include <soh/OTRGlobals.h>
 #include "static_data.h"
+#include "soh/ObjectExtension/ObjectExtension.h"
+#include "soh/ObjectExtension/ActorListIndex.h"
+#include "item_category_adj.h"
+#include "particle_cmc.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_En_Cow/z_en_cow.h"
@@ -33,8 +37,97 @@ void EnCow_MoveForRandomizer(EnCow* enCow, PlayState* play) {
     }
 }
 
+static void ShuffledCow_RandomizerDraw(EnCow* enCow, Color_RGBA8* primColor, Color_RGBA8* secColor,
+                                          Color_RGBA8* envColor, CheckIdentity* cowIdentity) {
+    Vec3f pos;
+    static Vec3f velocity = { 0.0f, 0.0f, 0.0f };
+    static Vec3f accel = { 0.0f, 0.0f, 0.0f };
+
+    velocity.y = -0.05f;
+    accel.y = -0.025f;
+
+    if (gPlayState->sceneNum == SCENE_IMPAS_HOUSE) {
+        pos.x = Rand_CenteredFloat(1.0f) + enCow->actor.world.pos.x;
+        pos.y = (Rand_ZeroOne() * 25.0f) + enCow->actor.world.pos.y + 65;
+        pos.z = Rand_CenteredFloat(1.0f) + enCow->actor.world.pos.z + 50; // Reposition particles for better visibility
+    } else {
+        pos.x = Rand_CenteredFloat(1.0f) + enCow->actor.world.pos.x;
+        pos.y = (Rand_ZeroOne() * 25.0f) + enCow->actor.world.pos.y + 80;
+        pos.z = Rand_CenteredFloat(1.0f) + enCow->actor.world.pos.z;
+    }
+    EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 2000, 100);
+    EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 2000, 100);
+}
+
+uint8_t ShuffledCow_RandomizerHoldsItem(EnCow* enCow, PlayState* play) {
+    const CheckIdentity* cowIdentity =
+        ObjectExtension::GetInstance().Get<CheckIdentity>(&enCow->actor);
+    if (cowIdentity == nullptr) {
+        auto newIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCow(
+            gPlayState->sceneNum, static_cast<int32_t>(enCow->actor.world.pos.x),
+            static_cast<int32_t>(enCow->actor.world.pos.z));
+
+        ObjectExtension::GetInstance().Set<CheckIdentity>(enCow, std::move(newIdentity));
+        cowIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(enCow);
+        if (cowIdentity == nullptr) {
+            return false;
+        }
+    }
+
+    // For some reason Impa's House has an invisible cow, so don't draw particles over it
+    if (gPlayState->sceneNum == SCENE_IMPAS_HOUSE && enCow->actor.world.pos.y == 57) {
+        return false;
+    }
+
+    if (!IS_RANDO || Flags_GetRandomizerInf(cowIdentity->randomizerInf) || !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0) ||
+        cowIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+void ShuffledCow_RandomizerDrawSetup(void* refActor) {
+    GetItemCategory getItemCategory;
+    EnCow* enCow = static_cast<EnCow*>(refActor);
+
+    // If not a randomized item or too far, don't draw.
+    if (!ShuffledCow_RandomizerHoldsItem(enCow, gPlayState) ||
+        !(RAND_GET_OPTION(RSK_COW_PARTICLES))) {
+        return;
+    } else if (enCow->actor.xzDistToPlayer > 1000.0f) {
+        return;
+    }
+
+    int requiresStoneAgony = CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeDependsStoneOfAgony"), 0);
+    int isNotCMC = (requiresStoneAgony && !CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY));
+
+    Color_RGBA8 primColor;
+    Color_RGBA8 secColor;
+    Color_RGBA8 envColor;
+
+    const auto cowIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(refActor);
+    if (cowIdentity == nullptr) {
+        return;
+    }
+
+    GetItemEntry enCowItem =
+        Rando::Context::GetInstance()->GetFinalGIEntry(cowIdentity->randomizerCheck, true, GI_NONE);
+    getItemCategory = Randomizer_AdjustItemCategory(enCowItem);
+
+    if (!isNotCMC) {
+        primColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_PRIMARY);
+        secColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_SECONDARY);
+        envColor = Randomizer_GetParticleCMCColor(getItemCategory, COLOR_FLARE);
+        ShuffledCow_RandomizerDraw(enCow, &primColor, &secColor, &envColor, cowIdentity);
+    }
+}
+
 void RegisterShuffleCows() {
     bool shouldRegister = IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_COWS);
+
+    // Draw particle effect on Cow to indicate a randomized item
+    COND_ID_HOOK(OnActorUpdate, ACTOR_EN_COW, shouldRegister, ShuffledCow_RandomizerDrawSetup);
 
     COND_VB_SHOULD(VB_GIVE_ITEM_FROM_COW, shouldRegister, {
         EnCow* enCow = va_arg(args, EnCow*);

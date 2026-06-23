@@ -655,6 +655,14 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_SHOPSANITY_PRICES_TYCOON_WALLET_WEIGHT, "Shops Tycoon Wallet Weight", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShopsanityTycoonWalletWeight"), mOptionDescriptions[RSK_SHOPSANITY_PRICES_TYCOON_WALLET_WEIGHT], WIDGET_CVAR_SLIDER_INT, 10, true, nullptr, IMFLAG_NONE);
     OPT_BOOL(RSK_SHOPSANITY_PRICES_AFFORDABLE, "Shops Affordable Prices", CVAR_RANDOMIZER_SETTING("ShopsanityPricesAffordable"), mOptionDescriptions[RSK_SHOPSANITY_PRICES_AFFORDABLE]);
     OPT_U8(RSK_SHUFFLE_TOKENS, "Token Shuffle", {"Off", "Dungeons", "Overworld", "All Tokens"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleTokens"), mOptionDescriptions[RSK_SHUFFLE_TOKENS], WIDGET_CVAR_COMBOBOX, RO_TOKENSANITY_OFF);
+    OPT_BOOL(RSK_SKULLTULA_PARTICLES, "Soil GS Particles", CVAR_RANDOMIZER_SETTING("SoilGSParticles"), mOptionDescriptions[RSK_SKULLTULA_PARTICLES]);
+    OPT_CALLBACK(RSK_SHUFFLE_TOKENS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleTokens"), RO_GENERIC_OFF) != RO_GENERIC_OFF) {
+            mOptions[RSK_SKULLTULA_PARTICLES].Enable();
+        } else {
+            mOptions[RSK_SKULLTULA_PARTICLES].Disable("If Gold Skulltulas aren't randomized, then particles aren't needed.");
+        }
+    });
     OPT_U8(RSK_SHUFFLE_SCRUBS, "Scrubs Shuffle", {"Off", "One-Time Only", "All"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleScrubs"), mOptionDescriptions[RSK_SHUFFLE_SCRUBS], WIDGET_CVAR_COMBOBOX, RO_SCRUBS_OFF);
     OPT_CALLBACK(RSK_SHUFFLE_SCRUBS, {
         bool isTycoon = CVarGetInteger(CVAR_RANDOMIZER_SETTING("IncludeTycoonWallet"), RO_GENERIC_OFF);
@@ -823,11 +831,14 @@ void Settings::CreateOptions() {
         }
     });
     OPT_BOOL(RSK_SHUFFLE_COWS, "Shuffle Cows", CVAR_RANDOMIZER_SETTING("ShuffleCows"), mOptionDescriptions[RSK_SHUFFLE_COWS]);
+    OPT_BOOL(RSK_COW_PARTICLES, "CMC Cow Particles", CVAR_RANDOMIZER_SETTING("CowParticles"), mOptionDescriptions[RSK_COW_PARTICLES]);
     OPT_CALLBACK(RSK_SHUFFLE_COWS, {
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleCows"), RO_GENERIC_OFF)) {
             mOptions[RSK_MALON_HINT].Enable();
+            mOptions[RSK_COW_PARTICLES].Enable();
         } else {
             mOptions[RSK_MALON_HINT].Disable("Malon's hint points to a cow, so requires cows to be shuffled.");
+            mOptions[RSK_COW_PARTICLES].Disable("If cows aren't randomized, then particles aren't needed.");
         }
     });
     OPT_BOOL(RSK_SHUFFLE_KOKIRI_SWORD, "Shuffle Kokiri Sword", CVAR_RANDOMIZER_SETTING("ShuffleKokiriSword"), mOptionDescriptions[RSK_SHUFFLE_KOKIRI_SWORD]);
@@ -1438,7 +1449,7 @@ void Settings::CreateOptions() {
         }
     });
     OPT_BOOL(RSK_STARTING_BEANS, "Start with Magic Beans", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBeans"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
-    OPT_BOOL(RSK_INDIVIDUAL_BEANS, "Make bean packs 1 bean per pack", CVAR_RANDOMIZER_SETTING("IndividualBeans"), mOptionDescriptions[RSK_INDIVIDUAL_BEANS]);
+    OPT_BOOL(RSK_INDIVIDUAL_BEANS, "Reworked Magic Beans", CVAR_RANDOMIZER_SETTING("IndividualBeans"), mOptionDescriptions[RSK_INDIVIDUAL_BEANS]);
     OPT_CALLBACK(RSK_SHUFFLE_MERCHANTS, {
         if ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_OFF) ||
             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_ALL_BUT_BEANS)) {
@@ -2013,6 +2024,7 @@ void Settings::CreateOptions() {
                               {
                                   &mOptions[RSK_SHUFFLE_SONGS],
                                   &mOptions[RSK_SHUFFLE_TOKENS],
+                                  &mOptions[RSK_SKULLTULA_PARTICLES],
                                   &mOptions[RSK_SHUFFLE_KOKIRI_SWORD],
                                   &mOptions[RSK_SHUFFLE_MASTER_SWORD],
                                   &mOptions[RSK_SHUFFLE_OCARINA],
@@ -2025,6 +2037,7 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SHUFFLE_WONDER_ITEMS],
                                   &mOptions[RSK_SHUFFLE_BEEHIVES],
                                   &mOptions[RSK_SHUFFLE_COWS],
+                                  &mOptions[RSK_COW_PARTICLES],
                                   &mOptions[RSK_SHUFFLE_POTS],
                                   &mOptions[RSK_SHUFFLE_GRASS],
                                   &mOptions[RSK_SHUFFLE_CRATES],

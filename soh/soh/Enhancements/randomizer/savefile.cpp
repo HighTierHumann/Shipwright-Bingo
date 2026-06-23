@@ -3,6 +3,7 @@
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/randomizer/logic.h"
+#include "soh/Enhancements/randomizer/3drando/pool_functions.hpp"
 
 extern "C" {
 #include <z64.h>
@@ -460,6 +461,16 @@ extern "C" void Randomizer_InitSaveFile() {
 
     // Reset Bombchu Bag Upgrade
     gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = 0;
+
+    // Set flags for excluded locations
+    std::vector<RandomizerCheck> excludedLocations =
+        FilterFromPool(ctx->allLocations, [ctx](const auto loc) { return ctx->GetItemLocation(loc)->IsExcluded(); });
+
+    for (RandomizerCheck loc : excludedLocations) {
+        RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(loc);
+        Flags_SetRandomizerInf(randInf);
+    }
+    Rupees_ChangeBy(-999); // Set Rupees to 0 after collecting all junk
 
     SetStartingItems();
 
