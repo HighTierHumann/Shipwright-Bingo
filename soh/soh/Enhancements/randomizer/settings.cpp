@@ -1474,6 +1474,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_STARTING_PRELUDE_OF_LIGHT, "Start with Prelude of Light", CVAR_RANDOMIZER_SETTING("StartingPreludeOfLight"));
     OPT_U8(RSK_STARTING_SKULLTULA_TOKEN, "Gold Skulltula Tokens", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSkulltulaToken"), "", WIDGET_CVAR_SLIDER_INT);
     OPT_U8(RSK_STARTING_HEARTS, "Starting Hearts", {NumOpts(1, 20)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingHearts"), "", WIDGET_CVAR_SLIDER_INT, 2);
+    OPT_U8(RSK_RANDOM_STARTING_ITEMS, "Starting Items (from \"Inventory\" screen)", {NumOpts(0, 19)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("RandomStartingItems"), "", WIDGET_CVAR_SLIDER_INT);
     // TODO: Remainder of Starting Items
     OPT_U8(RSK_LOGIC_RULES, "Logic", {"Glitchless", "No Logic"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("LogicRules"), mOptionDescriptions[RSK_LOGIC_RULES], WIDGET_CVAR_COMBOBOX, RO_LOGIC_GLITCHLESS, false, nullptr, IMFLAG_LABEL_INLINE);
     OPT_CALLBACK(RSK_LOGIC_RULES, {
@@ -2207,6 +2208,7 @@ void Settings::CreateOptions() {
                                                                                &mOptions[RSK_STARTING_BOTTLE],
                                                                                &mOptions[RSK_STARTING_SKULLTULA_TOKEN],
                                                                                &mOptions[RSK_STARTING_HEARTS],
+                                                                               &mOptions[RSK_RANDOM_STARTING_ITEMS],
                                                                            },
                                                                            WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_STARTING_EQUIPMENT] =

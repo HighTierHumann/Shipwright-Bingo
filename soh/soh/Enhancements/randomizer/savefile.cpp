@@ -5,6 +5,9 @@
 #include "soh/Enhancements/randomizer/logic.h"
 #include "soh/Enhancements/randomizer/3drando/pool_functions.hpp"
 
+#include <random>
+#include <algorithm>
+
 extern "C" {
 #include <z64.h>
 #include "variables.h"
@@ -208,6 +211,104 @@ void GiveLinksPocketItem() {
     }
 }
 
+void GiveRandomStartingItems() {
+    const auto ctx = Rando::Context::GetInstance();
+    int amountOfItems = CVarGetInteger(CVAR_RANDOMIZER_SETTING("RandomStartingItems"), 0);
+    if (amountOfItems <= 0) {
+        return;
+    }
+
+    std::vector<int> itemToGive = {
+        ITEM_STICK,       ITEM_NUT,             ITEM_BOMB,      ITEM_BOW,        ITEM_ARROW_FIRE,    ITEM_DINS_FIRE,
+        ITEM_SLINGSHOT,   ITEM_OCARINA_FAIRY,   ITEM_BOMBCHU,   ITEM_HOOKSHOT,   ITEM_ARROW_ICE,     ITEM_FARORES_WIND,
+        ITEM_BOOMERANG,   ITEM_LENS,            ITEM_BEAN,      ITEM_HAMMER,     ITEM_ARROW_LIGHT,   ITEM_NAYRUS_LOVE,
+        ITEM_BOTTLE
+    };
+
+    uint32_t seedHash = SohUtils::Hash(ctx->GetSeedString());
+
+    // Mix the seedHash into a seed sequence to avoid correlation with other single-integer seeding.
+    std::seed_seq seq{ seedHash, 0x9e3779b9u /* golden ratio constant as salt */ };
+    std::mt19937 gen(seq);
+
+    std::shuffle(itemToGive.begin(), itemToGive.end(), gen);
+
+    int picked = 0;
+    for (int candidate : itemToGive) {
+        if (picked >= amountOfItems) {
+            break;
+        }
+
+        if (INV_CONTENT(candidate) == candidate) {
+            // Skip this candidate because player already has it.
+            continue;
+        }
+
+        switch (candidate) {
+            case ITEM_STICK:
+                GiveLinkDekuSticks(10);
+                break;
+            case ITEM_NUT:
+                GiveLinkDekuNuts(20);
+                break;
+            case ITEM_BOMB:
+                GiveLinkBombs(20);
+                break;
+            case ITEM_BOW:
+                GiveLinkArrows(30);
+                break;
+            case ITEM_ARROW_FIRE:
+                Item_Give(NULL, ITEM_ARROW_FIRE);
+                break;
+            case ITEM_DINS_FIRE:
+                Item_Give(NULL, ITEM_DINS_FIRE);
+                break;
+            case ITEM_SLINGSHOT:
+                GiveLinkSeeds(30);
+                break;
+            case ITEM_OCARINA_FAIRY:
+                Item_Give(NULL, ITEM_OCARINA_FAIRY);
+                break;
+            case ITEM_BOMBCHU:
+                GiveLinkBombchus(50);
+                break;
+            case ITEM_HOOKSHOT:
+                Item_Give(NULL, ITEM_HOOKSHOT);
+                break;
+            case ITEM_ARROW_ICE:
+                Item_Give(NULL, ITEM_ARROW_ICE);
+                break;
+            case ITEM_FARORES_WIND:
+                Item_Give(NULL, ITEM_FARORES_WIND);
+                break;
+            case ITEM_BOOMERANG:
+                Item_Give(NULL, ITEM_BOOMERANG);
+                break;
+            case ITEM_LENS:
+                Item_Give(NULL, ITEM_LENS);
+                break;
+            case ITEM_BEAN:
+                Item_Give(NULL, ITEM_BEAN);
+                Inventory_ChangeAmmo(ITEM_BEAN, 9);
+                break;
+            case ITEM_HAMMER:
+                Item_Give(NULL, ITEM_HAMMER);
+                break;
+            case ITEM_ARROW_LIGHT:
+                Item_Give(NULL, ITEM_ARROW_LIGHT);
+                break;
+            case ITEM_NAYRUS_LOVE:
+                Item_Give(NULL, ITEM_NAYRUS_LOVE);
+                break;
+            case ITEM_BOTTLE:
+                Item_Give(NULL, ITEM_BOTTLE);
+                break;
+        }
+
+        ++picked;
+    }
+}
+
 void SetStartingItems() {
     int startingAge = OTRGlobals::Instance->gRandoContext->GetOption(RSK_SELECTED_STARTING_AGE).Get();
 
@@ -393,6 +494,8 @@ void SetStartingItems() {
                                               ? ITEM_HOOKSHOT
                                               : ITEM_LONGSHOT;
     }
+
+    GiveRandomStartingItems();
 
     if (Randomizer_GetSettingValue(RSK_FULL_WALLETS)) {
         GiveLinkRupees(9001);
