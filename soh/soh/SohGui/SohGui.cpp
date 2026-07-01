@@ -91,6 +91,8 @@ std::shared_ptr<SohModalWindow> mModalWindow;
 std::shared_ptr<Notification::Window> mNotificationWindow;
 std::shared_ptr<TimeDisplayWindow> mTimeDisplayWindow;
 std::shared_ptr<AnchorRoomWindow> mAnchorRoomWindow;
+std::shared_ptr<HintTracker::HintTrackerSettingsWindow> mHintTrackerSettingsWindow;
+std::shared_ptr<HintTracker::HintTrackerWindow> mHintTrackerWindow;
 
 UIWidgets::Colors GetMenuThemeColor() {
     return mSohMenu->GetMenuThemeColor();
@@ -185,6 +187,13 @@ void SetupGuiElements() {
     mItemTrackerSettingsWindow = std::make_shared<ItemTrackerSettingsWindow>(CVAR_WINDOW("ItemTrackerSettings"),
                                                                              "Item Tracker Settings", ImVec2(733, 472));
     gui->AddGuiWindow(mItemTrackerSettingsWindow);
+    mHintTrackerWindow =
+        std::make_shared<HintTracker::HintTrackerWindow>(CVAR_WINDOW("HintTracker"),
+                                                                       "Hint Tracker", ImVec2(400, 420));
+    gui->AddGuiWindow(mHintTrackerWindow);
+    mHintTrackerSettingsWindow = std::make_shared<HintTracker::HintTrackerSettingsWindow>(
+        CVAR_WINDOW("HintTrackerSettings"), "Hint Tracker Settings", ImVec2(600, 375));
+    gui->AddGuiWindow(mHintTrackerSettingsWindow);
     mTimeSplitWindow = std::make_shared<TimeSplitWindow>(CVAR_WINDOW("TimeSplits"), "Time Splits", ImVec2(450, 660));
     gui->AddGuiWindow(mTimeSplitWindow);
     mPlandomizerWindow =
@@ -211,6 +220,8 @@ void Destroy() {
     mEntranceTrackerSettingsWindow = nullptr;
     mCheckTrackerWindow = nullptr;
     mCheckTrackerSettingsWindow = nullptr;
+    mHintTrackerWindow = nullptr;
+    mHintTrackerSettingsWindow = nullptr;
     mGameplayStatsWindow = nullptr;
     mDLViewerWindow = nullptr;
     mValueViewerWindow = nullptr;

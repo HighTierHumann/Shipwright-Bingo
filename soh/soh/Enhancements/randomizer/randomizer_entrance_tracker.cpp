@@ -898,7 +898,8 @@ void EntranceTrackerWindow::DrawElement() {
         // Combine destToggle and groupToggle to get a range of 0-3
         uint8_t groupType = destToggle + (groupToggle * 2);
         size_t groupCount = groupToggle ? (size_t)ENTRANCE_TYPE_COUNT : (size_t)SPOILER_ENTRANCE_GROUP_COUNT;
-        auto groupNames = groupToggle ? groupTypeNames : spoilerEntranceGroupNames;
+        std::string* groupNames;
+        groupNames = groupToggle ? groupTypeNames : spoilerEntranceGroupNames;
 
         EntranceOverride* entranceList;
 

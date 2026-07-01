@@ -563,6 +563,22 @@ void DrawTricksMenu(WidgetInfo& info) {
     ImGui::PopStyleVar(1);
 }
 
+typedef enum {
+    SKWIMBLE_NONE,
+    SKWIMBLE_LIGHTLY_SALTED,
+    SKWIMBLE_WITH_PEPPER,
+    SKWIMBLE_SIDE_OF_FRIES,
+    SKWIMBLE_OMEGA_DESTRUCTION_DEMONCORE,
+    SKWIMBLE_CHEESY,
+    SKWIMBLE_HEAVILY_CODE_BROWNED,
+} SkwimbleSeasonings;
+
+static const std::map<int32_t, const char*> skwimbleSeasoning = {
+    { SKWIMBLE_NONE, "Unseasoned" }, { SKWIMBLE_LIGHTLY_SALTED, "Lightly Salted" }, { SKWIMBLE_WITH_PEPPER, "With Pepper" },
+    { SKWIMBLE_SIDE_OF_FRIES, "A side of fries" },  { SKWIMBLE_OMEGA_DESTRUCTION_DEMONCORE, "Omega Destruction Demon Core" }, { SKWIMBLE_CHEESY, "Cheesy" },
+    { SKWIMBLE_HEAVILY_CODE_BROWNED, "Heavily Code Browned" },
+};
+
 void SohMenu::AddMenuRandomizer() {
     // Add Randomizer Menu
     AddMenuEntry("Randomizer", CVAR_SETTING("Menu.RandomizerSidebarSection"));
@@ -1101,6 +1117,25 @@ void SohMenu::AddMenuRandomizer() {
         .WindowName("Check Tracker Settings")
         .HideInSearch(true)
         .Options(WindowButtonOptions().Tooltip("Enables the separate Check Tracker Settings Window."));
+
+    // Hint Tracker
+    path.sidebarName = "Hint Tracker";
+    AddSidebarEntry("Randomizer", path.sidebarName, 1);
+
+    AddWidget(path, "Hint Tracker", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path, "Toggle Hint Tracker", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("HintTracker"))
+        .RaceDisable(false)
+        .WindowName("Hint Tracker")
+        .HideInSearch(true)
+        .Options(WindowButtonOptions().Tooltip("Toggles the Hint Tracker.").EmbedWindow(false));
+    AddWidget(path, "Hint Tracker Settings", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path, "Popout Hint Tracker Settings", WIDGET_WINDOW_BUTTON)
+        .CVar(CVAR_WINDOW("HintTrackerSettings"))
+        .RaceDisable(false)
+        .WindowName("Hint Tracker Settings")
+        .HideInSearch(true)
+        .Options(WindowButtonOptions().Tooltip("Enables the separate Hint Tracker Settings Window."));
 }
 
 } // namespace SohGui

@@ -2,6 +2,8 @@
  * This file handles the custom messages for Gossip Stone
  * hints.
  */
+#include "../randomizer_gossip_tracker.h"
+
 #include <soh/OTRGlobals.h>
 
 extern "C" {
@@ -37,6 +39,27 @@ void BuildHintStoneMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
         }
     }
+
+    std::string cleanTrackerMessage;
+    if (stoneHint == RH_NONE) {
+        cleanTrackerMessage = "INVALID STONE. PARAMS: " + std::to_string(hintParams);
+    } else {
+        CustomMessage cleanMsg;
+        if (hintParams == 0x1D && (RAND_GET_OPTION(RSK_OCARINA_HINT))) {
+            cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(RH_OCARINA_HINT)->GetHintMessage(MF_RAW);
+        } else {
+            cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(stoneHint)->GetHintMessage(MF_RAW);
+        }
+
+        cleanMsg.Replace("Buy ", "");
+        cleanMsg.Replace("Acheter: ", "");
+        cleanMsg.Replace(" kaufen ", "");
+        cleanMsg.Replace(" kaufen", "");
+
+        cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_ENCODE);
+    }
+    HintTracker::RevealHint(stoneHint, cleanTrackerMessage);
+
     if (stoneHint == RH_NONE) {
         msg = CustomMessage("INVALID STONE. PARAMS: " + std::to_string(hintParams));
     } else if (hintParams == 0x1D && (RAND_GET_OPTION(RSK_OCARINA_HINT))) {

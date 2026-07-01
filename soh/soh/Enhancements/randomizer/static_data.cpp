@@ -65,8 +65,8 @@ std::unordered_map<uint32_t, CustomMessage> StaticData::hintNames = {
     { RH_DODONGOS_CAVERN_GOSSIP_STONE, CustomMessage("Dodongo's Cavern Gossip Stone") },
     { RH_GANONDORF_HINT, CustomMessage("Ganondorf Hint") },
     { RH_GANONDORF_JOKE, CustomMessage("Ganondorf Joke") },
-    { RH_SHEIK_HINT, CustomMessage("Sheik in Ganons Castle Hint") },
-    { RH_DAMPES_DIARY, CustomMessage("Dampe's Diary Hint") },
+    { RH_SHEIK_HINT, CustomMessage("Sheik IGC Light Arrows Hint") },
+    { RH_DAMPES_DIARY, CustomMessage("Dampe's Diary Hookshot Hint") },
     { RH_GREG_RUPEE, CustomMessage("Treasure Chest Game Greg Hint") },
     { RH_ALTAR_CHILD, CustomMessage("ToT Altar as Child") },
     { RH_ALTAR_ADULT, CustomMessage("ToT Altar as Adult") },
@@ -101,10 +101,10 @@ std::unordered_map<uint32_t, CustomMessage> StaticData::hintNames = {
     { RH_STRENGTH_HINT, CustomMessage("Strength Hint") },
     { RH_OCARINA_HINT, CustomMessage("LW Gossip Stone Ocarina Hint") },
     { RH_SCALE_HINT, CustomMessage("Zora Scale Hint") },
-    { RH_LULLABY_HINT, CustomMessage("Child Zelda Hint") },
-    { RH_HOVERS_HINT, CustomMessage("Truthspinner Sign Hint") },
+    { RH_LULLABY_HINT, CustomMessage("Zelda's Lullaby Hint") },
+    { RH_HOVERS_HINT, CustomMessage("Hover Boots Hint") },
     { RH_STORMS_HINT, CustomMessage("Song of Storms Hint") },
-    { RH_EPONAS_HINT, CustomMessage("Child Malon Hint") },
+    { RH_EPONAS_HINT, CustomMessage("Epona's Song Hint") },
 };
 
 std::unordered_map<RandomizerCheck, RandomizerHint> StaticData::gossipStoneCheckToHint{

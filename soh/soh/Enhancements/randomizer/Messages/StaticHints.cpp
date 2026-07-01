@@ -6,6 +6,7 @@
  * are always given by a specific NPC and/or for a specific item.
  */
 #include "soh/Enhancements/randomizer/randomizerTypes.h"
+#include "../randomizer_gossip_tracker.h"
 #include "z64scene.h"
 #include <soh/OTRGlobals.h>
 
@@ -25,19 +26,26 @@ extern PlayState* gPlayState;
 
 void BuildGanondorfHint(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg;
+    CustomMessage cleanMsg;
     if (RAND_GET_OPTION(RSK_SHUFFLE_MASTER_SWORD) && !CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER)) {
         if (INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT) {
             msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 1);
+            cleanMsg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_RAW, 1);
         } else {
             msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 2);
+            cleanMsg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_RAW, 2);
         }
     } else {
         if (INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT) {
             msg = RAND_GET_HINT(RH_GANONDORF_JOKE)->GetHintMessage(MF_AUTO_FORMAT);
+            cleanMsg = CustomMessage("Hinted items already obtained.");
         } else {
             msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 0);
+            cleanMsg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_RAW, 0);
         }
     }
+    std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+    HintTracker::RevealHint(RH_GANONDORF_HINT, cleanTrackerMessage);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -166,6 +174,9 @@ void Build100SkullsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 
 void BuildDampesDiaryMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg = RAND_GET_HINT(RH_DAMPES_DIARY)->GetHintMessage(MF_AUTO_FORMAT);
+    CustomMessage cleanMsg = RAND_GET_HINT(RH_DAMPES_DIARY)->GetHintMessage(MF_RAW);
+    std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+    HintTracker::RevealHint(RH_DAMPES_DIARY, cleanTrackerMessage);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -173,6 +184,9 @@ void BuildDampesDiaryMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildGregHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_TREASURE_BOX_SHOP) {
         CustomMessage msg = RAND_GET_HINT(RH_GREG_RUPEE)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_GREG_RUPEE)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_GREG_RUPEE, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -182,6 +196,9 @@ void BuildGregHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildStrengthHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_DEATH_MOUNTAIN_TRAIL) {
         CustomMessage msg = RAND_GET_HINT(RH_STRENGTH_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_STRENGTH_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_STRENGTH_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -190,6 +207,9 @@ void BuildStrengthHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildShadowSignMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_SHADOW_TEMPLE) {
         CustomMessage msg = RAND_GET_HINT(RH_HOVERS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_HOVERS_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_HOVERS_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -198,6 +218,9 @@ void BuildShadowSignMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildScaleHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_ZORAS_DOMAIN) {
         CustomMessage msg = RAND_GET_HINT(RH_SCALE_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_SCALE_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_SCALE_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -206,6 +229,9 @@ void BuildScaleHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildZeldaHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_CASTLE_COURTYARD_ZELDA) {
         CustomMessage msg = RAND_GET_HINT(RH_LULLABY_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_LULLABY_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_LULLABY_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -214,6 +240,9 @@ void BuildZeldaHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildStormsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_WINDMILL_AND_DAMPES_GRAVE) {
         CustomMessage msg = RAND_GET_HINT(RH_STORMS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_STORMS_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_STORMS_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -222,6 +251,9 @@ void BuildStormsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildChildMalonMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_LON_LON_RANCH) {
         CustomMessage msg = RAND_GET_HINT(RH_EPONAS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_EPONAS_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_EPONAS_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -230,6 +262,9 @@ void BuildChildMalonMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildBoomerangHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_JABU_JABU_BOSS) {
         CustomMessage msg = RAND_GET_HINT(RH_BOOMERANG_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_BOOMERANG_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_BOOMERANG_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -238,6 +273,9 @@ void BuildBoomerangHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildHammerHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_FIRE_TEMPLE_BOSS) {
         CustomMessage msg = RAND_GET_HINT(RH_HAMMER_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_HAMMER_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_HAMMER_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -246,6 +284,9 @@ void BuildHammerHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildMirrorHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE_BOSS) {
         CustomMessage msg = RAND_GET_HINT(RH_MIRROR_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(RH_MIRROR_HINT)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(RH_MIRROR_HINT, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -367,12 +408,18 @@ void BuildSariaMessage(uint16_t* textId, bool* loadFromMessageTable) {
     } else {
         msg = RAND_GET_HINT(RH_SARIA_HINT)->GetHintMessage(MF_AUTO_FORMAT, 1);
     }
+    CustomMessage cleanMsg = RAND_GET_HINT(RH_SARIA_HINT)->GetHintMessage(MF_RAW);
+    std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+    HintTracker::RevealHint(RH_SARIA_HINT, cleanTrackerMessage);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildMidoMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg = RAND_GET_HINT(RH_MIDO_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+    CustomMessage cleanMsg = RAND_GET_HINT(RH_MIDO_HINT)->GetHintMessage(MF_RAW);
+    std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+    HintTracker::RevealHint(RH_MIDO_HINT, cleanTrackerMessage);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -467,6 +514,9 @@ void BuildBossKeyHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     }
     if (rh != RH_NONE) {
         CustomMessage msg = RAND_GET_HINT(rh)->GetHintMessage(MF_AUTO_FORMAT);
+        CustomMessage cleanMsg = RAND_GET_HINT(rh)->GetHintMessage(MF_RAW);
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_RAW);
+        HintTracker::RevealHint(rh, cleanTrackerMessage);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
