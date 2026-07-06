@@ -34,6 +34,21 @@ Color_RGBA8 Color_Background = { 0, 0, 0, 255 };
 static WidgetInfo backgroundColorWidget;
 static WidgetInfo windowTypeWidget;
 
+u8 Hint_GetIsHintDiscovered(u16 hintIndex) {
+    u16 bitsPerIndex = sizeof(u32) * 8;
+    u32 idx = hintIndex / bitsPerIndex;
+    if (idx < RH_MAX) {
+        u32 hintBit = 1 << (hintIndex - (idx * bitsPerIndex));
+        return (gSaveContext.ship.stats.hintsDiscovered[idx] & hintBit) != 0;
+    }
+    return 0;
+}
+
+bool IsHintDiscovered(s16 index) {
+    bool isDiscovered = Hint_GetIsHintDiscovered(index);
+    return isDiscovered;
+}
+
 bool IsAreaScene(SceneID sceneNum) {
     switch (sceneNum) {
         case SCENE_HYRULE_FIELD:
@@ -185,9 +200,8 @@ RandomizerCheckArea GetCheckArea() {
 }
 
 void InitHintTrackingData() {
-    gHintEntries.clear();
-    gHintKeyToIndex.clear();
     auto ctx = Rando::Context::GetInstance();
+    CustomMessage cleanMsg;
 
     // Create a HintEntry for each hint whose gating setting is currently enabled.
     for (const auto& [hint, info] : hintMetadata) {
@@ -199,8 +213,14 @@ void InitHintTrackingData() {
         e.hintKey = hint;
         e.name = Rando::StaticData::hintNames.at(hint).GetForCurrentLanguage(MF_CLEAN);
         e.areaName = RandomizerCheckObjects::GetRCAreaName(info.area);
-        e.hintText = "";
-        e.revealed = false;
+        e.revealed = IsHintDiscovered(static_cast<s16>(hint));
+        if (hint == RH_GANONDORF_HINT) {
+            cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW, 2);
+        } else {
+            cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW);
+        }
+        std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_ENCODE);
+        e.hintText = cleanTrackerMessage;
 
         switch (info.type) {
             case TYPE_GOSSIP_STONE:
@@ -232,9 +252,9 @@ void InitHintTrackingData() {
     }
 }
 
-void RevealHint(RandomizerHint hintKey, const std::string& formattedMessage) {
-    if (hintKey == RH_NONE || formattedMessage.empty()) {
-        SPDLOG_DEBUG("HintTracker: Received RH_NONE or empty message");
+void RevealHint(RandomizerHint hintKey) {
+    if (hintKey == RH_NONE) {
+        SPDLOG_DEBUG("HintTracker: Received RH_NONE");
         return;
     }
 
@@ -242,11 +262,11 @@ void RevealHint(RandomizerHint hintKey, const std::string& formattedMessage) {
     if (it != gHintKeyToIndex.end()) {
         size_t idx = it->second;
         if (!gHintEntries[idx].revealed) {
-            gHintEntries[idx].hintText = formattedMessage;
+            gSaveContext.ship.stats.hintsDiscovered[hintKey / 32] |= (1 << (hintKey % 32));
             gHintEntries[idx].revealed = true;
         }
     } else {
-        SPDLOG_DEBUG("hintKey not found in list! {}", formattedMessage);
+        SPDLOG_DEBUG("hintKey not found in list!");
     }
 }
 
@@ -270,7 +290,7 @@ struct HintColorSegment {
     ImU32 color;
 };
 
-// Splits `text` on "%<letter>" tokens (matching MF_ENCODE's output) into runs of text
+// Splits `text` on "%<letter>" tokens (matching MF_RAW's output) into runs of text
 // paired with the color that should be applied to them. Any text preceding the first
 // token, or an unrecognized "%<letter>" sequence, uses `defaultColor`.
 static std::vector<HintColorSegment> ParseHintColorSegments(const std::string& text, ImU32 defaultColor) {
@@ -288,6 +308,8 @@ static std::vector<HintColorSegment> ParseHintColorSegments(const std::string& t
             i += 2;
             continue;
         }
+
+        text.at(i) == '^' ? current += ' ' :
         current += text[i];
         i++;
     }
@@ -543,8 +565,14 @@ void HintTrackerWindow::DrawElement() {
     Trackers::EndFloatWindows();
 }
 
+void ClearHintTrackingData() {
+    gHintEntries.clear();
+    gHintKeyToIndex.clear();
+}
+
 void HintTrackerWindow::InitElement() {
-    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnLoadGame>([](int32_t) { InitHintTrackingData(); });
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnLoadGame>([](int32_t fileNum) { InitHintTrackingData(); });
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnExitGame>([](int32_t fileNum) { ClearHintTrackingData(); });
 
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnTransitionEnd>([](uint32_t) {
         previousArea = currentArea;

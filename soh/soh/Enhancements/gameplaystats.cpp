@@ -338,6 +338,9 @@ void LoadStatsVersion1() {
     SaveManager::Instance->LoadArray(
         "entrancesDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.entrancesDiscovered),
         [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.entrancesDiscovered[i]); });
+    SaveManager::Instance->LoadArray(
+        "hintsDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.hintsDiscovered),
+        [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.hintsDiscovered[i]); });
 }
 
 void SaveStats(SaveContext* saveContext, int sectionID, bool fullSave) {
@@ -385,6 +388,9 @@ void SaveStats(SaveContext* saveContext, int sectionID, bool fullSave) {
     SaveManager::Instance->SaveArray(
         "entrancesDiscovered", ARRAY_COUNT(saveContext->ship.stats.entrancesDiscovered),
         [&](size_t i) { SaveManager::Instance->SaveData("", saveContext->ship.stats.entrancesDiscovered[i]); });
+    SaveManager::Instance->SaveArray(
+        "hintsDiscovered", ARRAY_COUNT(saveContext->ship.stats.hintsDiscovered),
+        [&](size_t i) { SaveManager::Instance->SaveData("", saveContext->ship.stats.hintsDiscovered[i]); });
 }
 
 void GameplayStatsRow(const char* label, const std::string& value, ImVec4 color = COLOR_WHITE,

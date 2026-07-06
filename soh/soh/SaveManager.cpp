@@ -1656,6 +1656,9 @@ void SaveManager::LoadBaseVersion2() {
         SaveManager::Instance->LoadArray(
             "entrancesDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.entrancesDiscovered),
             [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.entrancesDiscovered[i]); });
+        SaveManager::Instance->LoadArray(
+            "hintsDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.hintsDiscovered),
+            [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.hintsDiscovered[i]); });
     });
     SaveManager::Instance->LoadArray("sceneFlags", ARRAY_COUNT(gSaveContext.sceneFlags), [](size_t i) {
         SaveManager::Instance->LoadStruct("", [&i]() {
@@ -1885,6 +1888,9 @@ void SaveManager::LoadBaseVersion3() {
         SaveManager::Instance->LoadArray(
             "entrancesDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.entrancesDiscovered),
             [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.entrancesDiscovered[i]); });
+        SaveManager::Instance->LoadArray(
+            "hintsDiscovered", ARRAY_COUNT(gSaveContext.ship.stats.hintsDiscovered),
+            [](size_t i) { SaveManager::Instance->LoadData("", gSaveContext.ship.stats.hintsDiscovered[i]); });
     });
     SaveManager::Instance->LoadArray("sceneFlags", ARRAY_COUNT(gSaveContext.sceneFlags), [](size_t i) {
         SaveManager::Instance->LoadStruct("", [&i]() {

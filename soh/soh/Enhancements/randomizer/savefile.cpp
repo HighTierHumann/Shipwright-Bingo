@@ -4,6 +4,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/randomizer/logic.h"
 #include "soh/Enhancements/randomizer/3drando/pool_functions.hpp"
+#include "soh/Enhancements/randomizer/SeedContext.h"
 
 #include <random>
 #include <algorithm>
@@ -571,7 +572,9 @@ extern "C" void Randomizer_InitSaveFile() {
 
     for (RandomizerCheck loc : excludedLocations) {
         RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(loc);
-        Flags_SetRandomizerInf(randInf);
+        if (randInf != RAND_INF_MAX) { // Shops use RAND_INF_MAX to check if an item is "Sold Out". If we don't add this check, then shop items will be Sold Out when ANY check is excluded.
+            Flags_SetRandomizerInf(randInf);
+        }
     }
 
     SetStartingItems();

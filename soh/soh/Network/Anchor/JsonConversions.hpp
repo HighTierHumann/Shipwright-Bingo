@@ -94,6 +94,7 @@ inline void from_json(const json& j, Inventory& inventory) {
 inline void to_json(json& j, const SohStats& sohStats) {
     j = json{
         { "entrancesDiscovered", sohStats.entrancesDiscovered },
+        { "hintsDiscovered", sohStats.hintsDiscovered },
         { "firstInput", sohStats.firstInput },
         { "fileCreatedAt", sohStats.fileCreatedAt },
     };
@@ -101,6 +102,7 @@ inline void to_json(json& j, const SohStats& sohStats) {
 
 inline void from_json(const json& j, SohStats& sohStats) {
     j.at("entrancesDiscovered").get_to(sohStats.entrancesDiscovered);
+    j.at("hintsDiscovered").get_to(sohStats.hintsDiscovered);
     j.at("firstInput").get_to(sohStats.firstInput);
     j.at("fileCreatedAt").get_to(sohStats.fileCreatedAt);
 }
