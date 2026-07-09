@@ -1920,8 +1920,11 @@ void Settings::CreateOptions() {
           &mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED],
           &mOptions[RSK_GANONS_BOSS_KEY], &mOptions[RSK_LACS_OPTIONS],
           &mOptions[RSK_LACS_MEDALLION_COUNT], &mOptions[RSK_LACS_STONE_COUNT], &mOptions[RSK_LACS_DUNGEON_COUNT],
-          &mOptions[RSK_LACS_REWARD_COUNT], &mOptions[RSK_LACS_TOKEN_COUNT],
-          &mOptions[RSK_TRIFORCE_POWER_HUNT],
+          &mOptions[RSK_LACS_REWARD_COUNT], &mOptions[RSK_LACS_TOKEN_COUNT], },
+        WidgetContainerType::SECTION);
+    mOptionGroups[RSG_MENU_SECTION_LOSECON] = OptionGroup::SubGroup(
+        "Lose Condition",
+        { &mOptions[RSK_TRIFORCE_POWER_HUNT],
           &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL],
           &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED] },
         WidgetContainerType::SECTION);
@@ -1930,6 +1933,7 @@ void Settings::CreateOptions() {
                                                                             &mOptionGroups[RSG_ITEM_POOL],
                                                                             &mOptionGroups[RSG_MENU_SECTION_LOGIC],
                                                                             &mOptionGroups[RSG_MENU_SECTION_WINCON],
+                                                                            &mOptionGroups[RSG_MENU_SECTION_LOSECON],
                                                                         },
                                                                         WidgetContainerType::COLUMN);
     mOptionGroups[RSG_MENU_SECTION_AREA_ACCESS] =
