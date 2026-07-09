@@ -524,7 +524,8 @@ typedef enum CounterID {
     /* 0x06 */ COUNTER_SKULLTULLAS,
     /* 0x07 */ COUNTER_DEATHS,
     /* 0x08 */ COUNTER_TRIFORCE_PIECES,
-    /* 0x09 */ COUNTER_MAX,
+    /* 0x09 */ COUNTER_TRIFORCE_POWER_PIECES,
+    /* 0x0A */ COUNTER_MAX,
 } CounterID;
 
 typedef struct CounterData {
@@ -545,6 +546,8 @@ static CounterData counterData[COUNTER_MAX] = {
     { CREATE_SPRITE_24(dgQuestIconGoldSkulltulaTex, 103), COUNTER_SKULLTULLAS, { 0x05, 0x2A }, SIZE_COUNTER },
     { CREATE_SPRITE_SKULL, COUNTER_DEATHS, { 0x48, 0x2A }, SIZE_COUNTER },
     { CREATE_SPRITE_32(dgTriforcePiece, 121), COUNTER_TRIFORCE_PIECES, { 0x27, 0x10 }, SIZE_COUNTER },
+    { { dgWTriforcePiece, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b, 121 }, { 85, 85, 85, 0xFF }, 
+        COUNTER_TRIFORCE_POWER_PIECES, { 0xA8 + 4, 0x2A + 12 }, SIZE_COUNTER },
 };
 
 static Sprite counterDigitSprites[10] = {
@@ -587,6 +590,10 @@ static bool ShouldRenderCounter(s16 fileIndex, CounterID counterId) {
         return Save_GetSaveMetaInfo(fileIndex)->maxTriforcePieces != 0;
     }
 
+    if (counterId == COUNTER_TRIFORCE_POWER_PIECES) {
+        return Save_GetSaveMetaInfo(fileIndex)->maxTriforcePowerPieces != 0;
+    }
+
     return true;
 }
 
@@ -610,6 +617,10 @@ static u16 GetCurrentCounterValue(s16 fileIndex, CounterID counter) {
 
     if (counter == COUNTER_TRIFORCE_PIECES) {
         return Save_GetSaveMetaInfo(fileIndex)->triforcePieces;
+    }
+
+    if (counter == COUNTER_TRIFORCE_POWER_PIECES) {
+        return Save_GetSaveMetaInfo(fileIndex)->triforcePowerPieces;
     }
 
     return 0;
@@ -646,6 +657,10 @@ static u16 GetMaxCounterValue(s16 fileIndex, CounterID counter) {
 
     if (counter == COUNTER_TRIFORCE_PIECES) {
         return Save_GetSaveMetaInfo(fileIndex)->maxTriforcePieces;
+    }
+
+    if (counter == COUNTER_TRIFORCE_POWER_PIECES) {
+        return Save_GetSaveMetaInfo(fileIndex)->maxTriforcePowerPieces;
     }
 
     return 0;

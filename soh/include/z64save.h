@@ -208,6 +208,7 @@ typedef struct {
 
 typedef struct ShipRandomizerSaveContextData {
     u8 triforcePiecesCollected;
+    u8 triforcePowerPiecesCollected;
     u8 bombchuUpgradeLevel;
 } ShipRandomizerSaveContextData;
 

@@ -15,7 +15,8 @@ typedef enum {
     /*  7 */ TWEFF_MERGEFLAME,
     /*  8 */ TWEFF_SHLD_BLST,
     /*  9 */ TWEFF_SHLD_DEFL,
-    /* 10 */ TWEFF_SHLD_HIT
+    /* 10 */ TWEFF_SHLD_HIT,
+    /* 11 */ TWEFF_LIGHT_RAY,
 } TwEffType;
 
 typedef enum {
@@ -44,6 +45,14 @@ typedef struct {
     /* 0x0034 */ f32 workf[EFF_FWORK_MAX];
     /* 0x0044 */ Actor* target;
                  u32 epoch;
+    /*        */ f32 scale;
+    /*        */ s16 unk_2E;
+    /*        */ s16 unk_30;
+    /*        */ f32 unk_38; // scale target mostly, but used for other things
+    /*        */ f32 unk_3C; // mostly z rot
+    /*        */ f32 unk_40;
+    /*        */ f32 unk_44; // mostly x rot
+    /*        */ f32 unk_48; // mostly y rot
 } BossTwEffect;
 
 typedef enum {
@@ -175,6 +184,10 @@ typedef struct BossTw {
     /* 0x06A8 */ char unused_6A8[4];
     /* 0x06AC */ f32 subCamYaw;
     /* 0x06B0 */ f32 subCamYawStep;
+    /*        */ bool canBeDamaged;
+    /*        */ f32 nayruPrimAlpha;
+    /*        */ bool twinrovaReceivedIce;
+    /*        */ bool twinrovaReceivedFire;
 } BossTw; // size = 0x06B4
 
 #endif

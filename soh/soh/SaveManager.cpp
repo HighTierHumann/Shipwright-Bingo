@@ -229,6 +229,8 @@ void SaveManager::LoadRandomizer() {
 
     SaveManager::Instance->LoadData("triforcePiecesCollected",
                                     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected);
+    SaveManager::Instance->LoadData("triforcePowerPiecesCollected",
+                                    gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
     SaveManager::Instance->LoadData("bombchuUpgradeLevel", gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel);
 
     SaveManager::Instance->LoadData("pendingIceTrapCount", gSaveContext.ship.pendingIceTrapCount);
@@ -383,6 +385,8 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
 
     SaveManager::Instance->SaveData("triforcePiecesCollected",
                                     saveContext->ship.quest.data.randomizer.triforcePiecesCollected);
+    SaveManager::Instance->SaveData("triforcePowerPiecesCollected",
+                                    saveContext->ship.quest.data.randomizer.triforcePowerPiecesCollected);
     SaveManager::Instance->SaveData("bombchuUpgradeLevel", saveContext->ship.quest.data.randomizer.bombchuUpgradeLevel);
 
     SaveManager::Instance->SaveData("pendingIceTrapCount", saveContext->ship.pendingIceTrapCount);
@@ -608,6 +612,8 @@ void SaveManager::InitMeta(int fileNum) {
     fileMetaInfo[fileNum].hasWallet = Flags_GetRandomizerInf(RAND_INF_HAS_WALLET) || !IS_RANDO;
     fileMetaInfo[fileNum].triforcePieces =
         IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected : 0;
+    fileMetaInfo[fileNum].triforcePowerPieces =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected : 0;
     fileMetaInfo[fileNum].hasFishingRod = Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) || !IS_RANDO;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;
     fileMetaInfo[fileNum].health = gSaveContext.health;
@@ -615,6 +621,9 @@ void SaveManager::InitMeta(int fileNum) {
 
     fileMetaInfo[fileNum].maxTriforcePieces = IS_RANDO && (bool)randoContext->GetOption(RSK_TRIFORCE_HUNT)
                                                   ? randoContext->GetOption(RSK_TRIFORCE_HUNT_PIECES_REQUIRED).Get() + 1
+                                                  : 0;
+    fileMetaInfo[fileNum].maxTriforcePowerPieces = IS_RANDO && (bool)randoContext->GetOption(RSK_TRIFORCE_POWER_HUNT)
+                                                  ? randoContext->GetOption(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED).Get() + 1
                                                   : 0;
     fileMetaInfo[fileNum].fishingPoleShuffled =
         IS_RANDO ? (bool)randoContext->GetOption(RSK_SHUFFLE_FISHING_POLE) : false;

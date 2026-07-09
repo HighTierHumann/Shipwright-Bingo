@@ -446,10 +446,85 @@ extern "C" void Randomizer_DrawTriforcePieceGI(PlayState* play, GetItemEntry get
         // Get shard DL. Remove one before division to account for triforce piece given in the textbox
         // to match up the shard from the overworld model.
         Gfx* triforcePieceDL = Randomizer_GetTriforcePieceDL((current - 1) % 3);
-
         gSPDisplayList(POLY_XLU_DISP++, triforcePieceDL);
     } else if (current == required && triforcePieceScale > 0.00008f) {
         gSPDisplayList(POLY_XLU_DISP++, (Gfx*)gTriforcePieceCompletedDL);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+extern "C" void Randomizer_DrawTriforcePowerPiece(PlayState* play, GetItemEntry* getItemEntry) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+
+    uint8_t current = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected;
+
+    Matrix_Scale(0.035f, 0.035f, 0.035f, MTXMODE_APPLY);
+
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+
+    Gfx* triforcePieceDL = Randomizer_GetTriforcePieceDL(current % 3);
+
+    gSPDisplayList(POLY_XLU_DISP++, triforcePieceDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+// Separate draw function for drawing the Triforce piece when in the GI state.
+// Needed for delaying showing the triforce piece slightly so the triforce shard doesn't
+// suddenly snap to the new piece model or completed triforce because the piece is
+// given mid textbox. Also makes it so the overworld models don't turn into the completed
+// model when the player has exactly the required amount of pieces.
+extern "C" void Randomizer_DrawTriforcePowerPieceGI(PlayState* play, GetItemEntry getItemEntry) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+
+    uint8_t current = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected;
+    uint8_t required = OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1;
+
+    Matrix_Scale(triforcePieceScale, triforcePieceScale, triforcePieceScale, MTXMODE_APPLY);
+
+    // For creating a delay before showing the model so the model doesn't swap visually when the triforce piece
+    // is given when the textbox just appears.
+    if (triforcePieceScale < 0.0001f) {
+        triforcePieceScale += 0.00003f;
+    }
+
+    // Animation. When not the completed triforce, create delay before showing the piece to bypass interpolation.
+    // If the completed triforce, make it grow slowly.
+    if (current != required) {
+        if (triforcePieceScale > 0.00008f && triforcePieceScale < 0.034f) {
+            triforcePieceScale = 0.034f;
+        } else if (triforcePieceScale < 0.035f) {
+            triforcePieceScale += 0.0005f;
+        }
+    } else if (triforcePieceScale > 0.00008f && triforcePieceScale < 0.035f) {
+        triforcePieceScale += 0.0005f;
+    }
+
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+
+    // Show piece when not currently completing the triforce. Use the scale to create a delay so interpolation doesn't
+    // make the triforce twitch when the size is set to a higher value.
+    if (current != required && triforcePieceScale > 0.035f) {
+        // Get shard DL. Remove one before division to account for triforce piece given in the textbox
+        // to match up the shard from the overworld model.
+        Gfx* triforcePieceDL = Randomizer_GetTriforcePieceDL((current - 1) % 3);
+
+        gDPSetGrayscaleColor(POLY_XLU_DISP++, 150, 150, 150, 255);
+        gSPGrayscale(POLY_XLU_DISP++, true);
+        gSPDisplayList(POLY_XLU_DISP++, triforcePieceDL);
+        gSPGrayscale(POLY_XLU_DISP++, false);
+    } else if (current == required && triforcePieceScale > 0.00008f) {
+        gDPSetGrayscaleColor(POLY_XLU_DISP++, 150, 150, 150, 255);
+        gSPGrayscale(POLY_XLU_DISP++, true);
+        gSPDisplayList(POLY_XLU_DISP++, (Gfx*)gTriforcePieceCompletedDL);
+        gSPGrayscale(POLY_XLU_DISP++, false);
     }
 
     CLOSE_DISPS(play->state.gfxCtx);

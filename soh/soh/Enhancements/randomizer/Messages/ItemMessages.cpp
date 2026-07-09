@@ -67,6 +67,27 @@ void BuildTriforcePieceMessage(CustomMessage& msg) {
     msg.Format(ITEM_CUSTOM);
 }
 
+void BuildTriforcePowerPieceMessage(CustomMessage& msg) {
+    uint8_t current = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected + 1;
+    uint8_t required = OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1;
+    uint8_t remaining = required - current;
+    float percentageCollected = (float)current / (float)required;
+
+    if (percentageCollected != 1.0) {
+        msg = { "You found a %rTriforce of Power&Piece%w... %c[[remaining]]%w left before Ganon&wins!",
+                TODO_TRANSLATE,
+                TODO_TRANSLATE };
+    } else {
+        msg = { "%rGame Over. Return of Ganon.",
+                TODO_TRANSLATE,
+                TODO_TRANSLATE };
+    }
+    msg.Replace("[[current]]", std::to_string(current));
+    msg.Replace("[[remaining]]", std::to_string(remaining));
+    msg.Replace("[[required]]", std::to_string(required));
+    msg.Format(ITEM_CUSTOM);
+}
+
 void BuildCustomItemMessage(Player* player, CustomMessage& msg) {
     int16_t rgid;
     msg = CustomMessage("You found [[article]][[color]][[name]]%w!",
@@ -149,6 +170,8 @@ void BuildItemMessage(u16* textId, bool* loadFromMessageTable) {
         Rando::Traps::BuildIceTrapMessage(msg, player->getItemEntry);
     } else if (player->getItemEntry.getItemId == RG_TRIFORCE_PIECE) {
         BuildTriforcePieceMessage(msg);
+    } else if (player->getItemEntry.getItemId == RG_TRIFORCE_POWER_PIECE) {
+        BuildTriforcePowerPieceMessage(msg);
     } else {
         BuildCustomItemMessage(player, msg);
     }

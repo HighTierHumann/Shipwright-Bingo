@@ -28,6 +28,7 @@
 #include "randomizerTypes.h"
 #include "soh/Notification/Notification.h"
 #include "soh/ObjectExtension/ObjectExtension.h"
+#include "soh/SaveManager.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
@@ -314,6 +315,7 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
     switch (randoGet) {
         case RG_NONE:
         case RG_TRIFORCE:
+        case RG_TRIFORCE_POWER:
         case RG_HINT:
         case RG_MAX:
         case RG_SOLD_OUT:
@@ -754,6 +756,7 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
         case RG_TREASURE_GAME_GREEN_RUPEE:
         case RG_BUY_HEART:
         case RG_TRIFORCE_PIECE:
+        case RG_TRIFORCE_POWER_PIECE:
         default:
             return CAN_OBTAIN;
     }
@@ -4403,6 +4406,25 @@ void Randomizer_GameplayStats_SetTimestamp(uint16_t item) {
     }
 }
 
+static void DeleteFileOnLoseCondition() {
+    if (!GameInteractor::IsSaveLoaded() || gPlayState == NULL) {
+        return;
+    }
+
+    if (gPlayState->gameOverCtx.state == GAMEOVER_DEATH_MENU && gPlayState->pauseCtx.state == 9
+        && gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected ==
+        (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1)) {
+        SaveManager::Instance->DeleteZeldaFile(gSaveContext.fileNum);
+        std::reinterpret_pointer_cast<Ship::ConsoleWindow>(
+            Ship::Context::GetInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
+            ->Dispatch("reset");
+    }
+}
+
+static void RegisterDeleteFileOnLoseCondition() {
+    COND_HOOK(OnGameFrameUpdate, true, DeleteFileOnLoseCondition);
+}
+
 extern "C" u8 Return_Item_Entry(GetItemEntry itemEntry, u8 returnItem);
 
 extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
@@ -4695,6 +4717,24 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             }
 
             break;
+        case RG_TRIFORCE_POWER_PIECE:
+            gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected++;
+            Play_PerformSave(play);
+            Notification::Emit({
+                .message = "Game autosaved",
+            });
+
+            if (gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected ==
+                (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1)) {
+                    gSaveContext.health = 0;
+                    Audio_PlaySoundGeneral(NA_SE_EN_GANON_LAUGH, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            } else {
+                Audio_PlaySoundGeneral(NA_SE_EN_FANTOM_ST_LAUGH, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            }
+
+            break;
         case RG_PROGRESSIVE_BOMBCHU_BAG:
             OTRGlobals::Instance->gRandoContext->HandleGetBombchuBag();
             break;
@@ -4727,3 +4767,5 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
 
     return Return_Item_Entry(giEntry, RG_NONE);
 }
+
+static RegisterShipInitFunc initFunc_DeleteFileOnLoseCondition(RegisterDeleteFileOnLoseCondition);

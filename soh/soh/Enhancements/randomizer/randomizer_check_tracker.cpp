@@ -1616,7 +1616,7 @@ bool IsCheckShuffled(RandomizerCheck rc) {
                 (showShops &&
                  OTRGlobals::Instance->gRandomizer->IdentifyShopItem(loc->GetScene(), loc->GetActorParams() + 1)
                          .enGirlAShopItem == 50)) &&
-               (rc != RC_TRIFORCE_COMPLETED) && (rc != RC_GANON) &&
+               (rc != RC_TRIFORCE_COMPLETED) && (rc != RC_POWER_TRIFORCE_COMPLETED) && (rc != RC_GANON) &&
                (loc->GetRCType() != RCTYPE_SCRUB || showScrubs ||
                 (showMajorScrubs && (rc == RC_LW_DEKU_SCRUB_NEAR_BRIDGE || // The 3 scrubs that are always randomized
                                      rc == RC_HF_DEKU_SCRUB_GROTTO || rc == RC_LW_DEKU_SCRUB_GROTTO_FRONT))) &&

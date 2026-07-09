@@ -1006,6 +1006,7 @@ void Rando::StaticData::InitLocationTable() {
     locationTable[RC_MIRROR_HINT]       =                                         Location::OtherHint(RC_MIRROR_HINT,                                      RCQUEST_BOTH,    RCAREA_SPIRIT_TEMPLE,                                                    ACTOR_ID_MAX,         SCENE_SPIRIT_TEMPLE,        "Mirror Shield Hint");
 
     locationTable[RC_TRIFORCE_COMPLETED] =                                        Location::Base(RC_TRIFORCE_COMPLETED,                                    RCQUEST_BOTH,    RCTYPE_STANDARD,                    RCAREA_MARKET,                       ACTOR_ID_MAX,         SCENE_ID_MAX,                       0x00,                               "Completed Triforce", "Completed Triforce",    RHT_NONE,                                                        RG_NONE);
+    locationTable[RC_POWER_TRIFORCE_COMPLETED] =                                  Location::Base(RC_POWER_TRIFORCE_COMPLETED,                              RCQUEST_BOTH,    RCTYPE_STANDARD,                    RCAREA_MARKET,                       ACTOR_ID_MAX,         SCENE_ID_MAX,                       0x00,                               "Completed Triforce of Power", "Completed Triforce of Power",    RHT_NONE,                                                        RG_NONE);
     // clang-format on
 
     // Init locationNameToEnum

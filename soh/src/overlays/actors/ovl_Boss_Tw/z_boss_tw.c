@@ -6,6 +6,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "overlays/ovl_Magic_Dark/ovl_Magic_Dark.h"
 
 #include <string.h>
 
@@ -453,6 +454,8 @@ void BossTw_Init(Actor* thisx, PlayState* play2) {
     Actor_SetScale(&this->actor, 2.5 * 0.01f);
     this->actor.colChkInfo.mass = 255;
     this->actor.colChkInfo.health = 0;
+    this->canBeDamaged = true;
+    this->nayruPrimAlpha = 0.0f;
     Collider_InitCylinder(play, &this->collider);
 
     if (!sTwInitalized) {
@@ -575,6 +578,203 @@ void BossTw_Destroy(Actor* thisx, PlayState* play) {
     if (thisx->params == TW_TWINROVA) {
         sTwInitalized = false;
     }
+}
+
+void BossTw_DrawNayrusDiamond(BossTw* this, PlayState* play) {
+    f32 targetAlpha = this->canBeDamaged ? 0.0f : 128.0f;
+    f32 approachStep = this->canBeDamaged ? 8.0f : 4.0f;
+
+    Math_ApproachF(&this->nayruPrimAlpha, targetAlpha, 1.0f, approachStep);
+
+    /* If fully faded out, skip drawing. */
+    if (this->nayruPrimAlpha < 1.0f) {
+        return;
+    }
+
+    func_8002F974(this, NA_SE_PL_MAGIC_SOUL_NORMAL - SFX_FLAG);
+
+    OPEN_DISPS(play->state.gfxCtx);
+    Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+
+    Color_RGB8 Spell_env;
+    Color_RGB8 Spell_col;
+
+    if (this->actor.params == TW_KOUME) {
+        Spell_env = (Color_RGB8){ 128, 177, 255 };
+        Spell_col = (Color_RGB8){ 212, 255, 255 };
+    } else {
+        Spell_env = (Color_RGB8){ 255, 154, 0 };
+        Spell_col = (Color_RGB8){ 255, 170, 170 };
+    }
+
+    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, Spell_col.r, Spell_col.g, Spell_col.b, (s32)this->nayruPrimAlpha & 0xFF);
+    gDPSetEnvColor(POLY_XLU_DISP++, Spell_env.r, Spell_env.g, Spell_env.b, 128);
+
+    Matrix_Push();
+    Matrix_Translate(this->actor.world.pos.x, this->actor.world.pos.y + 20.0f, this->actor.world.pos.z, MTXMODE_NEW);
+    Matrix_Scale(this->actor.scale.x * 60.0f, this->actor.scale.y * 60.0f, this->actor.scale.z * 60.0f, MTXMODE_APPLY);
+    gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_XLU_DISP++, dsDiamondMaterialDL);
+    gSPDisplayList(POLY_XLU_DISP++,
+                   Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, play->gameplayFrames * 2, play->gameplayFrames * -4,
+                                      32, 32, 1, 0, play->gameplayFrames * -16, 64, 32, 2, -4, 0, -16));
+    gSPDisplayList(POLY_XLU_DISP++, dsDiamondModelDL);
+    Matrix_Pop();
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void BossTw_FinishShieldSister(BossTw* this, PlayState* play) {
+    BossTw* otherTw = (BossTw*)this->actor.parent;
+
+    SkelAnime_Update(&this->skelAnime);
+    Math_ApproachF(&this->scepterAlpha, 0.0f, 1.0f, 10.0f);
+
+    if (Animation_OnFrame(&this->skelAnime, this->workf[ANIM_SW_TGT])) {
+        if (sTwinrovaPtr->timers[2] == 0) {
+            BossTw_SetupFlyTo(this, play);
+        }
+
+        this->scepterAlpha = 0.0f;
+    }
+
+    otherTw->canBeDamaged = false;
+    this->canBeDamaged = true;
+}
+
+void BossTw_SetupFinishShieldSister(BossTw* this, PlayState* play) {
+    this->actionFunc = BossTw_FinishShieldSister;
+    Animation_MorphToPlayOnce(&this->skelAnime, &gTwinrovaKotakeKoumeFlyAnim, 12.0f);
+    this->workf[ANIM_SW_TGT] = Animation_GetLastFrame(&gTwinrovaKotakeKoumeFlyAnim);
+}
+
+void BossTw_ShieldSister(BossTw* this, PlayState* play) {
+    s16 i;
+    f32 xDiff;
+    f32 yDiff;
+    f32 zDiff;
+    Vec3f sp130;
+    Vec3s sp128;
+    BossTw* otherTw = (BossTw*)this->actor.parent;
+    Input* input = &play->state.input[0];
+
+    f32 dx = otherTw->actor.world.pos.x - this->actor.world.pos.x;
+    f32 dz = otherTw->actor.world.pos.z - this->actor.world.pos.z;
+    s16 yawToOther = (s16)(Math_FAtan2F(dx, dz) * (32768.0f / M_PI));
+
+    Math_ApproachF(&this->actor.world.pos.y, 400.0f, 0.05f, this->actor.speedXZ);
+    Math_ApproachF(&this->actor.speedXZ, 5.0f, 1.0f, 0.25f);
+    SkelAnime_Update(&this->skelAnime);
+
+    if (this->timers[1] != 0) {
+        Math_ApproachS(&this->actor.shape.rot.y, yawToOther, 5, this->rotateSpeed);
+
+        this->timers[0] = 70;
+        this->portalRotation += this->updateRate2 * 0.0025f;
+        Math_ApproachF(&this->spawnPortalAlpha, 255.0f, 1.0f, 10.0f);
+        Math_ApproachF(&this->updateRate2, 50.0f, 1.0f, 2.0f);
+
+        if (this->timers[1] < 50) {
+            if (this->timers[1] < 10) {
+                if (this->timers[1] == 9) {
+                    play->envCtx.unk_D8 = 0.5f;
+                    play->envCtx.unk_BD = 3 - this->actor.params;
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_MASIC_SET);
+                }
+
+                if (this->timers[1] > 4) {
+                    s16 j;
+                    for (j = 0; j < 2; j++) {
+                        for (i = 0; i < ARRAY_COUNT(this->scepterFlamePos); i++) {
+                            Vec3f pos;
+                            Vec3f velocity;
+                            Vec3f accel;
+
+                            pos.x = otherTw->actor.world.pos.x;
+                            pos.y = otherTw->actor.world.pos.y;
+                            pos.z = otherTw->actor.world.pos.z;
+                            velocity.x = Rand_CenteredFloat(10.0f);
+                            velocity.y = Rand_CenteredFloat(10.0f);
+                            velocity.z = Rand_CenteredFloat(10.0f);
+                            accel.x = 0.0f;
+                            accel.y = 0.0f;
+                            accel.z = 0.0f;
+                            BossTw_AddFlameEffect(play, &pos, &velocity, &accel, Rand_ZeroFloat(10.0f) + 25.0f,
+                                                  this->actor.params);
+                        }
+                    }
+                }
+            }
+
+            if (this->timers[1] < 20) {
+                Math_ApproachF(&this->flameAlpha, 0, 1.0f, 20.0f);
+                Math_ApproachF(&this->spawnPortalAlpha, 0, 1.0f, 30.0f);
+            } else {
+                Math_ApproachF(&this->flameAlpha, 255.0f, 1.0f, 10.0f);
+                if (this->actor.params == 1) {
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_MS_FIRE - SFX_FLAG);
+                } else {
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_MS_FREEZE - SFX_FLAG);
+                }
+            }
+
+            this->flameRotation += this->updateRate1 * 0.0025f;
+            Math_ApproachF(&this->spawnPortalScale, 0.0f, 0.1f, this->updateRate1);
+            Math_ApproachF(&this->updateRate1, 50.0f, 1.0f, 2.0f);
+        }
+    } else {
+        BossTw_SetupFinishShieldSister(this, play);
+    }
+}
+
+void BossTw_SetupShieldSister(BossTw* this, PlayState* play) {
+    BossTw* otherTw = (BossTw*)this->actor.parent;
+
+    this->actionFunc = BossTw_ShieldSister;;
+    Animation_MorphToPlayOnce(&this->skelAnime, &gTwinrovaKotakeKoumeChargeUpAttackStartAnim, -5.0f);
+    this->workf[ANIM_SW_TGT] = Animation_GetLastFrame(&gTwinrovaKotakeKoumeChargeUpAttackStartAnim);
+    this->timers[1] = 70;
+    this->targetPos = otherTw->actor.world.pos;
+    this->csState1 = 0;
+    this->flameAlpha = 0.0f;
+    this->spawnPortalAlpha = 0.0f;
+    this->spawnPortalScale = 2000.0f;
+    this->updateRate1 = 0.0f;
+    this->portalRotation = 0.0f;
+    this->updateRate2 = 0.0f;
+}
+
+void BossTw_TurnToSister(BossTw* this, PlayState* play) {
+    BossTw* otherTw = (BossTw*)this->actor.parent;
+
+    f32 dx = otherTw->actor.world.pos.x - this->actor.world.pos.x;
+    f32 dz = otherTw->actor.world.pos.z - this->actor.world.pos.z;
+    s16 yawToOther = (s16)(Math_FAtan2F(dx, dz) * (32768.0f / M_PI));
+
+    SkelAnime_Update(&this->skelAnime);
+    Math_ApproachF(&this->actor.speedXZ, 0.0f, 1.0f, 1.0f);
+    Math_ApproachS(&this->actor.shape.rot.y, yawToOther, 5, this->rotateSpeed);
+    Math_ApproachS(&this->actor.shape.rot.x, 0, 5, this->rotateSpeed);
+    Math_ApproachF(&this->rotateSpeed, 4096.0f, 1.0f, 1200.0f);
+    Actor_UpdateVelocityXYZ(&this->actor);
+    Actor_UpdatePos(&this->actor);
+    if (this->timers[0] == 0) {
+        BossTw_SetupShieldSister(this, play);
+    }
+}
+
+void BossTw_SetupTurnToSister(BossTw* this, PlayState* play) {
+    BossTw* otherTw = (BossTw*)this->actor.parent;
+
+    this->actionFunc = BossTw_TurnToSister;
+
+    if ((otherTw != NULL) && (otherTw->actionFunc == BossTw_ShootBeam)) {
+        this->timers[0] = 40;
+    } else {
+        this->timers[0] = 0;
+    }
+
+    this->rotateSpeed = 0.0f;
 }
 
 void BossTw_SetupTurnToPlayer(BossTw* this, PlayState* play) {
@@ -1466,6 +1666,8 @@ void BossTw_TwinrovaSetupMergeCS(BossTw* this, PlayState* play) {
     this->actionFunc = BossTw_TwinrovaMergeCS;
     this->csState2 = 0;
     this->csState1 = 0;
+    sKoumePtr->canBeDamaged = true;
+    sKotakePtr->canBeDamaged = true;
 }
 
 void BossTw_TwinrovaMergeCS(BossTw* this, PlayState* play) {
@@ -2840,6 +3042,7 @@ static s16 D_8094A90C[] = {
 
 void BossTw_Update(Actor* thisx, PlayState* play) {
     BossTw* this = (BossTw*)thisx;
+    BossTw* otherTw = (BossTw*)this->actor.parent;
     Player* player = GET_PLAYER(play);
     s16 i;
     s32 pad;
@@ -2876,10 +3079,50 @@ void BossTw_Update(Actor* thisx, PlayState* play) {
 
     if (this->actionFunc == BossTw_FlyTo || this->actionFunc == BossTw_Spin ||
         this->actionFunc == BossTw_TurnToPlayer) {
-        if ((s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&
-            (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) > -0x1000 && player->unk_A73) {
-            BossTw_SetupSpin(this, play);
+        if (!CVarGetInteger(CVAR_RANDOMIZER_SETTING("MagicArrowsTwinrova"), 0)) {
+            if ((s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&
+                (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) > -0x1000 && player->unk_A73) {
+                BossTw_SetupSpin(this, play);
+            }
+        } else {
+            if ((this->collider.base.acFlags & AC_HIT) && this->canBeDamaged) {
+                ColliderInfo* hitInfo = this->collider.info.acHitInfo;
+                u32 dmgFlags = (hitInfo != NULL) ? hitInfo->toucher.dmgFlags : 0;
+
+                if ((this->actor.params == TW_KOTAKE) && (dmgFlags & (1 << 0x0B))) { // DMG_ARROW_FIRE
+                    BossTw_SetupHitByBeam(this, play);
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_DAMAGE_VOICE);
+                    this->actor.colChkInfo.health++;
+                    if (otherTw->actionFunc != BossTw_ShootBeam) {
+                        otherTw->actionFunc = BossTw_SetupTurnToSister;
+                    } else {
+                        this->canBeDamaged = false;
+                        otherTw->canBeDamaged = true;
+                    }
+                } else if ((this->actor.params == TW_KOUME) && (dmgFlags & (1 << 0x0C))) { // DMG_ARROW_ICE
+                    BossTw_SetupHitByBeam(this, play);
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_DAMAGE_VOICE);
+                    this->actor.colChkInfo.health++;
+                    if (otherTw->actionFunc != BossTw_ShootBeam) {
+                        otherTw->actionFunc = BossTw_SetupTurnToSister;
+                    } else {
+                        this->canBeDamaged = false;
+                        otherTw->canBeDamaged = true;
+                    }
+                } else {
+                    BossTw_SetupSpin(this, play);
+                }
+            } else if ((this->collider.base.acFlags & AC_HIT) && !this->canBeDamaged &&
+              (this->actionFunc == BossTw_FlyTo ||
+              this->actionFunc == BossTw_TurnToPlayer)) {
+                BossTw_SetupLaugh(this, play);
+                Audio_PlayActorSound2(&this->actor, NA_SE_IT_SHIELD_REFLECT_SW);
+            }
         }
+    }
+
+    if (!this->canBeDamaged || this->nayruPrimAlpha > 1.0f) {
+        BossTw_DrawNayrusDiamond(this, play);
     }
 
     this->actionFunc(this, play);
@@ -2994,11 +3237,43 @@ void BossTw_TwinrovaUpdate(Actor* thisx, PlayState* play2) {
 
     this->actionFunc(this, play);
 
-    if (this->actionFunc != BossTw_TwinrovaShootBlast && this->actionFunc != BossTw_TwinrovaChargeBlast &&
-        this->visible && this->unk_5F8 == 0 &&
-        (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&
-        (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) > -0x1000 && player->unk_A73 != 0) {
-        BossTw_TwinrovaSetupSpin(this, play);
+    if (!CVarGetInteger(CVAR_RANDOMIZER_SETTING("MagicArrowsTwinrova"), 0)) {
+        if (this->actionFunc != BossTw_TwinrovaShootBlast && this->actionFunc != BossTw_TwinrovaChargeBlast &&
+            this->visible && this->unk_5F8 == 0 &&
+            (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&
+            (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) > -0x1000 && player->unk_A73 != 0) {
+            BossTw_TwinrovaSetupSpin(this, play);
+        }
+    } else {
+        ColliderInfo* hitInfo = this->collider.info.acHitInfo;
+        u32 dmgFlags = (hitInfo != NULL) ? hitInfo->toucher.dmgFlags : 0;
+
+        if (this->collider.base.acFlags & AC_HIT && this->actionFunc != BossTw_TwinrovaShootBlast && this->actionFunc != BossTw_TwinrovaChargeBlast && this->actionFunc != BossTw_TwinrovaStun && this->actionFunc != BossTw_TwinrovaDeathCS) {
+            bool prevBoth = this->twinrovaReceivedFire && this->twinrovaReceivedIce;
+            bool didSetNewFlag = false;
+
+            if ((dmgFlags & (1 << 0x0B)) && !this->twinrovaReceivedFire) { // DMG_ARROW_FIRE
+                this->twinrovaReceivedFire = true;
+                didSetNewFlag = true;
+            }
+
+            if ((dmgFlags & (1 << 0x0C)) && !this->twinrovaReceivedIce) { // DMG_ARROW_ICE
+                this->twinrovaReceivedIce = true;
+                didSetNewFlag = true;
+            }
+
+            bool nowBoth = this->twinrovaReceivedFire && this->twinrovaReceivedIce;
+
+            if (!prevBoth && nowBoth) {
+                this->twinrovaStun = 1;
+                Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_YOUNG_DAMAGE);
+            } else {
+                BossTw_TwinrovaSetupSpin(this, play);
+                if (didSetNewFlag) {
+                    Audio_PlayActorSound2(&this->actor, NA_SE_EN_TWINROBA_YOUNG_DAMAGE);
+                }
+            }
+        }
     }
 
     this->eyeTexIdx = D_8094A900[this->work[BLINK_IDX]];
@@ -3474,6 +3749,7 @@ void BossTw_Draw(Actor* thisx, PlayState* play2) {
     static Vec3f D_8094A9A4 = { 0.0f, 200.0f, 2000.0f };
     PlayState* play = play2;
     BossTw* this = (BossTw*)thisx;
+    BossTw* otherTw = (BossTw*)this->actor.parent;
     Player* player = GET_PLAYER(play);
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -5347,6 +5623,8 @@ void BossTw_TwinrovaSetupGetUp(BossTw* this, PlayState* play) {
     this->workf[ANIM_SW_TGT] = Animation_GetLastFrame(&gTwinrovaStunEndAnim);
     this->actionFunc = BossTw_TwinrovaGetUp;
     this->timers[0] = 50;
+    this->twinrovaReceivedFire = false;
+    this->twinrovaReceivedIce = false;
 }
 
 void BossTw_TwinrovaGetUp(BossTw* this, PlayState* play) {

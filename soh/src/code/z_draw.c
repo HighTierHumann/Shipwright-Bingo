@@ -395,6 +395,7 @@ DrawItemTableEntry sDrawItemTable[] = {
 
     { GetItem_DrawTriforcePiece, { gTriforcePiece0DL } }, // Triforce Piece
     { GetItem_DrawFishingPole, { gFishingPoleGiDL } },    // Fishing Pole
+    { GetItem_DrawTriforcePiece, { gTriforcePiece0DL } }, // Triforce of Power Piece
 };
 
 /**
@@ -1038,6 +1039,38 @@ void GetItem_DrawTriforcePiece(PlayState* play, s16 drawId) {
               G_MTX_MODELVIEW | G_MTX_LOAD);
 
     gSPDisplayList(POLY_OPA_DISP++, triforcePieceDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawTriforcePowerPiece(PlayState* play, s16 drawId) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Opa(play->state.gfxCtx);
+
+    Matrix_Scale(0.035f, 0.035f, 0.035f, MTXMODE_APPLY);
+
+    uint8_t index = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected % 3;
+    Gfx* triforcePieceDL;
+
+    switch (index) {
+        case 1:
+            triforcePieceDL = (Gfx*)gTriforcePiece1DL;
+            break;
+        case 2:
+            triforcePieceDL = (Gfx*)gTriforcePiece2DL;
+            break;
+        default:
+            triforcePieceDL = (Gfx*)gTriforcePiece0DL;
+            break;
+    }
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+    gDPSetGrayscaleColor(POLY_OPA_DISP++, 150, 150, 150, 255);
+    gSPGrayscale(POLY_OPA_DISP++, true);
+    gSPDisplayList(POLY_OPA_DISP++, triforcePieceDL);
+    gSPGrayscale(POLY_OPA_DISP++, false);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

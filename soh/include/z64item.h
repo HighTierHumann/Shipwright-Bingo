@@ -596,7 +596,8 @@ typedef enum {
     /* 0x7C */ GID_TRIFORCE_PIECE,
     /* 0x7D */ GID_ROCS_FEATHER,
     /* 0x7E */ GID_FISHING_POLE,
-    /* 0x7F */ GID_MAXIMUM
+    /* 0x7F */ GID_TRIFORCE_POWER_PIECE,
+    /* 0x80 */ GID_MAXIMUM
 
 } GetItemDrawID;
 

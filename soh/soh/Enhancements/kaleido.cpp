@@ -151,6 +151,13 @@ Kaleido::Kaleido() {
             ctx->GetOption(RSK_TRIFORCE_HUNT_PIECES_REQUIRED).Get() + 1,
             ctx->GetOption(RSK_TRIFORCE_HUNT_PIECES_TOTAL).Get() + 1));
     }
+    if (ctx->GetOption(RSK_TRIFORCE_POWER_HUNT)) {
+        mEntries.push_back(std::make_shared<KaleidoEntryIconCountRequired>(
+            gWTriforcePieceTex, G_IM_FMT_RGBA, G_IM_SIZ_32b, 32, 32, Color_RGBA8{ 85, 85, 85, 255 },
+            reinterpret_cast<int*>(&gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected),
+            ctx->GetOption(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED).Get() + 1,
+            ctx->GetOption(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL).Get() + 1));
+    }
     if (ctx->GetOption(RSK_SKELETON_KEY)) {
         mEntries.push_back(std::make_shared<KaleidoEntryIconFlag>(
             gSmallKeyCounterIconTex, G_IM_FMT_IA, G_IM_SIZ_8b, 16, 16, Color_RGBA8{ 255, 255, 255, 255 },

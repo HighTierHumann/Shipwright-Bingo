@@ -34,6 +34,8 @@ typedef struct {
     bool hasWallet;
     u8 triforcePieces;
     u8 maxTriforcePieces;
+    u8 triforcePowerPieces;
+    u8 maxTriforcePowerPieces;
     bool hasFishingRod;
     bool fishingPoleShuffled;
 } SaveFileMetaInfo;

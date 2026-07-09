@@ -132,11 +132,19 @@ void Settings::CreateOptionDescriptions() {
         "Castle Boss Key. Keep in mind that Ganon might not be logically reachable when \"All Locations Reachable\" "
         "is disabled.\n\n"
         "If set to GBK shuffled into pool: Ganon's Boss Key will still be placed in the item pool, allowing you to "
-        "win by defeating Ganon or completing the Triforce";
+        "win by defeating Ganon or completing the Triforce of Courage!";
     mOptionDescriptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL] =
         "The amount of Triforce pieces that will be placed in the world. "
         "Keep in mind seed generation can fail if more pieces are placed than there are junk items in the item pool.";
     mOptionDescriptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED] = "The amount of Triforce pieces required to win the game.";
+    mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT] =
+        "Pieces of the Triforce of Power will be added to the world.\n\n"
+        "Collecting all of them will result in a game over and the deletion of your save file! "
+        "The game save will save with every piece obtained, they look identical to the pieces of Courage, so be careful!";
+    mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL] =
+        "The amount of Triforce of Power pieces that will be placed in the world. "
+        "Keep in mind seed generation can fail if more pieces are placed than there are junk items in the item pool.";
+    mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED] = "The amount of Triforce of Power pieces required to lose.";
     mOptionDescriptions[RSK_SHUFFLE_DUNGEON_ENTRANCES] =
         "Shuffle the pool of dungeon entrances, including Bottom of the Well, Ice Cavern and Gerudo Training Ground.\n"
         "\n"
@@ -855,6 +863,11 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_SUNLIGHT_ARROWS] =
         "Light Arrows can be used to light up the sun switches instead of using the Mirror Shield. "
         "Item placement logic will respect this option, so it might be required to use this to progress.";
+    mOptionDescriptions[RSK_TWINROVA_REWORK] =
+        "Reworks the Twinrova boss fight to make the fight beatable with the Fire and Ice Arrows."
+        "\n\nOnce either Kotake or Koume is struck with the arrow of their opposite element, a shield will appear "
+        "around them, preventing you from hitting them again until you damage the other sister."
+        "\n\nPhase 2 Twinrova must be struck by both arrows to become stunned.";
     mOptionDescriptions[RSK_ROCS_FEATHER] =
         "Adds Roc's Feather to the item pool. Roc's Feather is a custom item granting the player a jump on demand. "
         "The jump can also be used when already in mid-air. Roc's Feather is not considered by logic.";

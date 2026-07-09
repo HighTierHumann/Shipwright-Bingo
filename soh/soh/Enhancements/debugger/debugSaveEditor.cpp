@@ -415,6 +415,15 @@ void DrawInfoTab() {
         PopStyleInput();
     }
 
+    if (IS_RANDO &&
+        OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT)) {
+        PushStyleInput(THEME_COLOR);
+        ImGui::InputScalar("Triforce of Power Pieces", ImGuiDataType_U8,
+                           &gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
+        Tooltip("Currently obtained Triforce of Power Pieces. For Triforce of Power Hunt.");
+        PopStyleInput();
+    }
+
     ImGui::PushItemWidth(ImGui::GetFontSize() * 10);
     static std::array<const char*, 7> minigameHS = { "Horseback Archery", "Big Poe Points",
                                                      "Fishing",           "Malon's Obstacle Course",

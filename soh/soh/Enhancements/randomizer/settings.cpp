@@ -459,6 +459,26 @@ void Settings::CreateOptions() {
         }
     });
     OPT_U8(RSK_TRIFORCE_HUNT_PIECES_REQUIRED, "Triforce Hunt Required Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforceHuntRequiredPieces"), mOptionDescriptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED], WIDGET_CVAR_SLIDER_INT, 19);
+    OPT_BOOL(RSK_TRIFORCE_POWER_HUNT, "Triforce of Power Hunt", CVAR_RANDOMIZER_SETTING("TriforcePowerHunt"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT]);
+    OPT_CALLBACK(RSK_TRIFORCE_POWER_HUNT, {
+        // Remove the pieces required/total sliders and add a separator after Triforce Hunt if Triforce Hunt is off
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHunt"), RO_GENERIC_OFF)) {
+            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].Unhide();
+            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].Unhide();
+        } else {
+            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].Hide();
+            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].Hide();
+        }
+    });
+    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, "Triforce of Power Hunt Total Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL], WIDGET_CVAR_SLIDER_INT, 29, false, nullptr, IMFLAG_NONE);
+    OPT_CALLBACK(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, {
+        // Update power triforce of power pieces required to be capped at the current value for pieces total.
+        const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 30);
+        if (mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].GetOptionCount() != powerTriforceTotal + 1) {
+            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, powerTriforceTotal + 1));
+        }
+    });
+    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED, "Triforce of Power Hunt Required Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntRequiredPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED], WIDGET_CVAR_SLIDER_INT, 19);
     OPT_U8(RSK_MQ_DUNGEON_RANDOM, "MQ Dungeon Setting", {"None", "Set Number", "Random", "Selection Only"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("MQDungeons"), mOptionDescriptions[RSK_MQ_DUNGEON_RANDOM], WIDGET_CVAR_COMBOBOX, RO_MQ_DUNGEONS_NONE, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_MQ_DUNGEON_RANDOM, {
         switch (CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeons"), RO_MQ_DUNGEONS_NONE)) {
@@ -1337,6 +1357,7 @@ void Settings::CreateOptions() {
     // TODO: Compasses show rewards/woth, maps show dungeon mode
     OPT_BOOL(RSK_BLUE_FIRE_ARROWS, "Blue Fire Arrows", CVAR_RANDOMIZER_SETTING("BlueFireArrows"), mOptionDescriptions[RSK_BLUE_FIRE_ARROWS]);
     OPT_BOOL(RSK_SUNLIGHT_ARROWS, "Sunlight Arrows", CVAR_RANDOMIZER_SETTING("SunlightArrows"), mOptionDescriptions[RSK_SUNLIGHT_ARROWS]);
+    OPT_BOOL(RSK_TWINROVA_REWORK, "Rework Twinrova Boss Fight", CVAR_RANDOMIZER_SETTING("MagicArrowsTwinrova"), mOptionDescriptions[RSK_TWINROVA_REWORK]);
     OPT_BOOL(RSK_ROCS_FEATHER, "Roc's Feather", CVAR_RANDOMIZER_SETTING("RocsFeather"), mOptionDescriptions[RSK_ROCS_FEATHER]);
     OPT_U8(RSK_INFINITE_UPGRADES, "Infinite Upgrades", {"Off", "Progressive", "Condensed Progressive"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("InfiniteUpgrades"), mOptionDescriptions[RSK_INFINITE_UPGRADES]);
     OPT_BOOL(RSK_SKELETON_KEY, "Skeleton Key", CVAR_RANDOMIZER_SETTING("SkeletonKey"), mOptionDescriptions[RSK_SKELETON_KEY]);
@@ -1882,6 +1903,7 @@ void Settings::CreateOptions() {
                                                                       &mOptions[RSK_BIG_POE_COUNT],
                                                                       &mOptions[RSK_BLUE_FIRE_ARROWS],
                                                                       &mOptions[RSK_SUNLIGHT_ARROWS],
+                                                                      &mOptions[RSK_TWINROVA_REWORK],
                                                                       &mOptions[RSK_FULL_WALLETS],
                                                                       &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                                                       &mOptions[RSK_SKIP_CHILD_ZELDA],
@@ -1895,9 +1917,13 @@ void Settings::CreateOptions() {
     mOptionGroups[RSG_MENU_SECTION_WINCON] = OptionGroup::SubGroup(
         "Win Condition",
         { &mOptions[RSK_TRIFORCE_HUNT], &mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL],
-          &mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED], &mOptions[RSK_GANONS_BOSS_KEY], &mOptions[RSK_LACS_OPTIONS],
+          &mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED],
+          &mOptions[RSK_GANONS_BOSS_KEY], &mOptions[RSK_LACS_OPTIONS],
           &mOptions[RSK_LACS_MEDALLION_COUNT], &mOptions[RSK_LACS_STONE_COUNT], &mOptions[RSK_LACS_DUNGEON_COUNT],
-          &mOptions[RSK_LACS_REWARD_COUNT], &mOptions[RSK_LACS_TOKEN_COUNT] },
+          &mOptions[RSK_LACS_REWARD_COUNT], &mOptions[RSK_LACS_TOKEN_COUNT],
+          &mOptions[RSK_TRIFORCE_POWER_HUNT],
+          &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL],
+          &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED] },
         WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_LOGIC_WINCON] = OptionGroup::SubGroup("",
                                                                         std::initializer_list<OptionGroup*>{

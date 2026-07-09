@@ -421,6 +421,11 @@ void GenerateItemPool() {
         ctx->PlaceItemInLocation(RC_GANON, RG_TRIFORCE); // Win condition
     }
 
+    if (ctx->GetOption(RSK_TRIFORCE_POWER_HUNT)) {
+        ctx->PlaceItemInLocation(RC_POWER_TRIFORCE_COMPLETED, RG_TRIFORCE_POWER); // Lose condition
+        AddFixedItemToPool(RG_TRIFORCE_POWER_PIECE, ctx->GetOption(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL).Get() + 1, false);
+    }
+
     // Fixed item locations
     ctx->PlaceItemInLocation(RC_HC_ZELDAS_LETTER, RG_ZELDAS_LETTER);
 

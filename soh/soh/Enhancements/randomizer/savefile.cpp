@@ -562,6 +562,7 @@ extern "C" void Randomizer_InitSaveFile() {
 
     // Reset triforce pieces collected.
     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected = 0;
 
     // Reset Bombchu Bag Upgrade
     gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = 0;

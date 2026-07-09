@@ -309,7 +309,7 @@ static std::vector<HintColorSegment> ParseHintColorSegments(const std::string& t
             continue;
         }
 
-        text.at(i) == '^' ? current += ' ' :
+        text.at(i) == '^' ? current += ' ' : // Remove next-page markers
         current += text[i];
         i++;
     }
@@ -431,13 +431,6 @@ void HintTrackerWindow::Draw() {
 
 void HintTrackerWindow::DrawElement() {
     Color_Background = CVarGetColor(CVAR_TRACKER_HINTS("BgColor.Value"), Color_Bg_Default);
-
-    if (CVarGetInteger(CVAR_TRACKER_HINTS("WindowType"), TRACKER_WINDOW_WINDOW) == TRACKER_WINDOW_FLOATING) {
-        if (CVarGetInteger(CVAR_TRACKER_HINTS("ShowOnlyPaused"), 0) &&
-            (gPlayState == nullptr || gPlayState->pauseCtx.state == 0)) {
-            return;
-        }
-    }
 
     if (Trackers::BeginFloatWindows(
             "Hint Tracker", mIsVisible, Color_Background,

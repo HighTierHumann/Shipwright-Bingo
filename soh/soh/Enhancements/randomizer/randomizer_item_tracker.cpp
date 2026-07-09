@@ -52,6 +52,7 @@ static WidgetInfo triforcePieceCount;
 static WidgetInfo dungeonItemTracking;
 static WidgetInfo gregTracking;
 static WidgetInfo triforcePieceTracking;
+static WidgetInfo triforcePowerPieceTracking;
 static WidgetInfo beanSoulsTracking;
 static WidgetInfo bossSoulsTracking;
 static WidgetInfo jabberNutsTracking;
@@ -133,6 +134,10 @@ std::vector<ItemTrackerItem> gregItems = {
 
 std::vector<ItemTrackerItem> triforcePieces = {
     ITEM_TRACKER_ITEM(RG_TRIFORCE_PIECE, 0, DrawItem),
+};
+
+std::vector<ItemTrackerItem> triforcePowerPieces = {
+    ITEM_TRACKER_ITEM(RG_TRIFORCE_POWER_PIECE, 0, DrawItem),
 };
 
 std::vector<ItemTrackerItem> rocsFeather = {
@@ -796,6 +801,43 @@ void DrawItemCount(ItemTrackerItem item, bool hideMax) {
         ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
         ImGui::Text("%s", maxString.c_str());
         ImGui::PopStyleColor();
+    } else if (item.id == RG_TRIFORCE_POWER_PIECE && IS_RANDO &&
+               OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT) &&
+               IsValidSaveFile()) {
+        std::string currentString = "";
+        std::string requiredString = "";
+        std::string maxString = "";
+        uint8_t powerPiecesRequired =
+            (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1);
+        uint8_t powerPiecesTotal =
+            (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL) + 1);
+        ImU32 currentColor = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected >= powerPiecesRequired
+                                 ? IM_COL_GREEN
+                                 : IM_COL_WHITE;
+        ImU32 maxColor = IM_COL_GREEN;
+        int32_t trackerPowerTriforcePieceNumberDisplayMode =
+            CVarGetInteger(CVAR_TRACKER_ITEM("TriforcePieceCounts"), TRIFORCE_PIECE_COLLECTED_REQUIRED_MAX);
+
+        currentString += std::to_string(gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
+        currentString += "/";
+        // gItemTrackerPowerTriforcePieceTrack
+        if (trackerPowerTriforcePieceNumberDisplayMode == TRIFORCE_PIECE_COLLECTED_REQUIRED_MAX) {
+            currentString += std::to_string(powerPiecesRequired);
+            currentString += "/";
+            maxString += std::to_string(powerPiecesTotal);
+        } else if (trackerPowerTriforcePieceNumberDisplayMode == TRIFORCE_PIECE_COLLECTED_REQUIRED) {
+            maxString += std::to_string(powerPiecesRequired);
+        }
+
+        ImGui::SetCursorScreenPos(
+            ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize((currentString + maxString).c_str()).x / 2), p.y - 14));
+        ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
+        ImGui::Text("%s", currentString.c_str());
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
+        ImGui::Text("%s", maxString.c_str());
+        ImGui::PopStyleColor();
     } else {
         ImGui::SetCursorScreenPos(ImVec2(p.x, p.y - 14));
         ImGui::Text("");
@@ -891,6 +933,11 @@ void DrawItem(ItemTrackerItem item) {
             hasItem = IS_RANDO && (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_HUNT) !=
                                    RO_TRIFORCE_HUNT_OFF);
             itemName = "Triforce Piece";
+            break;
+        case RG_TRIFORCE_POWER_PIECE:
+            actualItemId = item.id;
+            hasItem = IS_RANDO && OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT);
+            itemName = "Triforce of Power Piece";
             break;
         case ITEM_NAYRUS_LOVE:
             if (IS_RANDO && OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_ROCS_FEATHER)) {
@@ -1695,6 +1742,21 @@ void UpdateVectors() {
         mainWindowItems.insert(mainWindowItems.end(), triforcePieces.begin(), triforcePieces.end());
     }
 
+    // If we're adding triforce of power pieces to the main window
+    if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.TriforcePowerPieces"), SECTION_DISPLAY_HIDDEN) ==
+        SECTION_DISPLAY_MAIN_WINDOW) {
+        // If Greg isn't on the main window, add empty items to place the triforce pieces on a new row.
+        if (!newRowAdded) {
+            while (mainWindowItems.size() % 6) {
+                mainWindowItems.push_back(ITEM_TRACKER_ITEM(ITEM_NONE, 0, DrawItem));
+            }
+            newRowAdded = true;
+        }
+
+        // Add triforce pieces
+        mainWindowItems.insert(mainWindowItems.end(), triforcePowerPieces.begin(), triforcePowerPieces.end());
+    }
+
     // if misc is separate and fishing pole isn't added, add fishing pole to misc
     if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.FishingPole"), SECTION_DISPLAY_EXTENDED_HIDDEN) ==
             SECTION_DISPLAY_EXTENDED_MISC_WINDOW &&
@@ -1855,6 +1917,8 @@ void ItemTrackerWindow::DrawElement() {
              SECTION_DISPLAY_EXTENDED_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.TriforcePieces"), SECTION_DISPLAY_HIDDEN) ==
              SECTION_DISPLAY_MAIN_WINDOW) ||
+            (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.TriforcePowerPieces"), SECTION_DISPLAY_HIDDEN) ==
+             SECTION_DISPLAY_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.FishingPole"), SECTION_DISPLAY_EXTENDED_HIDDEN) ==
              SECTION_DISPLAY_EXTENDED_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.Notes"), SECTION_DISPLAY_HIDDEN) ==
@@ -1939,6 +2003,13 @@ void ItemTrackerWindow::DrawElement() {
             SECTION_DISPLAY_SEPARATE) {
             BeginFloatingWindows("Triforce Piece Tracker");
             DrawItemsInRows(triforcePieces);
+            EndFloatingWindows();
+        }
+
+        if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.TriforcePowerPieces"), SECTION_DISPLAY_HIDDEN) ==
+            SECTION_DISPLAY_SEPARATE) {
+            BeginFloatingWindows("Triforce of Power Piece Tracker");
+            DrawItemsInRows(triforcePowerPieces);
             EndFloatingWindows();
         }
 
@@ -2178,6 +2249,7 @@ void ItemTrackerSettingsWindow::DrawElement() {
         }
         SohGui::mSohMenu->MenuDrawItem(gregTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(triforcePieceTracking, 250, THEME_COLOR);
+        SohGui::mSohMenu->MenuDrawItem(triforcePowerPieceTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(beanSoulsTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(bossSoulsTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(jabberNutsTracking, 250, THEME_COLOR);
@@ -2268,6 +2340,17 @@ void RegisterItemTrackerWidgets() {
                      .ComboMap(displayTypes))
         .Callback([](WidgetInfo& info) { shouldUpdateVectors = true; });
     SohGui::mSohMenu->AddSearchWidget({ triforcePieceTracking, "Randomizer", "Item Tracker", "General Settings" });
+
+    triforcePowerPieceTracking = { .name = "Triforce of Power Pieces", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    triforcePowerPieceTracking.CVar(CVAR_TRACKER_ITEM("DisplayType.TriforcePowerPieces"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(SECTION_DISPLAY_HIDDEN)
+                     .ComponentAlignment(ComponentAlignments::Right)
+                     .LabelPosition(LabelPositions::Far)
+                     .Color(THEME_COLOR)
+                     .ComboMap(displayTypes))
+        .Callback([](WidgetInfo& info) { shouldUpdateVectors = true; });
+    SohGui::mSohMenu->AddSearchWidget({ triforcePowerPieceTracking, "Randomizer", "Item Tracker", "General Settings" });
 
     dungeonItemTracking = { .name = "Dungeon Items", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
     dungeonItemTracking.CVar(CVAR_TRACKER_ITEM("DisplayType.DungeonItems"))
