@@ -547,7 +547,7 @@ static CounterData counterData[COUNTER_MAX] = {
     { CREATE_SPRITE_SKULL, COUNTER_DEATHS, { 0x48, 0x2A }, SIZE_COUNTER },
     { CREATE_SPRITE_32(dgTriforcePiece, 121), COUNTER_TRIFORCE_PIECES, { 0x27, 0x10 }, SIZE_COUNTER },
     { { dgWTriforcePiece, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b, 121 }, { 85, 85, 85, 0xFF }, 
-        COUNTER_TRIFORCE_POWER_PIECES, { 0xA8 + 4, 0x2A + 12 }, SIZE_COUNTER },
+        COUNTER_TRIFORCE_POWER_PIECES, { 0xA8, 4 }, SIZE_COUNTER },
 };
 
 static Sprite counterDigitSprites[10] = {

@@ -140,7 +140,7 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT] =
         "Pieces of the Triforce of Power will be added to the world.\n\n"
         "Collecting all of them will result in a game over and the deletion of your save file! "
-        "The game save will save with every piece obtained, they look identical to the pieces of Courage, so be careful!";
+        "The game save will save with every piece obtained; they look identical to the pieces of Courage, so be careful!";
     mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL] =
         "The amount of Triforce of Power pieces that will be placed in the world. "
         "Keep in mind seed generation can fail if more pieces are placed than there are junk items in the item pool.";
