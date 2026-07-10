@@ -1,7 +1,7 @@
 #include <soh/OTRGlobals.h>
 #include "static_data.h"
-#include "soh/ObjectExtension/ObjectExtension.h"
-#include "soh/ObjectExtension/ActorListIndex.h"
+#include "soh/Enhancements/randomizer/randomizer.h"
+#include "soh/Enhancements/randomizer/RCToRandInf.h"
 #include "item_category_adj.h"
 #include "particle_cmc.h"
 
@@ -33,8 +33,31 @@ void EnCow_MoveForRandomizer(EnCow* enCow, PlayState* play) {
 
     if (moved) {
         // Reposition collider
-        func_809DEE9C(enCow);
+        EnCow_SetColliderPos(enCow);
     }
+}
+
+static CheckIdentity IdentifyCow(s32 sceneNum, s32 posX, s32 posZ) {
+    CheckIdentity cowIdentity;
+
+    cowIdentity.randomizerInf = RAND_INF_MAX;
+    cowIdentity.randomizerCheck = RC_UNKNOWN_CHECK;
+
+    s32 actorParams = 0x00;
+    // Only need to pass params if in a scene with two cows
+    if (sceneNum == SCENE_GROTTOS || sceneNum == SCENE_STABLE || sceneNum == SCENE_LON_LON_BUILDINGS) {
+        actorParams = TWO_ACTOR_PARAMS(posX, posZ);
+    }
+
+    Rando::Location* location =
+        OTRGlobals::Instance->gRandomizer->GetCheckObjectFromActor(ACTOR_EN_COW, sceneNum, actorParams);
+
+    if (location->GetRandomizerCheck() != RC_UNKNOWN_CHECK) {
+        cowIdentity.randomizerInf = rcToRandomizerInf[location->GetRandomizerCheck()];
+        cowIdentity.randomizerCheck = location->GetRandomizerCheck();
+    }
+
+    return cowIdentity;
 }
 
 static void ShuffledCow_RandomizerDraw(EnCow* enCow, Color_RGBA8* primColor, Color_RGBA8* secColor,
@@ -131,9 +154,8 @@ void RegisterShuffleCows() {
 
     COND_VB_SHOULD(VB_GIVE_ITEM_FROM_COW, shouldRegister, {
         EnCow* enCow = va_arg(args, EnCow*);
-        CheckIdentity cowIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCow(
-            gPlayState->sceneNum, static_cast<int32_t>(enCow->actor.world.pos.x),
-            static_cast<int32_t>(enCow->actor.world.pos.z));
+        CheckIdentity cowIdentity = IdentifyCow(gPlayState->sceneNum, static_cast<int32_t>(enCow->actor.world.pos.x),
+                                                static_cast<int32_t>(enCow->actor.world.pos.z));
         // Has this cow already rewarded an item?
         if (!Flags_GetRandomizerInf(cowIdentity.randomizerInf)) {
             Flags_SetRandomizerInf(cowIdentity.randomizerInf);

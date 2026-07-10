@@ -1084,7 +1084,7 @@ void GetItem_DrawFishingPole(PlayState* play, s16 drawId) {
     Matrix_Scale(0.2, 0.2, 0.2, MTXMODE_APPLY);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
               G_MTX_MODELVIEW | G_MTX_LOAD);
-    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gFishingPoleGiDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiFishingPoleDL);
 
     // Draw lure
     Matrix_Push();

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <libultraship/libultra/gbi.h>
 #include "z64save.h"
 
 #define SECTION_PARENT_NONE -1
@@ -50,7 +49,6 @@ typedef enum {
 
 #include <map>
 #include <string>
-#include <tuple>
 #include <functional>
 #include <vector>
 #include <filesystem>

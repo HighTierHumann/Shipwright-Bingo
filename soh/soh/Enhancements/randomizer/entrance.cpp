@@ -3,6 +3,7 @@
 #include "3drando/fill.hpp"
 #include "3drando/pool_functions.hpp"
 #include "3drando/item_pool.hpp"
+#include "3drando/random.hpp"
 #include "../debugger/performanceTimer.h"
 #include "soh/Enhancements/gameconsole.h"
 #include "z64camera.h"
@@ -655,7 +656,7 @@ BuildOneWayTargets(std::vector<EntranceType> typesToInclude,
         AddElementsToPool(oneWayEntrances, GetShuffleableEntrances(poolType, false));
     }
     // Filter out any that are passed in the exclusion list
-    FilterAndEraseFromPool(oneWayEntrances, [&exclude](Entrance* entrance) {
+    std::erase_if(oneWayEntrances, [&exclude](Entrance* entrance) {
         std::pair<RandomizerRegion, RandomizerRegion> entranceBeingChecked(entrance->GetParentRegionKey(),
                                                                            entrance->GetConnectedRegionKey());
         return ElementInContainer(entranceBeingChecked, exclude);
@@ -825,20 +826,16 @@ static bool ValidateWorld(Entrance* entrancePlaced) {
         // This is mostly relevant when mixing entrance pools or shuffling special interiors (such as windmill or kak
         // potion shop) Warp Songs and Overworld Spawns can also end up inside certain indoors so those need to be
         // handled as well
-        std::array<std::string, 3> childForbidden = { "OGC Great Fairy Fountain -> Castle Grounds",
-                                                      "GV Carpenter Tent -> GV Fortress Side",
-                                                      "Ganon's Castle Entryway -> Castle Grounds From Ganon's Castle" };
+        std::array<std::string, 1> childForbidden = { "OGC Great Fairy Fountain -> Castle Grounds" };
         std::array<std::string, 2> adultForbidden = { "HC Great Fairy Fountain -> Castle Grounds",
                                                       "HC Storms Grotto -> Castle Grounds" };
 
         auto allShuffleableEntrances = GetShuffleableEntrances(EntranceType::All, false);
         for (auto& entrance : allShuffleableEntrances) {
-
             std::vector<Entrance*> alreadyChecked = {};
 
             if (entrance->IsShuffled()) {
                 if (entrance->GetReplacement() != nullptr) {
-
                     auto replacementName = entrance->GetReplacement()->GetName();
                     alreadyChecked.push_back(entrance->GetReplacement()->GetReverse());
 
@@ -1333,7 +1330,7 @@ int EntranceShuffler::ShuffleAllEntrances() {
             GetShuffleableEntrances(EntranceType::Overworld, excludeOverworldReverse);
         // Only shuffle GV Lower Stream -> Lake Hylia if decoupled entrances are on
         if (!ctx->GetOption(RSK_DECOUPLED_ENTRANCES)) {
-            FilterAndEraseFromPool(entrancePools[EntranceType::Overworld], [](const Entrance* entrance) {
+            std::erase_if(entrancePools[EntranceType::Overworld], [](const Entrance* entrance) {
                 return entrance->GetParentRegionKey() == RR_GV_LOWER_STREAM &&
                        entrance->GetConnectedRegionKey() == RR_LAKE_HYLIA;
             });

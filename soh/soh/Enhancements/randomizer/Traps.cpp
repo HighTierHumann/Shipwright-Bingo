@@ -1,7 +1,8 @@
 #include "Traps.h"
 #include "soh/Enhancements/randomizer/SeedContext.h"
-#include "soh/Enhancements/randomizer/randomizerTypes.h"
 #include "soh/Enhancements/randomizer/static_data.h"
+#include "soh/ShipUtils.h"
+
 #include "soh/Enhancements/randomizer/3drando/random.hpp"
 
 #include <vector>
@@ -660,6 +661,12 @@ static void InitTrickNames() {
         Text{ "Triforce Shard", "Éclat de Triforce", "Triforce-Fragment" }, // "Triforce Shard"
         Text{ "Shiny Rock", "Caillou Brillant", "glänzender Stein" },       // "Shiny Rock"
     };
+    trickNameTable[RG_TRIFORCE] = {
+        // TODO_TRANSLATE
+        Text{ "Cheese Triangle" },
+        Text{ "Triumph Fork" },
+        Text{ "Force Gem" },
+    };
     trickNameTable[RG_TRIFORCE_POWER_PIECE] = {
         Text{ "Piece of Cheese", "Morceau de Fromage", "Käseteil" },        // "Piece of Cheese"
         Text{ "Triforce Shard", "Éclat de Triforce", "Triforce-Fragment" }, // "Triforce Shard"
@@ -1065,7 +1072,7 @@ static void InitTrickNames() {
     trickNameTable[RG_SPEAK_HYLIAN] = {
         // TODO_TRANSLATE
         Text{ "Human Jingle Nut" },
-        Text{ "Sheikah Jabber nut" },
+        Text{ "Sheikah Jabber Nut" },
         Text{ "Lorulean Blabber Nut" },
     };
     trickNameTable[RG_SPEAK_KOKIRI] = {
@@ -1429,7 +1436,7 @@ static void InitTrickNames() {
 }
 
 // Generate a fake name for the ice trap based on the item it's displayed as
-Text Rando::Traps::GetTrapName(uint16_t id) {
+Text Rando::Traps::GetTrapName(uint16_t id, uint64_t* state) {
     // If the trick names table has not been initialized, do so
     if (!initTrickNames) {
         InitTrickNames();
@@ -1442,19 +1449,19 @@ Text Rando::Traps::GetTrapName(uint16_t id) {
     }
 
     // Randomly get the easy, medium, or hard name for the given item id
-    return RandomElement(trickNameTable[id]);
+    return ShipUtils::RandomElement(trickNameTable[id], state);
 }
 
-RandomizerGet Rando::Traps::GetTrapTrickModel() {
+RandomizerGet Rando::Traps::GetTrapTrickModel(uint64_t* state) {
     auto ctx = Rando::Context::GetInstance();
-    RandomizerGet trickModel = RandomElementFromSet(ctx->possibleIceTrapModels);
+    RandomizerGet trickModel = ShipUtils::RandomElementFromSet(ctx->possibleIceTrapModels, state);
 
     if (trickModel == RG_EMPTY_BOTTLE) {
-        trickModel = RandomElement(Rando::StaticData::normalBottles);
+        trickModel = ShipUtils::RandomElement(Rando::StaticData::normalBottles, state);
     } else if (trickModel == RG_GUARD_HOUSE_KEY) {
-        trickModel = RandomElement(Rando::StaticData::overworldKeys);
+        trickModel = ShipUtils::RandomElement(Rando::StaticData::overworldKeys, state);
     } else if (trickModel == RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL) {
-        trickModel = RandomElement(Rando::StaticData::beanSouls);
+        trickModel = ShipUtils::RandomElement(Rando::StaticData::beanSouls, state);
     }
 
     return trickModel;
@@ -1462,16 +1469,9 @@ RandomizerGet Rando::Traps::GetTrapTrickModel() {
 
 bool Rando::Traps::ShouldJunkItemBeTrap() {
     auto ctx = Rando::Context::GetInstance();
-
-    if (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Is(0)) {
-        return false;
-    }
-
-    if (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Is(100) || Random(0, 100) < ctx->GetOption(RSK_ICE_TRAP_PERCENT).Get()) {
-        return true;
-    }
-
-    return false;
+    return ctx->GetOption(RSK_ICE_TRAP_PERCENT).IsNot(0) &&
+           (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Is(100) ||
+            Random(0, 100) < ctx->GetOption(RSK_ICE_TRAP_PERCENT).Get());
 }
 
 static const char* const englishIceTrapMessages[] = {
@@ -1716,7 +1716,7 @@ static const char* const frenchIceTrapMessages[] = {
     "Tu savais que le G de ZFG signifie #Glace#?",
     "Tu as obtenu #L'Âge de Glace (2002)#!",
     "Maintenant, tu peux lancer un #sort# que tu ne connais pas.",
-    "Que dirais-tu d'un héros #sur glace# ?",
+    "Que dirais-tu d'un héros #sur glace#?",
     "Pas de tunique pour #ça#!",
     "Je savais que tu étais #partiellement Metroid#!",
     "Voilà juste la #cerise sur le gâteau#!",
@@ -1737,7 +1737,7 @@ static const char* const frenchIceTrapMessages[] = {
     "#Continue#",
     "QU'EST-CE QU'ELLE VA FAIRE, ME FAIRE UNE #[Glace]#!?",
     "Tu as rencontré un #terrible destin#, n'est-ce pas?",
-    "Alors comme ça, tu aimes Shining ? Voici comment ça #finit#.",
+    "Alors comme ça, tu aimes Shining? Voici comment ça #finit#.",
     "Petite erreur de trajectoire. #Je gagne#.",
     "Prends ce #L#, @.",
     "#Problème de compétence#",

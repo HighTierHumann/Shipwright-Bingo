@@ -8,6 +8,7 @@
 #include "overlays/effects/ovl_Effect_Ss_Kakera/z_eff_ss_kakera.h"
 #include "objects/gameplay_field_keep/gameplay_field_keep.h"
 #include "soh/OTRGlobals.h"
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 #include "vt.h"
 
@@ -251,7 +252,7 @@ void EnIshi_SpawnDustLarge(EnIshi* this, PlayState* play) {
 void EnIshi_DropCollectible(EnIshi* this, PlayState* play) {
     s16 dropParams;
 
-    if ((this->actor.params & 1) == ROCK_SMALL) {
+    if (GameInteractor_Should(VB_ROCK_DROP_ITEM, (this->actor.params & 1) == ROCK_SMALL, this)) {
         dropParams = (this->actor.params >> 8) & 0xF;
 
         if (dropParams >= 0xD) {
@@ -443,7 +444,7 @@ void EnIshi_Fly(EnIshi* this, PlayState* play) {
             Quake_SetSpeed(quakeIdx, -0x3CB0);
             Quake_SetQuakeValues(quakeIdx, 3, 0, 0, 0);
             Quake_SetCountdown(quakeIdx, 7);
-            func_800AA000(this->actor.xyzDistToPlayerSq, 0xFF, 0x14, 0x96);
+            Rumble_Request(this->actor.xyzDistToPlayerSq, 0xFF, 0x14, 0x96);
         }
         Actor_Kill(&this->actor);
         return;

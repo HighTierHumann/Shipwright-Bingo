@@ -32,6 +32,7 @@ void RegionTable_Init_Graveyard() {
         LOCATION(RC_GY_GRASS_11,                       logic->CanCutShrubs()),
         LOCATION(RC_GY_GRASS_12,                       logic->CanCutShrubs()),
         LOCATION(RC_GRAVEYARD_CRATE,                   ((logic->IsAdult && CanPlantBean(RR_THE_GRAVEYARD, RG_GRAVEYARD_BEAN_SOUL)) || logic->CanUse(RG_LONGSHOT)) && logic->CanBreakCrates()),
+        LOCATION(RC_GY_ROCK,                           logic->CanBreakRocks()),
         LOCATION(RC_GY_NEAR_HUT_GRAVE_BUTTERFLY_FAIRY, logic->IsChild && logic->AtDay && logic->CanUse(RG_STICKS)),
         LOCATION(RC_GY_ENTRANCE_RECTANGLE_SIGN,        logic->CanRead()),
         LOCATION(RC_GY_ENTRANCE_PLINTH,                logic->CanRead()),
@@ -44,7 +45,7 @@ void RegionTable_Init_Graveyard() {
         ENTRANCE(RR_GRAVEYARD_COMPOSERS_GRAVE,    logic->CanUse(RG_ZELDAS_LULLABY)),
         ENTRANCE(RR_GRAVEYARD_HEART_PIECE_GRAVE,  (logic->IsAdult || logic->AtNight) && logic->HasItem(RG_POWER_BRACELET)),
         ENTRANCE(RR_GRAVEYARD_DAMPES_GRAVE,       logic->IsAdult && logic->HasItem(RG_POWER_BRACELET)),
-        ENTRANCE(RR_GRAVEYARD_DAMPES_HOUSE,       logic->IsAdult && logic->CanOpenOverworldDoor(RG_DAMPES_HUT_KEY) /*|| logic->AtDampeTime*/), //TODO: This needs to be handled in ToD rework
+        ENTRANCE(RR_GRAVEYARD_DAMPES_HOUSE,       logic->IsAdult && logic->HasItem(RG_DAMPES_HUT_KEY) /*|| logic->AtDampeTime*/), //TODO: This needs to be handled in ToD rework
         ENTRANCE(RR_KAKARIKO_VILLAGE,             true),
         ENTRANCE(RR_GRAVEYARD_WARP_PAD_REGION,    false),
     });

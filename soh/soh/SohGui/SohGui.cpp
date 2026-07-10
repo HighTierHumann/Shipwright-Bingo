@@ -7,10 +7,7 @@
 
 #include "SohGui.hpp"
 
-#include <spdlog/spdlog.h>
 #include <imgui.h>
-#include <imgui_internal.h>
-#include <libultraship/libultraship.h>
 
 #ifdef __APPLE__
 #include <fast/backends/gfx_metal.h>
@@ -103,7 +100,7 @@ std::shared_ptr<SohMenu> GetSohMenu() {
 }
 
 void SetupMenu() {
-    auto gui = Ship::Context::GetInstance()->GetWindow()->GetGui();
+    auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
     mSohMenu = std::make_shared<SohMenu>(CVAR_WINDOW("Menu"), "Port Menu");
     gui->SetMenu(mSohMenu);
 
@@ -117,7 +114,7 @@ void SetupMenuElements() {
 }
 
 void SetupGuiElements() {
-    auto gui = Ship::Context::GetInstance()->GetWindow()->GetGui();
+    auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
 
     mConsoleWindow = std::make_shared<SohConsoleWindow>(CVAR_WINDOW("SohConsole"), "Console##SoH", ImVec2(820, 630));
     gui->AddGuiWindow(mConsoleWindow);
@@ -209,7 +206,7 @@ void SetupGuiElements() {
 }
 
 void Destroy() {
-    auto gui = Ship::Context::GetInstance()->GetWindow()->GetGui();
+    auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui();
     gui->RemoveAllGuiWindows();
 
     mNotificationWindow = nullptr;

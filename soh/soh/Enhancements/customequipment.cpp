@@ -1,110 +1,105 @@
 #include <initializer_list>
+#include <libultraship/bridge/resourcebridge.h>
 #include "objects/object_link_boy/object_link_boy.h"
 #include "objects/object_link_child/object_link_child.h"
 #include "objects/object_custom_equip/object_custom_equip.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/ShipInit.hpp"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/cvar_prefixes.h"
 
 extern "C" {
-#include "variables.h"
 #include "macros.h"
-
+#include "functions.h"
+#include "variables.h"
 extern SaveContext gSaveContext;
-extern PlayState* gPlayState;
 }
-
-void DummyPlayer_Update(Actor* actor, PlayState* play);
-
-static void UpdatePatchCustomEquipmentDlists();
-static void RefreshCustomEquipment();
-static u8 GetEquippedSwordItem();
-static bool IsDummyPlayer(const Player* player);
 
 static const char* ResolveCustomChain(std::initializer_list<const char*> paths) {
     const char* fallback = nullptr;
     for (auto path : paths) {
-        if (path != nullptr) {
-            fallback = path;
-            if (ResourceMgr_FileExists(path) || ResourceGetIsCustomByName(path)) {
-                return path;
-            }
-        }
+        if (path == nullptr)
+            continue;
+        fallback = path;
+        if (ResourceGetIsCustomByName(path) || ResourceMgr_FileAltExists(path))
+            return path;
     }
     return fallback;
 }
 
-static const char* GetBreakableLongswordDL() {
-    return ResolveCustomChain({ gCustomBreakableLongswordDL, gCustomLongswordDL });
-}
+static const char* ResolveCustomFPSHand(const char* path) {
+    const bool isAdult = path == gCustomAdultFPSHandDL;
+    const bool isChild = path == gCustomChildFPSHandDL;
 
-static const char* GetBreakableLongswordSheathDL() {
-    return ResolveCustomChain({ gCustomBreakableLongswordSheathDL, gCustomLongswordSheathDL });
-}
-
-static const char* GetBreakableLongswordInSheathDL() {
-    return ResolveCustomChain({ gCustomBreakableLongswordInSheathDL, gCustomLongswordInSheathDL });
-}
-
-static const char* GetBrokenLongswordSheathDL() {
-    return ResolveCustomChain(
-        { gCustomBrokenLongswordSheathDL, gCustomBreakableLongswordSheathDL, gCustomLongswordSheathDL });
-}
-
-static const char* GetBrokenLongswordInSheathDL() {
-    return ResolveCustomChain(
-        { gCustomBrokenLongswordInSheathDL, gCustomBreakableLongswordInSheathDL, gCustomLongswordInSheathDL });
-}
-
-static void UpdateCustomEquipmentSetModel(Player* player, u8 ModelGroup) {
-    (void)ModelGroup;
-
-    if (player == nullptr || gPlayState == nullptr || player != GET_PLAYER(gPlayState) || IsDummyPlayer(player)) {
-        return;
+    if (!isAdult && !isChild) {
+        return path;
     }
 
-    RefreshCustomEquipment();
-}
-
-static void UpdateCustomEquipment() {
-    if (!GameInteractor::IsSaveLoaded() || gPlayState == nullptr || GET_PLAYER(gPlayState) == nullptr ||
-        IsDummyPlayer(GET_PLAYER(gPlayState))) {
-        return;
-    }
-
-    RefreshCustomEquipment();
-}
-
-static void RefreshCustomEquipment() {
-    if (!GameInteractor::IsSaveLoaded() || gPlayState == nullptr || GET_PLAYER(gPlayState) == nullptr ||
-        IsDummyPlayer(GET_PLAYER(gPlayState))) {
-        return;
-    }
-
-    UpdatePatchCustomEquipmentDlists();
-}
-
-static u8 GetEquippedSwordItem() {
-    switch (CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD)) {
-        case EQUIP_VALUE_SWORD_NONE:
-            return ITEM_NONE;
-        case EQUIP_VALUE_SWORD_KOKIRI:
-            return ITEM_SWORD_KOKIRI;
-        case EQUIP_VALUE_SWORD_MASTER:
-            return ITEM_SWORD_MASTER;
-        case EQUIP_VALUE_SWORD_BIGGORON:
-            if (CHECK_OWNED_EQUIP_ALT(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE)) {
-                return ITEM_SWORD_KNIFE;
-            }
-            return ITEM_SWORD_BGS;
+    switch (TUNIC_EQUIP_TO_PLAYER(CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC))) {
+        case PLAYER_TUNIC_GORON:
+            return ResolveCustomChain(
+                { isAdult ? gCustomAdultGoronFPSHandDL : gCustomChildGoronFPSHandDL, path, nullptr });
+        case PLAYER_TUNIC_ZORA:
+            return ResolveCustomChain(
+                { isAdult ? gCustomAdultZoraFPSHandDL : gCustomChildZoraFPSHandDL, path, nullptr });
         default:
-            return ITEM_NONE;
+            return path;
     }
 }
 
-static bool IsDummyPlayer(const Player* player) {
-    return player != nullptr && player->actor.update == DummyPlayer_Update;
+static Gfx* LoadGfxByName(const char* path) {
+    return path ? ResourceMgr_LoadGfxByName(path) : nullptr;
+}
+
+static Gfx* LoadCustomGfx(const char* path) {
+    if (!path)
+        return nullptr;
+    path = ResolveCustomFPSHand(path);
+    if (!ResourceMgr_FileAltExists(path) || !ResourceGetIsCustomByName(path))
+        return nullptr;
+    return ResourceMgr_LoadGfxByName(path);
+}
+
+static u8 sLastValidSwordEquip = EQUIP_VALUE_SWORD_NONE;
+
+static u8 GetEquippedSwordValue(PlayState* play) {
+    const u8 sword = CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD);
+    const bool inCutscene = (play->csCtx.state != CS_STATE_IDLE);
+    if (!(inCutscene && gSaveContext.linkAge == LINK_AGE_CHILD && sword == EQUIP_VALUE_SWORD_MASTER)) {
+        sLastValidSwordEquip = sword;
+    }
+    return sLastValidSwordEquip;
+}
+
+static const char* GetSwordInSheathDL(PlayState* play) {
+    switch (GetEquippedSwordValue(play)) {
+        case EQUIP_VALUE_SWORD_KOKIRI:
+            return gCustomKokiriSwordInSheathDL;
+        case EQUIP_VALUE_SWORD_MASTER:
+            return gCustomMasterSwordInSheathDL;
+        case EQUIP_VALUE_SWORD_BIGGORON:
+            if (gSaveContext.bgsFlag)
+                return gCustomLongswordInSheathDL;
+            if (CHECK_OWNED_EQUIP_ALT(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE))
+                return gCustomBrokenLongswordInSheathDL;
+            return ResolveCustomChain({ gCustomBreakableLongswordInSheathDL, gCustomLongswordInSheathDL, nullptr });
+    }
+    return nullptr;
+}
+
+static const char* GetSheathOnlyDL(PlayState* play) {
+    switch (GetEquippedSwordValue(play)) {
+        case EQUIP_VALUE_SWORD_KOKIRI:
+            return gCustomKokiriSwordSheathDL;
+        case EQUIP_VALUE_SWORD_MASTER:
+            return gCustomMasterSwordSheathDL;
+        case EQUIP_VALUE_SWORD_BIGGORON:
+            if (gSaveContext.bgsFlag)
+                return gCustomLongswordSheathDL;
+            if (CHECK_OWNED_EQUIP_ALT(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE))
+                return gCustomBrokenLongswordSheathDL;
+            return ResolveCustomChain({ gCustomBreakableLongswordSheathDL, gCustomLongswordSheathDL, nullptr });
+    }
+    return nullptr;
 }
 
 static const char* GetShieldOnBackDL(s32 shield) {
@@ -207,6 +202,22 @@ static bool IsScalingAdultItemAsChild() {
     return CVarGetInteger(CVAR_ENHANCEMENT("EquipmentAlwaysVisible"), 0) &&
            CVarGetInteger(CVAR_ENHANCEMENT("ScaleAdultEquipmentAsChild"), 0) && !LINK_IS_ADULT;
 }
+
+const char* bottleContentDLs[] = {
+    nullptr,                    // 0: PLAYER_IA_BOTTLE (empty - no custom content needed)
+    gCustomBottleFishDL,        // 1: PLAYER_IA_BOTTLE_FISH
+    gCustomBottleBlueFireDL,    // 2: PLAYER_IA_BOTTLE_FIRE
+    gCustomBottleBugDL,         // 3: PLAYER_IA_BOTTLE_BUG
+    gCustomBottlePoeDL,         // 4: PLAYER_IA_BOTTLE_POE
+    gCustomBottleBigPoeDL,      // 5: PLAYER_IA_BOTTLE_BIG_POE
+    gCustomBottleLetterDL,      // 6: PLAYER_IA_BOTTLE_RUTOS_LETTER
+    gCustomBottleRedPotionDL,   // 7: PLAYER_IA_BOTTLE_POTION_RED
+    gCustomBottleBluePotionDL,  // 8: PLAYER_IA_BOTTLE_POTION_BLUE
+    gCustomBottleGreenPotionDL, // 9: PLAYER_IA_BOTTLE_POTION_GREEN
+    gCustomBottleMilkDL,        // 10: PLAYER_IA_BOTTLE_MILK_FULL
+    gCustomBottleMilkHalfDL,    // 11: PLAYER_IA_BOTTLE_MILK_HALF
+    gCustomBottleFairyDL,       // 12: PLAYER_IA_BOTTLE_FAIRY
+};
 
 static void RegisterCustomEquipment() {
     // World (gameplay) character
@@ -609,6 +620,40 @@ static void RegisterCustomEquipment() {
             gSPDisplayList(play->state.gfxCtx->polyOpa.p++, resolvedChain);
         }
     });
+
+    COND_VB_SHOULD(VB_PLAYER_DRAW_BOTTLE, CVarGetInteger(CVAR_SETTING("AltAssets"), 1), {
+        Player* player = va_arg(args, Player*);
+        PlayState* play = va_arg(args, PlayState*);
+        const char* contentDL = nullptr;
+        Gfx* resolvedContent = nullptr;
+        Gfx* resolvedBottle = LoadCustomGfx(gCustomBottleDL);
+        if (resolvedBottle) {
+            *should = false;
+            gSPDisplayList(play->state.gfxCtx->polyXlu.p++, resolvedBottle);
+
+            if (player->itemAction >= PLAYER_IA_BOTTLE &&
+                player->itemAction < PLAYER_IA_BOTTLE + std::size(bottleContentDLs)) {
+                contentDL = bottleContentDLs[player->itemAction - PLAYER_IA_BOTTLE];
+            }
+
+            if (contentDL) {
+                resolvedContent = LoadCustomGfx(contentDL);
+            }
+
+            if (resolvedContent) {
+                gSPDisplayList(play->state.gfxCtx->polyOpa.p++, resolvedContent);
+            }
+        }
+    });
+
+    COND_VB_SHOULD(VB_PLAYER_UPDATE_BOTTLE_HELD, CVarGetInteger(CVAR_SETTING("AltAssets"), 1), {
+        Player* player = va_arg(args, Player*);
+        const bool isFullMilk = player->itemAction == PLAYER_IA_BOTTLE_MILK_FULL;
+        if (isFullMilk) {
+            *should = false;
+            player->itemAction = PLAYER_IA_BOTTLE_MILK_HALF;
+        }
+    });
 }
 
-static RegisterShipInitFunc initFunc(PatchCustomEquipment);
+static RegisterShipInitFunc initFunc(RegisterCustomEquipment, { CVAR_SETTING("AltAssets") });

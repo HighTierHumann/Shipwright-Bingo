@@ -6,6 +6,7 @@
  */
 
 #include <soh/OTRGlobals.h>
+#include "soh/Enhancements/randomizer/randomizer.h"
 
 extern "C" {
 #include <variables.h>
@@ -66,6 +67,21 @@ void BuildRockySignMessage(uint16_t* textId, bool* loadFromMessageTable) {
     *loadFromMessageTable = false;
 }
 
+void BuildGerudoGuardJailOfferMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    Player* player = GET_PLAYER(gPlayState);
+
+    if (gPlayState->sceneNum == SCENE_GERUDOS_FORTRESS && player->talkActor != NULL &&
+        player->talkActor->id == ACTOR_EN_GE2) {
+        CustomMessage msg =
+            CustomMessage("Want me to throw you in jail?&\x1B#Yes please&No thanks#",
+                          "Soll ich dich ins Gefängnis werfen?&\x1B#Ja, bitte&Nein, danke#",
+                          "Tu veux que je te jette en prison?&\x1B#Oui, s'il te plaît&Non merci#", { QM_GREEN });
+        msg.AutoFormat();
+        msg.LoadIntoFont();
+        *loadFromMessageTable = false;
+    }
+}
+
 void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_LAKE_HYLIA_WATER_SWITCH_NAVI, IS_RANDO, BuildWaterSwitchMessage);
     COND_ID_HOOK(OnOpenText, TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN, IS_RANDO, BuildWaterSwitchMessage);
@@ -74,6 +90,7 @@ void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_IS_AFRAID, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_MALON_LETS_SING_THIS_SONG, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_GV_ROCKY_SIGN, IS_RANDO, BuildRockySignMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_GERUDO_GUARD_FRIENDLY, IS_RANDO, BuildGerudoGuardJailOfferMessage);
 }
 
 static RegisterShipInitFunc initFunc(RegisterMiscellaneousMessages, { "IS_RANDO" });

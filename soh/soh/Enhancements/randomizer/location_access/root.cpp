@@ -14,10 +14,13 @@ void RegionTable_Init_Root() {
         EVENT_ACCESS(LOGIC_TH_COULD_FREE_SLOPE_CARPENTER,       ctx->GetOption(RSK_GERUDO_FORTRESS).Is(RO_GF_CARPENTERS_FREE) || ctx->GetOption(RSK_GERUDO_FORTRESS).Is(RO_GF_CARPENTERS_FAST)),
         EVENT_ACCESS(LOGIC_TH_RESCUED_ALL_CARPENTERS,           ctx->GetOption(RSK_GERUDO_FORTRESS).Is(RO_GF_CARPENTERS_FREE)),
         EVENT_ACCESS(LOGIC_FREED_EPONA,                         (bool)ctx->GetOption(RSK_SKIP_EPONA_RACE)),
+        EVENT_ACCESS(LOGIC_SHOWED_MIDO_SWORD_AND_SHIELD,        ctx->GetOption(RSK_FOREST).Is(RO_CLOSED_FOREST_OFF)),
     }, {
         //Locations
         LOCATION(RC_LINKS_POCKET,       true),
-        LOCATION(RC_TRIFORCE_COMPLETED, logic->GetSaveContext()->ship.quest.data.randomizer.triforcePiecesCollected >= ctx->GetOption(RSK_TRIFORCE_HUNT_PIECES_REQUIRED).Get() + 1;),
+        LOCATION(RC_GANONS_BOSS_KEY,    logic->CanTriggerGBK()),
+        LOCATION(RC_GANON_SOUL,         logic->CanTriggerGanonsSoul()),
+        LOCATION(RC_WINCON,             logic->CanTriggerWincon()),
         LOCATION(RC_POWER_TRIFORCE_COMPLETED, logic->GetSaveContext()->ship.quest.data.randomizer.triforcePowerPiecesCollected >= ctx->GetOption(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED).Get() + 1;),
         LOCATION(RC_SARIA_SONG_HINT,    logic->CanUse(RG_SARIAS_SONG)),
         LOCATION(RC_SONG_FROM_IMPA,     (bool)ctx->GetOption(RSK_SKIP_CHILD_ZELDA)),
