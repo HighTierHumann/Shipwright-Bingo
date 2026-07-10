@@ -80,11 +80,37 @@ static void StartingItemTiered(RandomizerSettingKey rsk, const std::vector<uint3
             ImGui::SameLine();
             const ItemMapEntry& entry = itemMapping[itemIds[i]];
             PushStyleButton(Colors::DarkGray);
-            if (ImGui::ImageButton(entry.name.c_str(), GetFast3dGui()->GetTextureByName(entry.name),
-                                   ImVec2(kIconSize, kIconSize), ImVec2(0, 0), ImVec2(1, 1))) {
+            // Stick, Nut, and Bombchu Bags don't have textures, so we use the ITEM_ texture, but adjust red tint
+            // based on tier of upgrade
+            if (entry.id == ITEM_STICK || entry.id == ITEM_NUT || entry.id == ITEM_BOMBCHU) {
+                f32 rgbToSubtract;
+                switch (i) {
+                    case 0:
+                        rgbToSubtract = 0;
+                        break;
+                    case 1:
+                        rgbToSubtract = 0.25f;
+                        break;
+                    case 2:
+                        rgbToSubtract = 0.5f;
+                        break;
+                    default:
+                        rgbToSubtract = 0;
+                        break;
+                }
+                if (ImGui::ImageButton((std::to_string(i) + entry.name).c_str(), GetFast3dGui()->GetTextureByName(entry.name),
+                                   ImVec2(kIconSize, kIconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 0), ImVec4(1, 1 - rgbToSubtract, 1 - rgbToSubtract, 1))) {
                 CVarSetInteger(cvar, static_cast<int32_t>(i) + 1);
                 SaveStartingItemCVars();
                 ImGui::CloseCurrentPopup();
+        }
+            } else {
+                if (ImGui::ImageButton(entry.name.c_str(), GetFast3dGui()->GetTextureByName(entry.name),
+                                    ImVec2(kIconSize, kIconSize), ImVec2(0, 0), ImVec2(1, 1))) {
+                    CVarSetInteger(cvar, static_cast<int32_t>(i) + 1);
+                    SaveStartingItemCVars();
+                    ImGui::CloseCurrentPopup();
+                }
             }
             PopStyleButton();
             Tooltip(option.GetOptionText(i + 1).c_str());
@@ -197,7 +223,7 @@ void DrawStartingItemsMenu(WidgetInfo& info) {
         ImGui::SetTooltip("Disabled because Shuffle Swim is on.");
     }
     ImGui::SameLine();
-    StartingItemTiered(RSK_STARTING_MAGIC_METER, { ITEM_MAGIC_SMALL, ITEM_MAGIC_LARGE });
+    StartingItemTiered(RSK_STARTING_MAGIC_METER, { ITEM_MAGIC_SMALL, ITEM_MAGIC_LARGE, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
     bool childsWalletShuffled =
         CVarGetInteger(Rando::Settings::GetInstance()->GetOption(RSK_SHUFFLE_CHILD_WALLET).GetCVarName().c_str(), 0) !=
@@ -210,35 +236,19 @@ void DrawStartingItemsMenu(WidgetInfo& info) {
     }
 
     ImGui::SeparatorText("Items");
-    bool stickBagShuffled =
-        CVarGetInteger(Rando::Settings::GetInstance()->GetOption(RSK_SHUFFLE_DEKU_STICK_BAG).GetCVarName().c_str(),
-                       0) != 0;
-    ImGui::BeginDisabled(stickBagShuffled);
-    StartingItemToggle(RSK_STARTING_STICKS, ITEM_STICK, stickBagShuffled);
-    ImGui::EndDisabled();
-    if (stickBagShuffled && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-        ImGui::SetTooltip("Disabled because the Deku Stick Bag is being shuffled.");
-    }
+    StartingItemTiered(RSK_STARTING_STICKS, { ITEM_STICK, ITEM_STICK, ITEM_STICK, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
-    bool nutBagShuffled =
-        CVarGetInteger(Rando::Settings::GetInstance()->GetOption(RSK_SHUFFLE_DEKU_NUT_BAG).GetCVarName().c_str(), 0) !=
-        0;
-    ImGui::BeginDisabled(nutBagShuffled);
-    StartingItemToggle(RSK_STARTING_NUTS, ITEM_NUT, nutBagShuffled);
-    ImGui::EndDisabled();
-    if (nutBagShuffled && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-        ImGui::SetTooltip("Disabled because the Deku Nut Bag is being shuffled.");
-    }
+    StartingItemTiered(RSK_STARTING_NUTS, { ITEM_NUT, ITEM_NUT, ITEM_NUT, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
-    StartingItemTiered(RSK_STARTING_BOMB_BAG, { ITEM_BOMB_BAG_20, ITEM_BOMB_BAG_30, ITEM_BOMB_BAG_40 });
+    StartingItemTiered(RSK_STARTING_BOMB_BAG, { ITEM_BOMB_BAG_20, ITEM_BOMB_BAG_30, ITEM_BOMB_BAG_40, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
-    StartingItemTiered(RSK_STARTING_BOW, { ITEM_QUIVER_30, ITEM_QUIVER_40, ITEM_QUIVER_50 });
+    StartingItemTiered(RSK_STARTING_BOW, { ITEM_QUIVER_30, ITEM_QUIVER_40, ITEM_QUIVER_50, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
     StartingItemToggle(RSK_STARTING_FIRE_ARROWS, ITEM_ARROW_FIRE);
     ImGui::SameLine();
     StartingItemToggle(RSK_STARTING_DINS_FIRE, ITEM_DINS_FIRE);
 
-    StartingItemTiered(RSK_STARTING_SLINGSHOT, { ITEM_BULLET_BAG_30, ITEM_BULLET_BAG_40, ITEM_BULLET_BAG_50 });
+    StartingItemTiered(RSK_STARTING_SLINGSHOT, { ITEM_BULLET_BAG_30, ITEM_BULLET_BAG_40, ITEM_BULLET_BAG_50, ITEM_MEDALLION_LIGHT });
     ImGui::SameLine();
     StartingItemTiered(RSK_STARTING_OCARINA, { ITEM_OCARINA_FAIRY, ITEM_OCARINA_TIME });
     ImGui::SameLine();
@@ -248,16 +258,9 @@ void DrawStartingItemsMenu(WidgetInfo& info) {
         Rando::Option& bombchuOption = Rando::Settings::GetInstance()->GetOption(RSK_BOMBCHU_BAG);
         int32_t bombchuMode = CVarGetInteger(bombchuOption.GetCVarName().c_str(), RO_BOMBCHU_BAG_NONE);
         if (bombchuMode == RO_BOMBCHU_BAG_PROGRESSIVE) {
-            StartingItemTiered(RSK_STARTING_BOMBCHU_BAG, { ITEM_BOMBCHU, ITEM_BOMBCHU, ITEM_BOMBCHU });
-        } else if (bombchuMode == RO_BOMBCHU_BAG_SINGLE) {
-            StartingItemToggle(RSK_STARTING_BOMBCHU_BAG, ITEM_BOMBCHU);
+            StartingItemTiered(RSK_STARTING_BOMBCHU_BAG, { ITEM_BOMBCHU, ITEM_BOMBCHU, ITEM_BOMBCHU, ITEM_MEDALLION_LIGHT });
         } else {
-            ImGui::BeginDisabled();
-            StartingItemToggle(RSK_STARTING_BOMBCHU_BAG, ITEM_BOMBCHU, true);
-            ImGui::EndDisabled();
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-                ImGui::SetTooltip("Enable the Bombchu Bag setting to start with bombchus.");
-            }
+            StartingItemTiered(RSK_STARTING_BOMBCHU_BAG, { ITEM_BOMBCHU, ITEM_MEDALLION_LIGHT });
         }
     }
     ImGui::SameLine();
@@ -332,6 +335,7 @@ void DrawStartingItemsMenu(WidgetInfo& info) {
                        RO_LINKS_POCKET_DUNGEON_REWARD) == RO_LINKS_POCKET_DUNGEON_REWARD) {
         StartingItemCombobox(RSK_LINKS_POCKET_REWARD);
     }
+    StartingItemCount(RSK_RANDOM_STARTING_ITEMS, ITEM_BOMB);
     StartingItemCount(RSK_STARTING_SKULLTULA_TOKEN, ITEM_SKULL_TOKEN);
     StartingItemCount(RSK_STARTING_HEARTS, ITEM_HEART_CONTAINER);
 

@@ -253,61 +253,6 @@ static uint8_t TokensRequiredBySettings() {
     return RequiredBySettings(TokensConfig);
 }
 
-<<<<<<< HEAD
-std::vector<std::pair<RandomizerCheck, std::function<bool()>>> conditionalAlwaysHints = {
-    // std::make_pair(RC_MARKET_10_BIG_POES,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return ctx->GetOption(RSK_BIG_POE_COUNT).Get() > 3 && !ctx->GetOption(RSK_BIG_POES_HINT);
-    //                }),
-    // std::make_pair(RC_DEKU_THEATER_MASK_OF_TRUTH,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return !ctx->GetOption(RSK_MASK_SHOP_HINT) && !ctx->GetOption(RSK_MASK_QUEST);
-    //                }),
-    // std::make_pair(RC_SONG_FROM_OCARINA_OF_TIME,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return StonesRequiredBySettings() < 2 && !ctx->GetOption(RSK_OOT_HINT);
-    //                }),
-    // std::make_pair(RC_HF_OCARINA_OF_TIME_ITEM, []() { return StonesRequiredBySettings() < 2; }),
-    std::make_pair(RC_SHEIK_IN_KAKARIKO, []() { return MedallionsRequiredBySettings() < 5; }),
-    // std::make_pair(RC_DMT_TRADE_CLAIM_CHECK,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return !ctx->GetOption(RSK_BIGGORON_HINT);
-    //                }),
-    // std::make_pair(RC_KAK_30_GOLD_SKULLTULA_REWARD,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return !ctx->GetOption(RSK_KAK_30_SKULLS_HINT) && TokensRequiredBySettings() < 30;
-    //                }),
-    // std::make_pair(RC_KAK_40_GOLD_SKULLTULA_REWARD,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return !ctx->GetOption(RSK_KAK_40_SKULLS_HINT) && TokensRequiredBySettings() < 40;
-    //                }),
-    // std::make_pair(RC_KAK_50_GOLD_SKULLTULA_REWARD,
-    //                []() {
-    //                    auto ctx = Rando::Context::GetInstance();
-    //                    return !ctx->GetOption(RSK_KAK_50_SKULLS_HINT) && TokensRequiredBySettings() < 50;
-    //                }),
-    std::make_pair(RC_ZR_FROGS_OCARINA_GAME,
-                   []() {
-                       auto ctx = Rando::Context::GetInstance();
-                       return !ctx->GetOption(RSK_FROGS_HINT);
-                   }),
-    std::make_pair(RC_KF_LINKS_HOUSE_COW,
-                   []() {
-                       auto ctx = Rando::Context::GetInstance();
-                       return !ctx->GetOption(RSK_MALON_HINT);
-                   }),
-    std::make_pair(RC_KAK_100_GOLD_SKULLTULA_REWARD,
-                   []() {
-                       auto ctx = Rando::Context::GetInstance();
-                       return !ctx->GetOption(RSK_KAK_100_SKULLS_HINT) && TokensRequiredBySettings() < 100;
-                   }),
-=======
 // An 'always' hint that only applies under certain settings. Suppressed when the user
 // has enabled `dedicatedHint` (since a dedicated hint renders the gossip-stone hint redundant),
 // or when `extra` is present and returns false. RSK_NONE in `dedicatedHint` means no suppression.
@@ -315,23 +260,22 @@ struct ConditionalAlwaysHint {
     RandomizerCheck loc;
     RandomizerSettingKey dedicatedHint;
     std::function<bool()> extra;
->>>>>>> upstream/develop
 };
 
 std::vector<ConditionalAlwaysHint> conditionalAlwaysHints = {
     // clang-format off
-    { RC_MARKET_10_BIG_POES,            RSK_BIG_POES_HINT,       []() { return Rando::Context::GetInstance()->GetOption(RSK_BIG_POE_COUNT).Get() > 3; } },
-    { RC_DEKU_THEATER_MASK_OF_TRUTH,    RSK_MASK_SHOP_HINT,      []() { return !Rando::Context::GetInstance()->GetOption(RSK_MASK_QUEST); } },
-    { RC_SONG_FROM_OCARINA_OF_TIME,     RSK_OOT_HINT,            []() { return StonesRequiredBySettings() < 2; } },
-    { RC_HF_OCARINA_OF_TIME_ITEM,       RSK_OOT_HINT,            []() { return StonesRequiredBySettings() < 2; } },
+    // { RC_MARKET_10_BIG_POES,            RSK_BIG_POES_HINT,       []() { return Rando::Context::GetInstance()->GetOption(RSK_BIG_POE_COUNT).Get() > 3; } },
+    // { RC_DEKU_THEATER_MASK_OF_TRUTH,    RSK_MASK_SHOP_HINT,      []() { return !Rando::Context::GetInstance()->GetOption(RSK_MASK_QUEST); } },
+    // { RC_SONG_FROM_OCARINA_OF_TIME,     RSK_OOT_HINT,            []() { return StonesRequiredBySettings() < 2; } },
+    // { RC_HF_OCARINA_OF_TIME_ITEM,       RSK_OOT_HINT,            []() { return StonesRequiredBySettings() < 2; } },
     { RC_SHEIK_IN_KAKARIKO,             RSK_NONE,                []() { return MedallionsRequiredBySettings() < 5; } },
-    { RC_DMT_TRADE_CLAIM_CHECK,         RSK_BIGGORON_HINT,       nullptr },
-    { RC_KAK_30_GOLD_SKULLTULA_REWARD,  RSK_KAK_30_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 30; } },
-    { RC_KAK_40_GOLD_SKULLTULA_REWARD,  RSK_KAK_40_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 40; } },
-    { RC_KAK_50_GOLD_SKULLTULA_REWARD,  RSK_KAK_50_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 50; } },
-    { RC_ZR_FROGS_OCARINA_GAME,         RSK_FROGS_HINT,          nullptr },
-    { RC_KF_LINKS_HOUSE_COW,            RSK_MALON_HINT,          nullptr },
-    { RC_KAK_100_GOLD_SKULLTULA_REWARD, RSK_KAK_100_SKULLS_HINT, []() { return TokensRequiredBySettings() < 100; } },
+    // { RC_DMT_TRADE_CLAIM_CHECK,         RSK_BIGGORON_HINT,       nullptr },
+    // { RC_KAK_30_GOLD_SKULLTULA_REWARD,  RSK_KAK_30_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 30; } },
+    // { RC_KAK_40_GOLD_SKULLTULA_REWARD,  RSK_KAK_40_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 40; } },
+    // { RC_KAK_50_GOLD_SKULLTULA_REWARD,  RSK_KAK_50_SKULLS_HINT,  []() { return TokensRequiredBySettings() < 50; } },
+    // { RC_ZR_FROGS_OCARINA_GAME,         RSK_FROGS_HINT,          nullptr },
+    // { RC_KF_LINKS_HOUSE_COW,            RSK_MALON_HINT,          nullptr },
+    // { RC_KAK_100_GOLD_SKULLTULA_REWARD, RSK_KAK_100_SKULLS_HINT, []() { return TokensRequiredBySettings() < 100; } },
     // clang-format on
 };
 

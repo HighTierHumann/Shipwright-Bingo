@@ -1,9 +1,12 @@
 #include <soh/OTRGlobals.h>
-#include "static_data.h"
-#include "soh/Enhancements/randomizer/randomizer.h"
-#include "soh/Enhancements/randomizer/RCToRandInf.h"
+#include <soh/GameVersions.h>
+#include "soh/ResourceManagerHelpers.h"
+#include "soh/ObjectExtension/ObjectExtension.h"
+#include "soh/ObjectExtension/ActorListIndex.h"
 #include "item_category_adj.h"
 #include "particle_cmc.h"
+#include "soh/Enhancements/randomizer/randomizer.h"
+#include "soh/Enhancements/randomizer/RCToRandInf.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_En_Cow/z_en_cow.h"
@@ -86,7 +89,7 @@ uint8_t ShuffledCow_RandomizerHoldsItem(EnCow* enCow, PlayState* play) {
     const CheckIdentity* cowIdentity =
         ObjectExtension::GetInstance().Get<CheckIdentity>(&enCow->actor);
     if (cowIdentity == nullptr) {
-        auto newIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCow(
+        auto newIdentity = IdentifyCow(
             gPlayState->sceneNum, static_cast<int32_t>(enCow->actor.world.pos.x),
             static_cast<int32_t>(enCow->actor.world.pos.z));
 

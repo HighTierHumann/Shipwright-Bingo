@@ -212,7 +212,7 @@ void SohMenu::AddMenuEnhancements() {
             info.options->disabled =
                 IS_RANDO && OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_COWS).Is(RO_GENERIC_OFF);
             info.options->disabledTooltip = "This setting is forcefully disabled because a randomizer savefile without "
-                                            "\Shuffle Cows\" is loaded.";
+                                            "\"Shuffle Cows\" is loaded.";
         })
         .Options(
             CheckboxOptions()
@@ -1451,6 +1451,14 @@ void SohMenu::AddMenuEnhancements() {
     AddWidget(path, "Hyper Enemies", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("HyperEnemies"))
         .Options(CheckboxOptions().Tooltip("All Regular Enemies and Mini-Bosses move and act twice as fast."));
+    AddWidget(path, "Rework Twinrova Boss Fight", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("MagicArrowsTwinrova"))
+        .Options(CheckboxOptions().Tooltip(
+            "Reworks the Twinrova boss fight to make the fight beatable with the Fire and Ice Arrows."
+            "\n\nOnce either Kotake or Koume is struck with the arrow of their opposite element, a shield will appear "
+            "around them, preventing you from hitting them again until you damage the other sister."
+            "\n\nPhase 2 Twinrova must be struck by both arrows to become stunned."
+        ));
     AddWidget(path, "Enable Visual Guard Vision", WIDGET_CVAR_CHECKBOX).CVar(CVAR_ENHANCEMENT("GuardVision"));
     AddWidget(path, "Leever Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("LeeverSpawnRate"))

@@ -4,9 +4,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include <libultraship/libultraship.h>
-#include "3drando/text.hpp"
+#include "soh/SohGui/UIWidgets.hpp"
 #include "3drando/hints.hpp"
+#include "randomizerTypes.h"
+
+#include <nlohmann/json_fwd.hpp>
+#include <libultraship/color.h>
+#include <libultraship/libultra.h>
+#include <ship/window/gui/GuiWindow.h>
 #include "randomizerTypes.h"
 
 typedef enum {

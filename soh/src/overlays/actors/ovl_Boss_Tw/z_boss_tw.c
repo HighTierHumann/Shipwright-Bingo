@@ -591,7 +591,7 @@ void BossTw_DrawNayrusDiamond(BossTw* this, PlayState* play) {
         return;
     }
 
-    func_8002F974(this, NA_SE_PL_MAGIC_SOUL_NORMAL - SFX_FLAG);
+    Actor_PlaySfx_Flagged(this, NA_SE_PL_MAGIC_SOUL_NORMAL - SFX_FLAG);
 
     OPEN_DISPS(play->state.gfxCtx);
     Gfx_SetupDL_25Xlu(play->state.gfxCtx);
@@ -3079,7 +3079,7 @@ void BossTw_Update(Actor* thisx, PlayState* play) {
 
     if (this->actionFunc == BossTw_FlyTo || this->actionFunc == BossTw_Spin ||
         this->actionFunc == BossTw_TurnToPlayer) {
-        if (!CVarGetInteger(CVAR_RANDOMIZER_SETTING("MagicArrowsTwinrova"), 0)) {
+        if (!CVarGetInteger(CVAR_ENHANCEMENT("MagicArrowsTwinrova"), 0)) {
             if ((s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&
                 (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) > -0x1000 && player->unk_A73) {
                 BossTw_SetupSpin(this, play);
@@ -3237,7 +3237,7 @@ void BossTw_TwinrovaUpdate(Actor* thisx, PlayState* play2) {
 
     this->actionFunc(this, play);
 
-    if (!CVarGetInteger(CVAR_RANDOMIZER_SETTING("MagicArrowsTwinrova"), 0)) {
+    if (!CVarGetInteger(CVAR_ENHANCEMENT("MagicArrowsTwinrova"), 0)) {
         if (this->actionFunc != BossTw_TwinrovaShootBlast && this->actionFunc != BossTw_TwinrovaChargeBlast &&
             this->visible && this->unk_5F8 == 0 &&
             (s16)(player->actor.shape.rot.y - this->actor.yawTowardsPlayer + 0x8000) < 0x1000 &&

@@ -372,11 +372,12 @@ void AddToPlaythrough(LocationAccess& locPair, GetAccessibleLocationsStruct& gal
         if (!exclude) {
             gals.itemSphere.push_back(loc);
         }
+
         // Triforce has been found, seed is beatable, nothing else in this or future spheres matters
         if (location->GetPlacedRandomizerGet() == RG_TRIFORCE) {
-            gals.itemSphere.clear();
-            gals.itemSphere.push_back(loc);
-            ctx->playthroughBeatable = true;
+                gals.itemSphere.clear();
+                gals.itemSphere.push_back(loc);
+                ctx->playthroughBeatable = true;
         }
     }
 }
@@ -505,6 +506,7 @@ void ProcessRegion(Region* region, GetAccessibleLocationsStruct& gals, Randomize
         if (AddCheckToLogic(region->locations[k], gals, ignore, stopOnBeatable, region, addToPlaythrough)) {
             Rando::Context::GetInstance()->playthroughBeatable = true;
             logic->CurrentRegionKey = previousRegionKey;
+            SPDLOG_DEBUG("Playthrough beatable: {}", Rando::Context::GetInstance()->playthroughBeatable);
             return;
         }
     }
@@ -605,6 +607,7 @@ bool CheckBeatable(RandomizerGet ignore /* = RG_NONE*/) {
             }
         }
     } while (gals.logicUpdated);
+    SPDLOG_DEBUG("CheckBeatable result: {}", ctx->playthroughBeatable);
     return false;
 }
 

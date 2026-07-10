@@ -1,10 +1,15 @@
 #include "randomizer_gossip_tracker.h"
 
 #include <soh/OTRGlobals.h>
+#include "soh/SohGui/UIWidgets.hpp"
 #include "soh/SohGui/SohGui.hpp"
+#include "soh/SohGui/SohMenu.h"
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
+#include "soh/Enhancements/randomizer/randomizer.h"
+#include "soh/Enhancements/randomizer/RCToRandInf.h"
+#include "soh/Enhancements/randomizer/randomizer_check_objects.h"
 
 #include "soh/cvar_prefixes.h"
 
@@ -370,9 +375,9 @@ static void DrawHintColorSegments(const std::vector<HintColorSegment>& segments,
 
 void HintTrackerSettingsWindow::DrawElement() {
     ImGui::TableNextColumn();
-    SohGui::GetSohMenu()->MenuDrawItem(backgroundColorWidget, ImGui::GetContentRegionAvail().x, THEME_COLOR);
+    SohGui::GetSohMenu()->MenuDrawItem(backgroundColorWidget, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x), THEME_COLOR);
 
-    SohGui::GetSohMenu()->MenuDrawItem(windowTypeWidget, ImGui::GetContentRegionAvail().x, THEME_COLOR);
+    SohGui::GetSohMenu()->MenuDrawItem(windowTypeWidget, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x), THEME_COLOR);
 
     if (CVarGetInteger(CVAR_TRACKER_HINTS("WindowType"), TRACKER_WINDOW_WINDOW) == TRACKER_WINDOW_FLOATING) {
         CVarCheckbox("Enable Dragging", CVAR_TRACKER_HINTS("Draggable"), CheckboxOptions().Color(THEME_COLOR));

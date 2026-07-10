@@ -4537,7 +4537,7 @@ void Audio_PlaySceneSequence(u16 seqId) {
             D_8013062C = 0;
         } else {
             nv = (sSeqFlags[(seqId & 0xFF) & 0xFF] & 0x40) ? 1 : 0xFF;
-            func_800F5E18(SEQ_PLAYER_BGM_MAIN, seqId, 0, 7, nv);
+            Audio_PlaySequenceWithSeqPlayerIO(SEQ_PLAYER_BGM_MAIN, seqId, 0, 7, nv);
             if (!(sSeqFlags[seqId] & 0x20)) {
                 D_8013062C = 0xC0;
             }

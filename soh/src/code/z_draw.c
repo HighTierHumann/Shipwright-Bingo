@@ -394,7 +394,7 @@ DrawItemTableEntry sDrawItemTable[] = {
     { GetItem_DrawGenericMusicNote, { gGiSongNoteDL } },  // Song of storms
 
     { GetItem_DrawTriforcePiece, { gTriforcePiece0DL } }, // Triforce Piece
-    { GetItem_DrawFishingPole, { gFishingPoleGiDL } },    // Fishing Pole
+    { GetItem_DrawFishingPole, { gGiFishingPoleDL } },    // Fishing Pole
     { GetItem_DrawTriforcePiece, { gTriforcePiece0DL } }, // Triforce of Power Piece
 };
 

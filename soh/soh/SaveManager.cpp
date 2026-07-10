@@ -455,7 +455,7 @@ void SaveManager::Init() {
 
                 CVarSetInteger(CVAR_SETTING("AudioBackend"), gSaveContext.audioSetting);
                 CVarSetInteger(CVAR_SETTING("Controls.ZTarget"), gSaveContext.zTargetSetting);
-                Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+                Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
                 break;
             default:
                 SPDLOG_WARN("Global save has a unrecognized version. We are reconstructing it.");
@@ -1273,7 +1273,7 @@ void SaveManager::SaveGlobal() {
 
     CVarSetInteger(CVAR_SETTING("AudioBackend"), gSaveContext.audioSetting);
     CVarSetInteger(CVAR_SETTING("Controls.ZTarget"), gSaveContext.zTargetSetting);
-    Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+    Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
 }
 
 void SaveManager::LoadFile(int fileNum) {

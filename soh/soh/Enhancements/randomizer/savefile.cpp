@@ -327,142 +327,23 @@ void SetStartingItems() {
             gSaveContext.inventory.equipment |= 1 << 1;
         }
     }
-    if (Randomizer_GetSettingValue(RSK_STARTING_BGS_SWORD))
-        Item_Give(NULL, ITEM_SWORD_BGS);
+
     if (Randomizer_GetSettingValue(RSK_STARTING_DEKU_SHIELD))
         Item_Give(NULL, ITEM_SHIELD_DEKU);
     if (Randomizer_GetSettingValue(RSK_STARTING_HYLIAN_SHIELD))
         Item_Give(NULL, ITEM_SHIELD_HYLIAN);
     if (Randomizer_GetSettingValue(RSK_STARTING_MIRROR_SHIELD))
         Item_Give(NULL, ITEM_SHIELD_MIRROR);
-    if (Randomizer_GetSettingValue(RSK_STARTING_IRON_BOOTS))
-        Item_Give(NULL, ITEM_BOOTS_IRON);
-    if (Randomizer_GetSettingValue(RSK_STARTING_HOVER_BOOTS))
-        Item_Give(NULL, ITEM_BOOTS_HOVER);
     if (Randomizer_GetSettingValue(RSK_STARTING_GORON_TUNIC))
         Item_Give(NULL, ITEM_TUNIC_GORON);
     if (Randomizer_GetSettingValue(RSK_STARTING_ZORA_TUNIC))
         Item_Give(NULL, ITEM_TUNIC_ZORA);
-
-    // Magic Items
-    if (Randomizer_GetSettingValue(RSK_STARTING_DINS))
-        Item_Give(NULL, ITEM_DINS_FIRE);
-    if (Randomizer_GetSettingValue(RSK_STARTING_FARORES))
-        Item_Give(NULL, ITEM_FARORES_WIND);
-    if (Randomizer_GetSettingValue(RSK_STARTING_NAYRUS))
-        Item_Give(NULL, ITEM_NAYRUS_LOVE);
-    if (Randomizer_GetSettingValue(RSK_STARTING_FIRE_ARROWS))
-        Item_Give(NULL, ITEM_ARROW_FIRE);
-    if (Randomizer_GetSettingValue(RSK_STARTING_ICE_ARROWS))
-        Item_Give(NULL, ITEM_ARROW_ICE);
-    if (Randomizer_GetSettingValue(RSK_STARTING_LIGHT_ARROWS))
-        Item_Give(NULL, ITEM_ARROW_LIGHT);
-
-    // Inventory Items
-    if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) != RO_STARTING_BOMB_BAG_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_20) {
-            GiveLinkBombs(20);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_30) {
-            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 2);
-            GiveLinkBombs(30);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_40) {
-            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 3);
-            GiveLinkBombs(40);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG) == RO_STARTING_BOMB_BAG_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMB_BAG);
-            Inventory_ChangeUpgrade(UPG_BOMB_BAG, 3);
-            GiveLinkBombs(40);
-        }
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) != RO_STARTING_FAIRY_BOW_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_30) {
-            GiveLinkArrows(30);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_40) {
-            Inventory_ChangeUpgrade(UPG_QUIVER, 2);
-            GiveLinkArrows(40);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_50) {
-            Inventory_ChangeUpgrade(UPG_QUIVER, 3);
-            GiveLinkArrows(50);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_FAIRY_BOW) == RO_STARTING_FAIRY_BOW_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_QUIVER);
-            Inventory_ChangeUpgrade(UPG_QUIVER, 3);
-            GiveLinkArrows(50);
-        }
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) != RO_STARTING_SLINGSHOT_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_30) {
-            GiveLinkSeeds(30);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_40) {
-            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 2);
-            GiveLinkSeeds(40);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_50) {
-            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 3);
-            GiveLinkSeeds(50);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT) == RO_STARTING_SLINGSHOT_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BULLET_BAG);
-            Inventory_ChangeUpgrade(UPG_BULLET_BAG, 3);
-            GiveLinkSeeds(50);
-        }
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) != RO_STARTING_BOMBCHU_BAG_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) == RO_STARTING_BOMBCHU_BAG_ON) {
-            GiveLinkBombchus(50);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG) == RO_STARTING_BOMBCHU_BAG_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMBCHUS);
-            GiveLinkBombchus(50);
-        }
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) != RO_STARTING_DEKU_STICKS_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_10) {
-            GiveLinkDekuSticks(10);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_20) {
-            Inventory_ChangeUpgrade(UPG_STICKS, 2);
-            GiveLinkDekuSticks(20);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_30) {
-            Inventory_ChangeUpgrade(UPG_STICKS, 3);
-            GiveLinkDekuSticks(30);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_STICKS) == RO_STARTING_DEKU_STICKS_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_STICK_UPGRADE);
-            Inventory_ChangeUpgrade(UPG_STICKS, 3);
-            GiveLinkDekuSticks(30);
-        }
-    }
-    if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) != RO_STARTING_DEKU_NUTS_OFF) {
-        if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_20) {
-            GiveLinkDekuNuts(20);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_30) {
-            Inventory_ChangeUpgrade(UPG_NUTS, 2);
-            GiveLinkDekuNuts(30);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_40) {
-            Inventory_ChangeUpgrade(UPG_NUTS, 3);
-            GiveLinkDekuNuts(40);
-        } else if (Randomizer_GetSettingValue(RSK_STARTING_NUTS) == RO_STARTING_DEKU_NUTS_INF) {
-            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_NUT_UPGRADE);
-            Inventory_ChangeUpgrade(UPG_NUTS, 3);
-            GiveLinkDekuNuts(30);
-        }
-    }
-
+    if (Randomizer_GetSettingValue(RSK_STARTING_IRON_BOOTS))
+        Item_Give(NULL, ITEM_BOOTS_IRON);
+    if (Randomizer_GetSettingValue(RSK_STARTING_HOVER_BOOTS))
+        Item_Give(NULL, ITEM_BOOTS_HOVER);
     if (Randomizer_GetSettingValue(RSK_STARTING_BOOMERANG))
         Item_Give(NULL, ITEM_BOOMERANG);
-    if (Randomizer_GetSettingValue(RSK_STARTING_LENS))
-        Item_Give(NULL, ITEM_LENS);
-    if (Randomizer_GetSettingValue(RSK_STARTING_HAMMER))
-        Item_Give(NULL, ITEM_HAMMER);
-    if (Randomizer_GetSettingValue(RSK_STARTING_BOTTLE))
-        Item_Give(NULL, ITEM_BOTTLE);
-    if (Randomizer_GetSettingValue(RSK_STARTING_HYLIAN_SHIELD))
-        Item_Give(NULL, ITEM_SHIELD_HYLIAN);
-    if (Randomizer_GetSettingValue(RSK_STARTING_MIRROR_SHIELD))
-        Item_Give(NULL, ITEM_SHIELD_MIRROR);
-    if (Randomizer_GetSettingValue(RSK_STARTING_GORON_TUNIC))
-        Item_Give(NULL, ITEM_TUNIC_GORON);
-    if (Randomizer_GetSettingValue(RSK_STARTING_ZORA_TUNIC))
-        Item_Give(NULL, ITEM_TUNIC_ZORA);
-    if (Randomizer_GetSettingValue(RSK_STARTING_IRON_BOOTS))
-        Item_Give(NULL, ITEM_BOOTS_IRON);
-    if (Randomizer_GetSettingValue(RSK_STARTING_HOVER_BOOTS))
-        Item_Give(NULL, ITEM_BOOTS_HOVER);
     if (Randomizer_GetSettingValue(RSK_STARTING_MEGATON_HAMMER))
         Item_Give(NULL, ITEM_HAMMER);
     if (Randomizer_GetSettingValue(RSK_STARTING_BOOMERANG))
@@ -526,12 +407,6 @@ void SetStartingItems() {
                                               : ITEM_OCARINA_TIME;
     }
 
-    if (Randomizer_GetSettingValue(RSK_STARTING_HOOKSHOT)) {
-        INV_CONTENT(ITEM_HOOKSHOT) = Randomizer_GetSettingValue(RSK_STARTING_HOOKSHOT) == RO_STARTING_HOOKSHOT_HOOKSHOT
-                                              ? ITEM_HOOKSHOT
-                                              : ITEM_LONGSHOT;
-    }
-
     GiveRandomStartingItems();
 
     // Tiered/progressive starting items. The upgrade items are given cumulatively where Item_Give
@@ -552,6 +427,9 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_QUIVER_40);
     if (startBow >= 3)
         Item_Give(NULL, ITEM_QUIVER_50);
+    if (startBow >= 4)
+        Item_Give(NULL, ITEM_QUIVER_50);
+        Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_QUIVER);
 
     uint8_t startSlingshot = Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT);
     if (startSlingshot >= 1)
@@ -560,6 +438,9 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_BULLET_BAG_40);
     if (startSlingshot >= 3)
         Item_Give(NULL, ITEM_BULLET_BAG_50);
+    if (startSlingshot >= 4)
+        Item_Give(NULL, ITEM_BULLET_BAG_50);
+        Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BULLET_BAG);
 
     uint8_t startBombBag = Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG);
     if (startBombBag >= 1)
@@ -568,6 +449,41 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_BOMB_BAG_30);
     if (startBombBag >= 3)
         Item_Give(NULL, ITEM_BOMB_BAG_40);
+    if (startBombBag >= 4)
+        Item_Give(NULL, ITEM_BOMB_BAG_40);
+        Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMB_BAG);
+
+    uint8_t startSticks = Randomizer_GetSettingValue(RSK_STARTING_STICKS);
+    if (startSticks >= 1)
+        if (Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_STICK_BAG)) {
+            Inventory_ChangeUpgrade(UPG_STICKS, 1);
+            INV_CONTENT(ITEM_STICK) = ITEM_STICK;
+            AMMO(ITEM_STICK) = static_cast<int8_t>(CUR_CAPACITY(UPG_STICKS));
+        }
+        GiveLinkDekuSticks(10);
+    if (startSticks >= 2)
+        Inventory_ChangeUpgrade(UPG_STICKS, 2);
+    if (startSticks >= 3)
+        Inventory_ChangeUpgrade(UPG_STICKS, 3);
+    if (startSticks >= 4)
+        Inventory_ChangeUpgrade(UPG_STICKS, 3);
+        Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_STICK_UPGRADE);
+    
+    uint8_t startNuts = Randomizer_GetSettingValue(RSK_STARTING_NUTS);
+    if (startNuts >= 1)
+        if (Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_NUT_BAG)) {
+            Inventory_ChangeUpgrade(UPG_NUTS, 1);
+            INV_CONTENT(ITEM_NUT) = ITEM_NUT;
+            AMMO(ITEM_NUT) = static_cast<int8_t>(CUR_CAPACITY(UPG_NUTS));
+        }
+        GiveLinkDekuNuts(20);
+    if (startNuts >= 2)
+        Inventory_ChangeUpgrade(UPG_NUTS, 2);
+    if (startNuts >= 3)
+        Inventory_ChangeUpgrade(UPG_NUTS, 3);
+    if (startNuts >= 4)
+        Inventory_ChangeUpgrade(UPG_NUTS, 3);
+        Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_NUT_UPGRADE);
 
     switch (Randomizer_GetSettingValue(RSK_STARTING_STRENGTH)) {
         case 3:
@@ -601,11 +517,20 @@ void SetStartingItems() {
 
     uint8_t startMagic = Randomizer_GetSettingValue(RSK_STARTING_MAGIC_METER);
     if (startMagic > 0) {
-        gSaveContext.isMagicAcquired = true;
-        gSaveContext.isDoubleMagicAcquired = startMagic >= 2;
-        gSaveContext.magicLevel = startMagic;
-        gSaveContext.magicCapacity = startMagic * MAGIC_NORMAL_METER;
-        gSaveContext.magic = static_cast<s8>(gSaveContext.magicCapacity);
+        if (startMagic == 3) {
+            gSaveContext.isMagicAcquired = true;
+            gSaveContext.isDoubleMagicAcquired = true;
+            gSaveContext.magicLevel = 2;
+            gSaveContext.magicCapacity = 2 * MAGIC_NORMAL_METER;
+            gSaveContext.magic = static_cast<s8>(gSaveContext.magicCapacity);
+            Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_MAGIC_METER);
+        } else {
+            gSaveContext.isMagicAcquired = true;
+            gSaveContext.isDoubleMagicAcquired = startMagic >= 2;
+            gSaveContext.magicLevel = startMagic;
+            gSaveContext.magicCapacity = startMagic * MAGIC_NORMAL_METER;
+            gSaveContext.magic = static_cast<s8>(gSaveContext.magicCapacity);
+        }
     }
 
     uint8_t startBombchu = Randomizer_GetSettingValue(RSK_STARTING_BOMBCHU_BAG);
@@ -614,11 +539,20 @@ void SetStartingItems() {
         if (bombchuMode == RO_BOMBCHU_BAG_SINGLE) {
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = 20;
+            if (startBombchu == 2)
+                Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMBCHUS);
         } else if (bombchuMode == RO_BOMBCHU_BAG_PROGRESSIVE) {
-            static const uint8_t bombchuCapacities[] = { 0, 20, 30, 50 };
+            static const uint8_t bombchuCapacities[] = { 0, 20, 30, 50, 50 };
             gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = startBombchu;
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = bombchuCapacities[startBombchu];
+            if (startBombchu == 4)
+                Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMBCHUS);
+        } else {
+            INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
+            AMMO(ITEM_BOMBCHU) = 50;
+            if (startBombchu == 2)
+                Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMBCHUS);
         }
     }
 

@@ -172,7 +172,7 @@ void GenerateItemPool() {
     if (!ctx->GetOption(RSK_STARTING_FARORES_WIND))  AddItemToPool(RG_FARORES_WIND, 2, 1, 1, 0);
     if (!ctx->GetOption(RSK_STARTING_NAYRUS_LOVE))   AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 1, 0);
     AddItemToPool(RG_GREG_RUPEE, 1, 1, 1, 1);
-    AddFixedItemToPool(RG_PROGRESSIVE_HOOKSHOT, 2 - ctx->GetOption(RSK_STARTING_HOOKSHOT).Get());
+    AddFixedItemToPool(RG_PROGRESSIVE_HOOKSHOT, 3 - ctx->GetOption(RSK_STARTING_HOOKSHOT).Get());
     if (!ctx->GetOption(RSK_STARTING_HYLIAN_SHIELD)) AddItemToPool(RG_HYLIAN_SHIELD, 1, 1, 1, 1);
     AddItemToPool(RG_DOUBLE_DEFENSE, 2, 1, 0, 0);
     if (ctx->GetOption(RSK_STARTING_BIGGORON_SWORD).IsNot(RO_STARTING_BGS_BIGGORON_SWORD)) {
@@ -218,6 +218,16 @@ void GenerateItemPool() {
                                             std::max(0, 3 + infiniteProgressive - startBombBag),
                                             std::max(0, 2 + infiniteProgressive - startBombBag),
                                             std::max(0, 1 + infiniteProgressive - startBombBag));
+    int startSticks = ctx->GetOption(RSK_STARTING_STICKS).Get();
+    AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, std::max(0, 3 + infiniteProgressive - startSticks),
+                                                std::max(0, 2 + infiniteProgressive - startSticks),
+                                                std::max(0, 1 + infiniteProgressive - startSticks),
+                                                std::max(0, 1 + infiniteProgressive - startSticks));
+    int startNuts = ctx->GetOption(RSK_STARTING_NUTS).Get();
+    AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE,   std::max(0, 3 + infiniteProgressive - startNuts),
+                                                std::max(0, 2 + infiniteProgressive - startNuts),
+                                                std::max(0, 1 + infiniteProgressive - startNuts),
+                                                std::max(0, 1 + infiniteProgressive - startNuts));
     int startMagic = ctx->GetOption(RSK_STARTING_MAGIC_METER).Get();
     AddItemToPool(RG_PROGRESSIVE_MAGIC_METER, std::max(0, 3 + infiniteProgressive - startMagic),
                                               std::max(0, 2 + infiniteProgressive - startMagic),
@@ -231,29 +241,6 @@ void GenerateItemPool() {
                                          std::max(0, 2 + infiniteProgressive + extraWallets - startWallet),
                                          std::max(0, 2 + infiniteProgressive + extraWallets - startWallet),
                                          std::max(0, 2 + infiniteProgressive + extraWallets - startWallet));
-
-    int stickShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_STICK_BAG) ? 1 : 0;
-    if (!ctx->GetOption(RSK_STARTING_STICKS).Get()) {
-    AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 3 + infiniteProgressive + stickShuffle,
-                                                2 + infiniteProgressive + stickShuffle,
-                                                1 + infiniteProgressive + stickShuffle,
-                                                0 + infiniteProgressive + stickShuffle);
-    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_10)) {
-        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 2 + infiniteProgressive , 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
-    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_20)) {
-        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 1 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
-    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_30)) {
-        AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive , 0 + infiniteProgressive );
-    } else if (ctx->GetOption(RSK_STARTING_STICKS).Is(RO_STARTING_DEKU_STICKS_INF)) {
-        
-    }
-
-    int nutShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_NUT_BAG) ? 1 : 0;
-    if (!ctx->GetOption(RSK_STARTING_NUTS).Get()) {
-    AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE, 3 + infiniteProgressive + nutShuffle,
-                                              2 + infiniteProgressive + nutShuffle,
-                                              1 + infiniteProgressive + nutShuffle,
-                                              0 + infiniteProgressive + nutShuffle);
 
     int startBombchu = ctx->GetOption(RSK_STARTING_BOMBCHU_BAG).Get();
     if (ctx->GetOption(RSK_BOMBCHU_BAG).Is(RO_BOMBCHU_BAG_SINGLE)) {
@@ -402,11 +389,6 @@ void GenerateItemPool() {
                 ctx->PlaceItemInLocation(RC_HF_OCARINA_OF_TIME_ITEM, RG_PROGRESSIVE_OCARINA, false, true);
             }
         }
-    }
-
-    if (ctx->GetOption(RSK_STARTING_HOOKSHOT).IsNot(RO_STARTING_HOOKSHOT_LONGSHOT)) {
-        int baseHookshots = ctx->GetOption(RSK_STARTING_HOOKSHOT).Is(RO_STARTING_HOOKSHOT_OFF) ? 2 : 1;
-        AddItemToPool(RG_PROGRESSIVE_HOOKSHOT, baseHookshots + 1, baseHookshots, baseHookshots, baseHookshots);
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_OCARINA_BUTTONS)) {

@@ -67,8 +67,8 @@ void GenerateStartingInventory() {
     // the option selected. If None is selected, the value will be zero and
     // zero of the item will be added to the starting inventory.
     //  TODO: Uncomment when these options are implemented.
-    //  AddItemToInventory(RG_PROGRESSIVE_STICK_UPGRADE, StartingStickCapacity.Value<uint8_t>());
-    //  AddItemToInventory(RG_PROGRESSIVE_NUT_UPGRADE, StartingNutCapacity.Value<uint8_t>());
+    AddItemToInventory(RG_PROGRESSIVE_STICK_UPGRADE, ctx->GetOption(RSK_STARTING_STICKS).Get());
+    AddItemToInventory(RG_PROGRESSIVE_NUT_UPGRADE, ctx->GetOption(RSK_STARTING_NUTS).Get());
     AddItemToInventory(RG_PROGRESSIVE_BOMB_BAG, ctx->GetOption(RSK_STARTING_BOMB_BAG).Get());
     AddItemToInventory(RG_PROGRESSIVE_BOW, ctx->GetOption(RSK_STARTING_BOW).Get());
     AddItemToInventory(RG_PROGRESSIVE_SLINGSHOT, ctx->GetOption(RSK_STARTING_SLINGSHOT).Get());
@@ -115,30 +115,18 @@ void GenerateStartingInventory() {
     AddItemToInventory(RG_BUNNY_HOOD, ctx->GetOption(RSK_STARTING_BUNNY_HOOD) ? 1 : 0);
     AddItemToInventory(RG_CLAIM_CHECK, ctx->GetOption(RSK_STARTING_CLAIM_CHECK) ? 1 : 0);
     AddItemToInventory(RG_PROGRESSIVE_OCARINA, ctx->GetOption(RSK_STARTING_OCARINA).Get());
-    AddItemToInventory(RG_PROGRESSIVE_HOOKSHOT, ctx->GetOption(RSK_STARTING_HOOKSHOT).Get());
-    // Magic Items
-    AddItemToInventory(RG_DINS_FIRE, ctx->GetOption(RSK_STARTING_DINS) ? 1 : 0);
-    AddItemToInventory(RG_FARORES_WIND, ctx->GetOption(RSK_STARTING_FARORES) ? 1 : 0);
-    AddItemToInventory(RG_NAYRUS_LOVE, ctx->GetOption(RSK_STARTING_NAYRUS) ? 1 : 0);
     AddItemToInventory(RG_FIRE_ARROWS, ctx->GetOption(RSK_STARTING_FIRE_ARROWS) ? 1 : 0);
     AddItemToInventory(RG_ICE_ARROWS, ctx->GetOption(RSK_STARTING_ICE_ARROWS) ? 1 : 0);
     AddItemToInventory(RG_LIGHT_ARROWS, ctx->GetOption(RSK_STARTING_LIGHT_ARROWS) ? 1 : 0);
-    //Inventory Items
     AddItemToInventory(RG_PROGRESSIVE_BOMB_BAG, ctx->GetOption(RSK_STARTING_BOMB_BAG) ? 1 : 0);
-    AddItemToInventory(RG_PROGRESSIVE_BOW, ctx->GetOption(RSK_STARTING_FAIRY_BOW) ? 1 : 0);
     AddItemToInventory(RG_PROGRESSIVE_SLINGSHOT, ctx->GetOption(RSK_STARTING_SLINGSHOT) ? 1 : 0);
     AddItemToInventory(RG_PROGRESSIVE_BOMBCHU_BAG, ctx->GetOption(RSK_STARTING_BOMBCHU_BAG) ? 1 : 0);
     AddItemToInventory(RG_BOOMERANG, ctx->GetOption(RSK_STARTING_BOOMERANG) ? 1 : 0);
-    AddItemToInventory(RG_LENS_OF_TRUTH, ctx->GetOption(RSK_STARTING_LENS) ? 1 : 0);
-    AddItemToInventory(RG_MEGATON_HAMMER, ctx->GetOption(RSK_STARTING_HAMMER) ? 1 : 0);
-    AddItemToInventory(RG_EMPTY_BOTTLE, ctx->GetOption(RSK_STARTING_BOTTLE) ? 1 : 0);
-    // Equipment Items
+    AddItemToInventory(RG_PROGRESSIVE_HOOKSHOT, ctx->GetOption(RSK_STARTING_HOOKSHOT).Get());
     AddItemToInventory(RG_HYLIAN_SHIELD, ctx->GetOption(RSK_STARTING_HYLIAN_SHIELD) ? 1 : 0);
     AddItemToInventory(RG_MIRROR_SHIELD, ctx->GetOption(RSK_STARTING_MIRROR_SHIELD) ? 1 : 0);
     AddItemToInventory(RG_IRON_BOOTS, ctx->GetOption(RSK_STARTING_IRON_BOOTS) ? 1 : 0);
     AddItemToInventory(RG_HOVER_BOOTS, ctx->GetOption(RSK_STARTING_HOVER_BOOTS) ? 1 : 0);
-    AddItemToInventory(RG_BIGGORON_SWORD, ctx->GetOption(RSK_STARTING_BGS_SWORD) ? 1 : 0);
-    // Songs
     AddItemToInventory(RG_ZELDAS_LULLABY, ctx->GetOption(RSK_STARTING_ZELDAS_LULLABY) ? 1 : 0);
     AddItemToInventory(RG_EPONAS_SONG, ctx->GetOption(RSK_STARTING_EPONAS_SONG) ? 1 : 0);
     AddItemToInventory(RG_SARIAS_SONG, ctx->GetOption(RSK_STARTING_SARIAS_SONG) ? 1 : 0);

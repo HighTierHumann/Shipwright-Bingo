@@ -875,10 +875,6 @@ void SetupDisplayNames() {
     strcpy(itemTimestampDisplayName[TIMESTAMP_DEFEAT_GANON],         "Ganon Defeated:        ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_BOSSRUSH_FINISH],      "Boss Rush Finished:    ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_GREG],           "Greg Found:            ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_STICK_BAG],      "Deku Stick Bag:     ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_NUT_BAG],        "Deku Nut Bag:       ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_CHILD_WALLET],         "Child Wallet:       ");
-    strcpy(itemTimestampDisplayName[TIMESTAMP_FOUND_BRONZE_SCALE],   "Bronze Scale:       ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_DOUBLE_MAGIC],         "Double Magic:       ");
     strcpy(itemTimestampDisplayName[TIMESTAMP_TRIFORCE_COMPLETED],   "Triforce Completed:    ");
 

@@ -22,6 +22,8 @@
 #include "soh/ObjectExtension/ObjectExtension.h"
 #include "soh/Enhancements/randomizer/RCToRandInf.h"
 #include "dungeon.h"
+#include "soh/SaveManager.h"
+#include "soh/Notification/Notification.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
@@ -476,9 +478,10 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
                        ? CAN_OBTAIN
                        : CANT_OBTAIN_ALREADY_HAVE;
         case RG_POCKET_EGG:
-            return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_EGG)
-                       ? CAN_OBTAIN
-                       : CANT_OBTAIN_ALREADY_HAVE;
+            return Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_EGG) ||
+                       Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_CUCCO)
+                       ? CANT_OBTAIN_ALREADY_HAVE
+                       : CAN_OBTAIN;
         case RG_COJIRO:
             return !Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_COJIRO)
                        ? CAN_OBTAIN
@@ -519,11 +522,6 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
         // case RG_GIANTS_KNIFE:
 
         // Misc Items
-        case RG_POCKET_EGG:
-            return Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_EGG) ||
-                           Flags_GetRandomizerInf(RAND_INF_ADULT_TRADES_HAS_POCKET_CUCCO)
-                       ? CANT_OBTAIN_ALREADY_HAVE
-                       : CAN_OBTAIN;
         case RG_STONE_OF_AGONY:
             return !CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
         case RG_GERUDO_MEMBERSHIP_CARD:
@@ -1049,8 +1047,6 @@ static std::unordered_map<RandomizerGet, GameplayStatTimestamp> randomizerGetToS
     { RG_GANON_SOUL, TIMESTAMP_FOUND_GANON_SOUL },
 
     { RG_BRONZE_SCALE, TIMESTAMP_FOUND_BRONZE_SCALE },
-    { RG_DEKU_STICK_BAG, TIMESTAMP_FOUND_STICK_BAG },
-    { RG_DEKU_NUT_BAG, TIMESTAMP_FOUND_NUT_BAG },
 
     { RG_OCARINA_A_BUTTON, TIMESTAMP_FOUND_OCARINA_A_BUTTON },
     { RG_OCARINA_C_UP_BUTTON, TIMESTAMP_FOUND_OCARINA_C_UP_BUTTON },
@@ -1168,26 +1164,7 @@ static void DeleteFileOnLoseCondition() {
         (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1)) {
         SaveManager::Instance->DeleteZeldaFile(gSaveContext.fileNum);
         std::reinterpret_pointer_cast<Ship::ConsoleWindow>(
-            Ship::Context::GetInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
-            ->Dispatch("reset");
-    }
-}
-
-static void RegisterDeleteFileOnLoseCondition() {
-    COND_HOOK(OnGameFrameUpdate, true, DeleteFileOnLoseCondition);
-}
-
-static void DeleteFileOnLoseCondition() {
-    if (!GameInteractor::IsSaveLoaded() || gPlayState == NULL) {
-        return;
-    }
-
-    if (gPlayState->gameOverCtx.state == GAMEOVER_DEATH_MENU && gPlayState->pauseCtx.state == 9
-        && gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected ==
-        (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1)) {
-        SaveManager::Instance->DeleteZeldaFile(gSaveContext.fileNum);
-        std::reinterpret_pointer_cast<Ship::ConsoleWindow>(
-            Ship::Context::GetInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
+            Ship::Context::GetRawInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
             ->Dispatch("reset");
     }
 }

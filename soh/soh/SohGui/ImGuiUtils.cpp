@@ -249,16 +249,6 @@ void RegisterImGuiItemIcons() {
             ->LoadGuiTexture(entry.second.nameFaded, entry.second.texturePath, ImVec4(0.33f, 0.33f, 0.33f, 0.3f));
     }
 
-    for (const auto& entry : actionShuffleMapping) {
-        ImVec4 aButtonBlue = ImVec4(90.f / 255.f, 90.f / 250.f, 255.f / 255.f, 255.f / 255.f);
-        ImVec4 aButtonBlueFaded = aButtonBlue;
-        aButtonBlueFaded.w = 0.3f;
-        Ship::Context::GetInstance()->GetWindow()->GetGui()->LoadGuiTexture(entry.second.name, entry.second.texturePath,
-                                                                            aButtonBlue);
-        Ship::Context::GetInstance()->GetWindow()->GetGui()->LoadGuiTexture(entry.second.nameFaded,
-                                                                            entry.second.texturePath, aButtonBlueFaded);
-    }
-
     for (const auto& entry : customItemsMapping) {
         std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
             ->LoadGuiTexture(entry.second.name, entry.second.texturePath, ImVec4(1, 1, 1, 1));

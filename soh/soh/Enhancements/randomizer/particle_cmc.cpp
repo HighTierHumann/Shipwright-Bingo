@@ -1,5 +1,6 @@
 #include "particle_cmc.h"
 #include "soh/Enhancements/cosmetics/CosmeticsEditor.h"
+#include "soh/cvar_prefixes.h"
 
 // Color of the circle for the particles
 static Color_RGBA8 mainColors[7] = {

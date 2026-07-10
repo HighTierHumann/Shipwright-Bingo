@@ -10,9 +10,50 @@
 #include "particle_cmc.h"
 #include "macros.h"
 #include "z64actor_enum.h"
+#include "soh/Enhancements/randomizer/randomizer.h"
+#include "soh/Enhancements/randomizer/RCToRandInf.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
+}
+
+CheckIdentity IdentifySoilSkulltula(s32 sceneNum, s32 beanActorParams) {
+    struct CheckIdentity soilSkullIdentity;
+    soilSkullIdentity.randomizerInf = RAND_INF_MAX;
+    soilSkullIdentity.randomizerCheck = RC_UNKNOWN_CHECK;
+
+    // Bean-patch GS checks are uniquely identified by (sceneId, switchFlag).
+    // The switch flag lives in bits [5:0] of the bean actor's params, confirmed by
+    // ObjBean_WaitForBean: Flags_SetSwitch(play, this->dyna.actor.params & 0x3F).
+    // Switch flags sourced from BeanPlanted() in location_access.cpp.
+    const s32 switchFlag = beanActorParams & 0x3F;
+
+    struct BeanPatchEntry {
+        SceneID scene;
+        s32 flag;
+        RandomizerCheck rc;
+    };
+    static constexpr std::array<BeanPatchEntry, 10> sBeanPatchGSTable = { {
+        { SCENE_GRAVEYARD, 3, RC_GRAVEYARD_GS_BEAN_PATCH },
+        { SCENE_KOKIRI_FOREST, 9, RC_KF_GS_BEAN_PATCH },
+        { SCENE_LOST_WOODS, 4, RC_LW_GS_BEAN_PATCH_NEAR_BRIDGE },
+        { SCENE_LOST_WOODS, 18, RC_LW_GS_BEAN_PATCH_NEAR_THEATER },
+        { SCENE_DEATH_MOUNTAIN_TRAIL, 6, RC_DMT_GS_BEAN_PATCH },
+        { SCENE_LAKE_HYLIA, 1, RC_LH_GS_BEAN_PATCH },
+        { SCENE_GERUDO_VALLEY, 3, RC_GV_GS_BEAN_PATCH },
+        { SCENE_DEATH_MOUNTAIN_CRATER, 3, RC_DMC_GS_BEAN_PATCH },
+        { SCENE_DESERT_COLOSSUS, 24, RC_COLOSSUS_GS_BEAN_PATCH },
+    } };
+
+    for (const auto& entry : sBeanPatchGSTable) {
+        if (static_cast<s32>(entry.scene) == sceneNum && entry.flag == switchFlag) {
+            soilSkullIdentity.randomizerCheck = entry.rc;
+            return soilSkullIdentity;
+        }
+    }
+
+    LUSLOG_WARN("IdentifySoilSkulltula: no bean-patch GS entry for sceneNum=%d switchFlag=%d.", sceneNum, switchFlag);
+    return soilSkullIdentity;
 }
 
 // Cache the bean patch's CheckIdentity at actor init time using its params & 0x3F switch flag.
@@ -20,8 +61,7 @@ extern "C" {
 // entirely from the static (sceneNum, switchFlag) -> RandomizerCheck table.
 static void SoilSkulltula_CacheIdentity(void* refActor) {
     ObjBean* beanActor = static_cast<ObjBean*>(refActor);
-    auto identity =
-        OTRGlobals::Instance->gRandomizer->IdentifySoilSkulltula(gPlayState->sceneNum, beanActor->dyna.actor.params);
+    auto identity = IdentifySoilSkulltula(gPlayState->sceneNum, beanActor->dyna.actor.params);
     ObjectExtension::GetInstance().Set<CheckIdentity>(&beanActor->dyna.actor, std::move(identity));
 }
 

@@ -148,36 +148,8 @@ void BuildTriforcePowerPieceMessage(CustomMessage& msg) {
                 TODO_TRANSLATE,
                 TODO_TRANSLATE };
     }
-    msg.Replace("[[current]]", std::to_string(current));
-    msg.AutoFormat(ITEM_CUSTOM);
-}
-
-void BuildTriforceMessage(CustomMessage& msg) {
-    msg = { "You completed the %yTriforce of&Courage%w! %gGG%w!",
-            "Das %yTriforce des Mutes%w! Du hast&alle Splitter gefunden. %gGut gemacht%w!",
-            "Vous avez complété la %yTriforce&du Courage%w! %gFélicitations%w!" };
-    msg.Format(ITEM_CUSTOM);
-}
-
-void BuildTriforcePowerPieceMessage(CustomMessage& msg) {
-    uint8_t current = gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected + 1;
-    uint8_t required = OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1;
-    uint8_t remaining = required - current;
-    float percentageCollected = (float)current / (float)required;
-
-    if (percentageCollected != 1.0) {
-        msg = { "You found a %rTriforce of Power&Piece%w... %c[[remaining]]%w left before Ganon&wins!",
-                TODO_TRANSLATE,
-                TODO_TRANSLATE };
-    } else {
-        msg = { "%rGame Over. Return of Ganon.",
-                TODO_TRANSLATE,
-                TODO_TRANSLATE };
-    }
-    msg.Replace("[[current]]", std::to_string(current));
     msg.Replace("[[remaining]]", std::to_string(remaining));
-    msg.Replace("[[required]]", std::to_string(required));
-    msg.Format(ITEM_CUSTOM);
+    msg.AutoFormat(ITEM_CUSTOM);
 }
 
 void BuildCustomItemMessage(Player* player, CustomMessage& msg) {

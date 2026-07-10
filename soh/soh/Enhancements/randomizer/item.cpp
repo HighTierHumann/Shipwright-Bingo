@@ -470,6 +470,11 @@ bool Item::IsMajorItem() const {
          ctx->GetOption(RSK_BOSS_KEYSANITY).Is(RO_DUNGEON_ITEM_LOC_OWN_DUNGEON))) {
         return false;
     }
+
+    if (randomizerGet == RG_TRIFORCE_POWER_PIECE) {
+        return false;
+    }
+    
     // Ganons Castle Boss Key
     if (getItemId == 0xAD && (ctx->GetOption(RSK_GANONS_BOSS_KEY).Is(RO_GANON_BOSS_KEY_VANILLA) ||
                               ctx->GetOption(RSK_GANONS_BOSS_KEY).Is(RO_GANON_BOSS_KEY_OWN_DUNGEON))) {

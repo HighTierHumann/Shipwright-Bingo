@@ -884,11 +884,6 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_SUNLIGHT_ARROWS] =
         "Light Arrows can be used to light up the sun switches instead of using the Mirror Shield. "
         "Item placement logic will respect this option, so it might be required to use this to progress.";
-    mOptionDescriptions[RSK_TWINROVA_REWORK] =
-        "Reworks the Twinrova boss fight to make the fight beatable with the Fire and Ice Arrows."
-        "\n\nOnce either Kotake or Koume is struck with the arrow of their opposite element, a shield will appear "
-        "around them, preventing you from hitting them again until you damage the other sister."
-        "\n\nPhase 2 Twinrova must be struck by both arrows to become stunned.";
     mOptionDescriptions[RSK_ROCS_FEATHER] =
         "Adds Roc's Feather to the item pool. Roc's Feather is a custom item granting the player a jump on demand. "
         "The jump can also be used when already in mid-air. Roc's Feather is not considered by logic.";
