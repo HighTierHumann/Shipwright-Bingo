@@ -100,8 +100,9 @@ uint8_t ShuffledCow_RandomizerHoldsItem(EnCow* enCow, PlayState* play) {
         }
     }
 
-    // For some reason Impa's House has an invisible cow, so don't draw particles over it
-    if (gPlayState->sceneNum == SCENE_IMPAS_HOUSE && enCow->actor.world.pos.y == 57) {
+    // For some reason Impa's House and Gerudo Valley have an invisible cow, so don't draw particles over it
+    if ((gPlayState->sceneNum == SCENE_IMPAS_HOUSE && enCow->actor.world.pos.y == 57) ||
+        (gPlayState->sceneNum == SCENE_GERUDO_VALLEY && enCow->actor.world.pos.y == -1994)) { // Adjust the Y position for Gerudo Valley as needed
         return false;
     }
 

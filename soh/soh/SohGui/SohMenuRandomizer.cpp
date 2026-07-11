@@ -571,22 +571,6 @@ void DrawTricksMenu(WidgetInfo& info) {
     ImGui::PopStyleVar(1);
 }
 
-typedef enum {
-    SKWIMBLE_NONE,
-    SKWIMBLE_LIGHTLY_SALTED,
-    SKWIMBLE_WITH_PEPPER,
-    SKWIMBLE_SIDE_OF_FRIES,
-    SKWIMBLE_OMEGA_DESTRUCTION_DEMONCORE,
-    SKWIMBLE_CHEESY,
-    SKWIMBLE_HEAVILY_CODE_BROWNED,
-} SkwimbleSeasonings;
-
-static const std::map<int32_t, const char*> skwimbleSeasoning = {
-    { SKWIMBLE_NONE, "Unseasoned" }, { SKWIMBLE_LIGHTLY_SALTED, "Lightly Salted" }, { SKWIMBLE_WITH_PEPPER, "With Pepper" },
-    { SKWIMBLE_SIDE_OF_FRIES, "A side of fries" },  { SKWIMBLE_OMEGA_DESTRUCTION_DEMONCORE, "Omega Destruction Demon Core" }, { SKWIMBLE_CHEESY, "Cheesy" },
-    { SKWIMBLE_HEAVILY_CODE_BROWNED, "Heavily Code Browned" },
-};
-
 void SohMenu::AddMenuRandomizer() {
     // Add Randomizer Menu
     AddMenuEntry("Randomizer", CVAR_SETTING("Menu.RandomizerSidebarSection"));
