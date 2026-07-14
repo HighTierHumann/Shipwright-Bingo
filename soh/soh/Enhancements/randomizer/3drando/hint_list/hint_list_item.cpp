@@ -1964,6 +1964,12 @@ void StaticData::HintTable_Init_Item() {
                                                  CustomMessage("a gold fragment", /*german*/"ein Goldfragment", /*french*/"un fragment d'or")});
                                                   // /*spanish*/un fragmento dorado
 
+     hintTextTable[RHT_TRIFORCE_POWER_PIECE] = HintText(CustomMessage("a Piece of the Triforce of Power", TODO_TRANSLATE, TODO_TRANSLATE),
+                                             {
+                                             CustomMessage("a powerful triumph fork", TODO_TRANSLATE, TODO_TRANSLATE)
+                                             }, {
+                                             CustomMessage("powerful cheese", TODO_TRANSLATE, TODO_TRANSLATE)});
+
     hintTextTable[RHT_ROCS_FEATHER] = HintText(CustomMessage("Roc's Feather", /*german*/"Greifenfeder", /*french*/"Plume de Roc"),
                                                  {}, {
                                                  CustomMessage("a feather", /*german*/TODO_TRANSLATE, /*french*/"une plume"),
