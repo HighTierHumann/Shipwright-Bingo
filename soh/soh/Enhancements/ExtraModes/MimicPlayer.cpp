@@ -3,11 +3,11 @@
 #include "soh/ObjectExtension/ObjectExtension.h"
 #include "soh/Notification/Notification.h"
 #include <vector>
+#include "include/functions.h"
 
 extern "C" {
 #include "include/macros.h"
 #include "include/variables.h"
-#include "include/functions.h"
 extern PlayState* gPlayState;
 
 void Player_UseItem(PlayState* play, Player* player, s32 item);

@@ -171,7 +171,6 @@ void DrawLocationsMenu(WidgetInfo& info) {
         RCAREA_GANONS_CASTLE,
     };
 
-    static ImGuiTextFilter locationSearch;
     UIWidgets::PushStyleInput(THEME_COLOR);
     locationSearch.Draw("Filter (inc,-exc)", 490.0f);
     UIWidgets::PopStyleInput();

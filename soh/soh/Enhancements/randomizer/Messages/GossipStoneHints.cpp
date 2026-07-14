@@ -6,20 +6,12 @@
 
 #include <soh/OTRGlobals.h>
 #include "soh/Enhancements/randomizer/randomizer.h"
-#include "soh/Enhancements/game-interactor/GameInteractor.h"
 
 extern "C" {
 extern PlayState* gPlayState;
 #include <macros.h>
 #include <functions.h>
 #include <variables.h>
-}
-
-// Resolves a hint's message for textbox display, firing OnRandoHintRevealed so
-// observers such as the Hint Tracker know the player has seen the hint.
-static CustomMessage ReadHintMessage(RandomizerHint rh, MessageFormat format = MF_AUTO_FORMAT, size_t id = 0) {
-    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnRandoHintRevealed>(rh);
-    return OTRGlobals::Instance->gRandoContext->GetHint(rh)->GetHintMessage(format, id);
 }
 
 void BuildHintStoneMessage(uint16_t* textId, bool* loadFromMessageTable) {
@@ -57,7 +49,7 @@ void BuildHintStoneMessage(uint16_t* textId, bool* loadFromMessageTable) {
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     } else {
-        msg = ReadHintMessage(stoneHint, MF_AUTO_FORMAT);
+        msg = OTRGlobals::Instance->gRandoContext->GetHint(stoneHint)->GetHintMessage(MF_AUTO_FORMAT);
     }
     // Remove "Buy " if present.
     msg.Replace("Buy ", "");

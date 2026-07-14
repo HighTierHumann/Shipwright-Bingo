@@ -10,7 +10,6 @@
 #include "z64scene.h"
 #include <soh/OTRGlobals.h>
 #include "soh/Enhancements/randomizer/randomizer.h"
-#include "soh/Enhancements/game-interactor/GameInteractor.h"
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -26,27 +25,20 @@ extern PlayState* gPlayState;
         RAND_GET_OPTION(RSK_KAK_30_SKULLS_HINT) || RAND_GET_OPTION(RSK_KAK_40_SKULLS_HINT) || \
         RAND_GET_OPTION(RSK_KAK_50_SKULLS_HINT)
 
-// Resolves a hint's message for textbox display, firing OnRandoHintRevealed so
-// observers such as the Hint Tracker know the player has seen the hint.
-static CustomMessage ReadHintMessage(RandomizerHint rh, MessageFormat format = MF_AUTO_FORMAT, size_t id = 0) {
-    GameInteractor::Instance->ExecuteHooks<GameInteractor::OnRandoHintRevealed>(rh);
-    return RAND_GET_HINT(rh)->GetHintMessage(format, id);
-}
-
 void BuildGanondorfHint(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg;
     CustomMessage cleanMsg;
     if (RAND_GET_OPTION(RSK_SHUFFLE_MASTER_SWORD) && !CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER)) {
         if (INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT) {
-            msg = ReadHintMessage(RH_GANONDORF_HINT, MF_AUTO_FORMAT, 1);
+            msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 1);
         } else {
-            msg = ReadHintMessage(RH_GANONDORF_HINT, MF_AUTO_FORMAT, 2);
+            msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 2);
         }
     } else {
         if (INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT) {
-            msg = ReadHintMessage(RH_GANONDORF_JOKE, MF_AUTO_FORMAT);
+            msg = RAND_GET_HINT(RH_GANONDORF_JOKE)->GetHintMessage(MF_AUTO_FORMAT);
         } else {
-            msg = ReadHintMessage(RH_GANONDORF_HINT, MF_AUTO_FORMAT, 0);
+            msg = RAND_GET_HINT(RH_GANONDORF_HINT)->GetHintMessage(MF_AUTO_FORMAT, 0);
         }
     }
     HintTracker::RevealHint(RH_GANONDORF_HINT);
@@ -59,7 +51,7 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
     switch (gPlayState->sceneNum) {
         case SCENE_TEMPLE_OF_TIME:
             if (RAND_GET_OPTION(RSK_OOT_HINT) && !RAND_GET_ITEM_LOC(RC_SONG_FROM_OCARINA_OF_TIME)->HasObtained()) {
-                msg = ReadHintMessage(RH_OOT_HINT, MF_RAW);
+                msg = RAND_GET_HINT(RH_OOT_HINT)->GetHintMessage(MF_RAW);
             } else if (!CHECK_DUNGEON_ITEM(DUNGEON_KEY_BOSS, SCENE_GANONS_TOWER)) {
                 msg = CustomMessage(
                     "@, meet me at %gGanon's Castle%w once you obtain the %rkey to his lair%w.",
@@ -72,7 +64,7 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
             break;
         case SCENE_INSIDE_GANONS_CASTLE:
             if (RAND_GET_OPTION(RSK_SHEIK_LA_HINT) && INV_CONTENT(ITEM_ARROW_LIGHT) != ITEM_ARROW_LIGHT) {
-                msg = ReadHintMessage(RH_SHEIK_HINT, MF_RAW);
+                msg = RAND_GET_HINT(RH_SHEIK_HINT)->GetHintMessage(MF_RAW);
             } else if (!(CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER) &&
                          INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT && CUR_CAPACITY(UPG_QUIVER) >= 30 &&
                          gSaveContext.isMagicAcquired)) {
@@ -108,13 +100,15 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildChildAltarMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_ALTAR_CHILD);
+    CustomMessage msg = RAND_GET_HINT(RH_ALTAR_CHILD)->GetHintMessage();
+    HintTracker::RevealHint(RH_ALTAR_CHILD);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildAdultAltarMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_ALTAR_ADULT);
+    CustomMessage msg = RAND_GET_HINT(RH_ALTAR_ADULT)->GetHintMessage();
+    HintTracker::RevealHint(RH_ALTAR_ADULT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -177,14 +171,16 @@ void Build100SkullsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildDampesDiaryMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_DAMPES_DIARY, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_DAMPES_DIARY)->GetHintMessage(MF_AUTO_FORMAT);
+    HintTracker::RevealHint(RH_DAMPES_DIARY);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildGregHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if (gPlayState->sceneNum == SCENE_TREASURE_BOX_SHOP) {
-        CustomMessage msg = ReadHintMessage(RH_GREG_RUPEE, MF_AUTO_FORMAT);
+        CustomMessage msg = RAND_GET_HINT(RH_GREG_RUPEE)->GetHintMessage(MF_AUTO_FORMAT);
+        HintTracker::RevealHint(RH_GREG_RUPEE);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
@@ -281,7 +277,7 @@ static void BuildWarpMessage(RandomizerHint rh, bool* loadFromMessageTable) {
         msg.AutoFormat();
         msg.LoadIntoFont();
     } else {
-        CustomMessage msg = ReadHintMessage(rh, MF_AUTO_FORMAT);
+        CustomMessage msg = RAND_GET_HINT(rh)->GetHintMessage(MF_AUTO_FORMAT);
         msg.LoadIntoFont();
     }
     *loadFromMessageTable = false;
@@ -312,13 +308,13 @@ void BuildPreludeWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildFrogsHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_FROGS_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_FROGS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildLoachHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_LOACH_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_LOACH_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -333,7 +329,7 @@ void BuildFishingPoleHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
         "fischen!",
         "Désolé, mais l'étang est fermé.&J'ai perdu ma bonne %rCanne à Pêche%w...&Impossible de pêcher sans elle!");
     if (RAND_GET_OPTION(RSK_FISHING_POLE_HINT)) {
-        msg = msg + ReadHintMessage(RH_FISHING_POLE);
+        msg = msg + RAND_GET_HINT(RH_FISHING_POLE)->GetHintMessage();
     }
     if (*textId == TEXT_FISHING_POND_START_MET) {
         msg = CustomMessage("Hey, mister! I remember you!&It's been a long time!^",
@@ -349,9 +345,9 @@ void BuildFishingPoleHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
 void BuildSariaMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg;
     if (*textId == TEXT_SARIA_SFM) {
-        msg = ReadHintMessage(RH_SARIA_HINT, MF_AUTO_FORMAT, 0);
+        msg = RAND_GET_HINT(RH_SARIA_HINT)->GetHintMessage(MF_AUTO_FORMAT, 0);
     } else {
-        msg = ReadHintMessage(RH_SARIA_HINT, MF_AUTO_FORMAT, 1);
+        msg = RAND_GET_HINT(RH_SARIA_HINT)->GetHintMessage(MF_AUTO_FORMAT, 1);
     }
     HintTracker::RevealHint(RH_SARIA_HINT);
     msg.LoadIntoFont();
@@ -359,25 +355,26 @@ void BuildSariaMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildMidoMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_MIDO_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_MIDO_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+    HintTracker::RevealHint(RH_MIDO_HINT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildBiggoronHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_BIGGORON_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_BIGGORON_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildBigPoesHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_BIG_POES_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_BIG_POES_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildChickensHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_CHICKENS_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_CHICKENS_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -397,7 +394,7 @@ void BuildMalonHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
         assert(!"This should not be reachable");
         return;
     }
-    msg = ReadHintMessage(RH_MALON_HINT, MF_AUTO_FORMAT, id);
+    msg = RAND_GET_HINT(RH_MALON_HINT)->GetHintMessage(MF_AUTO_FORMAT, id);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -417,13 +414,13 @@ void BuildHorsebackArcheryMessage(uint16_t* textId, bool* loadFromMessageTable) 
         assert(!"This should not be reachable");
         return;
     }
-    msg = ReadHintMessage(RH_HBA_HINT, MF_AUTO_FORMAT, id);
+    msg = RAND_GET_HINT(RH_HBA_HINT)->GetHintMessage(MF_AUTO_FORMAT, id);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildMaskShopSignMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    CustomMessage msg = ReadHintMessage(RH_MASK_SHOP_HINT, MF_AUTO_FORMAT);
+    CustomMessage msg = RAND_GET_HINT(RH_MASK_SHOP_HINT)->GetHintMessage(MF_AUTO_FORMAT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
@@ -453,7 +450,8 @@ void BuildBossKeyHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             break;
     }
     if (rh != RH_NONE) {
-        CustomMessage msg = ReadHintMessage(rh, MF_AUTO_FORMAT);
+        CustomMessage msg = RAND_GET_HINT(rh)->GetHintMessage(MF_AUTO_FORMAT);
+        HintTracker::RevealHint(rh);
         msg.LoadIntoFont();
         *loadFromMessageTable = false;
     }
