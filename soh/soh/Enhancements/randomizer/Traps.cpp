@@ -1241,6 +1241,90 @@ static void InitTrickNames() {
         Text{ "Beaver Race Key", "Beaver Race Key", "Beaver Race Key" },
         Text{ "Squid-Hunt Key", "Squid-Hunt Key", "Squid-Hunt Key" },
     };
+    trickNameTable[RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Rock Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Boulder Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Boulder Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Keese Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Torch Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Torch Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Statue Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple Scythe Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple Scythe Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Armos Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple Beamos Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple Beamos Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Zombie Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple ReDead Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple ReDead Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Forest Test Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Forest Trial Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Four Wrist Trial Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Fire Test Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Fire Trial Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Far Trial Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Test Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Trial Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Trial Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Light Test Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Light Trial Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Lite Trial Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Ice Cavern Spinning Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Ice Cavern Scythe Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spice Cavern Scythe Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Ice Cavern Ice Keese Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Ice Cavern Push Block Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spice Cavern Push Block Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Boulder Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Rock Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Boulder Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Lava Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Magma Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Lava Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Toilet Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Water Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Toilet Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
 
     /*
     //Names for individual upgrades, in case progressive names are replaced

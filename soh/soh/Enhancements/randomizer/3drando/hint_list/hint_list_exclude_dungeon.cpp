@@ -1380,6 +1380,13 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                      /*german*/ "Man erzählt sich, daß sich ein #Wunder-Gegenstand im Geistertempel# #[[1]]# verstecke.",
                                                      /*french*/ "Selon moi, un #objet merveilleux dans le Temple de l'Esprit# cache #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some boulders in the Spirit Temple# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some Keese# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+
   /*--------------------------
   |      SHADOW TEMPLE       |
   ---------------------------*/
@@ -1655,6 +1662,16 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                      /*german*/ "Man erzählt sich, daß sich ein #Wunder-Gegenstand im Schattentempel# #[[1]]# verstecke.",
                                                      /*french*/ "Selon moi, un #objet merveilleux dans le Temple de l'Ombre# cache #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near a scythe# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near a Beamos# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_SHADOW_TEMPLE_REDEAD_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some ReDeads# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+
   /*--------------------------
   |    BOTTOM OF THE WELL    |
   ---------------------------*/
@@ -1907,6 +1924,13 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                         /*german*/ "Man erzählt sich, daß das #Schmelzen von rotem Eis in einer gefrorenen Kaverne# #[[1]]# gäbe.",
                                                         /*french*/ "Selon moi, #faire fondre la glace rouge dans la Caverne Polaire# donne #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_ICE_CAVERN_SCYTHE_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near a frozen scythe# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some frozen Keese# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+
   /*--------------------------
   | Gerudo Training Ground  |
   ---------------------------*/
@@ -2108,6 +2132,16 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_GERUDO_TRAINING_GROUND_RED_ICE] = HintText(CustomMessage("They say that #melting red ice in Gerudo Training Ground# gives #[[1]]#.",
                                                         /*german*/ "Man erzählt sich, daß das #Schmelzen von rotem Eis in der Gerudo-Trainingsarena# #[[1]]# gäbe.",
                                                         /*french*/ "Selon moi, #faire fondre la glace rouge dans le Gymnase Gerudo# donne #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some boulders in the Gerudo Training Grounds# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some lava# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee in a pool of water# contains #[[1]]#.",
+                                                       /*german*/ TODO_TRANSLATE,
+                                                       /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      GANONS CASTLE       |
@@ -2329,6 +2363,19 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_GANONS_CASTLE_RED_ICE] = HintText(CustomMessage("They say that #melting red ice in a Ganon's Castle# gives #[[1]]#.",
                                                         /*german*/ "Man erzählt sich, daß das #Schmelzen von rotem Eis in Ganons Schloß# #[[1]]# gäbe.",
                                                         /*french*/ "Selon moi, #faire fondre la glace rouge dans le Château de Ganon# donne #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee in the Forest Trial# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee in the Fire Trial# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee in the Spirit Trial# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee in the Light Trial# contains #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
     // clang-format on
 }
 } // namespace Rando

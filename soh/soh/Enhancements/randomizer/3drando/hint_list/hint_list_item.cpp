@@ -2036,6 +2036,12 @@ void StaticData::HintTable_Init_Item() {
                                              CustomMessage("an evil soul", /*german*/"eine böse Seele", /*french*/"une âme maléfique"),
                                              CustomMessage("some powerful essence", /*german*/"etwas mächtige Essenz", /*french*/"une essence incroyablement puissante")});
 
+     hintTextTable[RHT_SILVER_RUPEE] = HintText(CustomMessage("a Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE),
+                                             {
+                                             CustomMessage("a shiny Rupee", TODO_TRANSLATE, TODO_TRANSLATE)
+                                             }, {
+                                             CustomMessage("a nickel-plated currency", TODO_TRANSLATE, TODO_TRANSLATE)});
+
     hintTextTable[RHT_OCARINA_A_BUTTON] = HintText(CustomMessage("an Ocarina A Button", /*german*/"die A-Taste der Okarina", /*french*/"la Touche A de l'Ocarina"),
                                                    // /*spanish*/un botón A de Ocarina
                                                    {
