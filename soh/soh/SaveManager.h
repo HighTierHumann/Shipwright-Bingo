@@ -34,6 +34,7 @@ typedef struct {
     u8 triforcePieces;
     u8 maxTriforcePieces;
     u8 triforcePowerPieces;
+    bool loseCon;
     u8 maxTriforcePowerPieces;
     bool hasFishingRod;
     bool fishingPoleShuffled;

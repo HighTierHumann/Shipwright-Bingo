@@ -106,6 +106,11 @@ void RegionTable_Init_ShadowTemple() {
     areaTable[RR_SHADOW_TEMPLE_SPINNING_BLADES] = Region("Shadow Temple Spinning Blades", SCENE_SHADOW_TEMPLE, {}, {
         //Locations
         LOCATION(RC_SHADOW_TEMPLE_EARLY_SILVER_RUPEE_CHEST, ((logic->IsAdult && (logic->CanUse(RG_HOVER_BOOTS) || logic->CanGroundJump())) || logic->CanUse(RG_HOOKSHOT)) && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1, true),
+        LOCATION(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_2, true),
+        LOCATION(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_3, true),
+        LOCATION(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_4, logic->IsAdult && logic->CanGroundJump() || logic->HookshotOrBoomerang()),
+        LOCATION(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_5, true),
     }, {
         //Exits
         ENTRANCE(RR_SHADOW_TEMPLE_FIRST_BEAMOS, true),
@@ -141,7 +146,14 @@ void RegionTable_Init_ShadowTemple() {
         ENTRANCE(RR_SHADOW_TEMPLE_INVISIBLE_SPINNING_BLADES, logic->SmallKeys(SCENE_SHADOW_TEMPLE, 2)),
     });
 
-    areaTable[RR_SHADOW_TEMPLE_LOWER_HUGE_PIT] = Region("Shadow Temple Lower Huge Pit", SCENE_SHADOW_TEMPLE, {}, {},{
+    areaTable[RR_SHADOW_TEMPLE_LOWER_HUGE_PIT] = Region("Shadow Temple Lower Huge Pit", SCENE_SHADOW_TEMPLE, {}, {
+        // Locations
+        LOCATION(RC_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_1, true),
+        LOCATION(RC_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_2, true),
+        LOCATION(RC_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_3, true),
+        LOCATION(RC_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_4, true),
+        LOCATION(RC_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_5, true),
+    }, {
         //Exits
         ENTRANCE(RR_SHADOW_TEMPLE_UPPER_HUGE_PIT,            logic->IsAdult || logic->CanJumpslash()),
         ENTRANCE(RR_SHADOW_TEMPLE_LOWER_HUGE_PIT_DOOR_LEDGE, (ctx->GetTrickOption(RT_LENS_SHADOW_PLATFORM) && ctx->GetTrickOption(RT_LENS_SHADOW)) || logic->CanUse(RG_LENS_OF_TRUTH)),
@@ -198,6 +210,11 @@ void RegionTable_Init_ShadowTemple() {
     areaTable[RR_SHADOW_TEMPLE_INVISIBLE_SPIKES] = Region("Shadow Temple Invisible Spikes", SCENE_SHADOW_TEMPLE, {}, {
         //Locations
         LOCATION(RC_SHADOW_TEMPLE_INVISIBLE_SPIKES_CHEST, logic->CanKillEnemy(RE_REDEAD) && (ctx->GetTrickOption(RT_LENS_SHADOW) || logic->CanUse(RG_LENS_OF_TRUTH) || logic->TakeDamage() || logic->CanUse(RG_GORON_TUNIC)) && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_1, logic->HookshotOrBoomerang()),
+        LOCATION(RC_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_2, logic->HookshotOrBoomerang()),
+        LOCATION(RC_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_3, true),
+        LOCATION(RC_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_4, logic->HookshotOrBoomerang()),
+        LOCATION(RC_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_5, logic->HookshotOrBoomerang()),
     }, {
         //Exits
         ENTRANCE(RR_SHADOW_TEMPLE_LOWER_HUGE_PIT_DOOR_LEDGE, logic->SmallKeys(SCENE_SHADOW_TEMPLE, 2)),

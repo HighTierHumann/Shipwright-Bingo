@@ -461,6 +461,7 @@ void Settings::CreateOptions() {
         }
     });
     OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED, "Triforce of Power Hunt Required Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntRequiredPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED], WIDGET_CVAR_SLIDER_INT, 19);
+    OPT_BOOL(RSK_MIMIC_LOSE, "Lose to Mimic", CVAR_RANDOMIZER_SETTING("MimicLose"), mOptionDescriptions[RSK_MIMIC_LOSE]);
     OPT_U8(RSK_MQ_DUNGEON_RANDOM, "MQ Dungeon Setting", {"None", "Set Number", "Random", "Selection Only"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("MQDungeons"), mOptionDescriptions[RSK_MQ_DUNGEON_RANDOM], WIDGET_CVAR_COMBOBOX, RO_MQ_DUNGEONS_NONE, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_MQ_DUNGEON_RANDOM, {
         switch (CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeons"), RO_MQ_DUNGEONS_NONE)) {
@@ -873,6 +874,7 @@ void Settings::CreateOptions() {
     });
     OPT_BOOL(RSK_SHUFFLE_SPEAK, "Shuffle Jabber Nuts", CVAR_RANDOMIZER_SETTING("ShuffleSpeak"), mOptionDescriptions[RSK_SHUFFLE_SPEAK]);
     OPT_BOOL(RSK_SHUFFLE_OPEN_CHEST, "Shuffle Open Chest", CVAR_RANDOMIZER_SETTING("ShuffleOpenChest"), mOptionDescriptions[RSK_SHUFFLE_OPEN_CHEST]);
+    OPT_BOOL(RSK_SHUFFLE_SILVER_RUPEES, "Shuffle Silver Rupees", CVAR_RANDOMIZER_SETTING("ShuffleSilverRupees"), mOptionDescriptions[RSK_SHUFFLE_SILVER_RUPEES]);
     OPT_BOOL(RSK_SHUFFLE_WEIRD_EGG, "Shuffle Weird Egg", CVAR_RANDOMIZER_SETTING("ShuffleWeirdEgg"), mOptionDescriptions[RSK_SHUFFLE_WEIRD_EGG]);
     OPT_BOOL(RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD, "Shuffle Gerudo Membership Card", CVAR_RANDOMIZER_SETTING("ShuffleGerudoToken"), mOptionDescriptions[RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD]);
     OPT_U8(RSK_SHUFFLE_POTS, "Shuffle Pots", {"Off", "Dungeons", "Overworld", "All Pots"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShufflePots"), mOptionDescriptions[RSK_SHUFFLE_POTS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_POTS_OFF);
@@ -2068,7 +2070,8 @@ void Settings::CreateOptions() {
         "Lose Condition",
         { &mOptions[RSK_TRIFORCE_POWER_HUNT],
           &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL],
-          &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED] },
+          &mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED],
+          &mOptions[RSK_MIMIC_LOSE] },
         WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_LOGIC_WINCON] = OptionGroup::SubGroup("",
                                                                         std::initializer_list<OptionGroup*>{
@@ -2270,6 +2273,7 @@ void Settings::CreateOptions() {
                                                                                  &mOptions[RSK_SHUFFLE_CRAWL],
                                                                                  &mOptions[RSK_SHUFFLE_SPEAK],
                                                                                  &mOptions[RSK_SHUFFLE_OPEN_CHEST],
+                                                                                 &mOptions[RSK_SHUFFLE_SILVER_RUPEES],
                                                                                  &mOptions[RSK_SHUFFLE_BEAN_SOULS],
                                                                                  &mOptions[RSK_ROCS_FEATHER],
                                                                                  &mOptions[RSK_BOMBCHU_BAG],
@@ -2510,6 +2514,7 @@ void Settings::CreateOptions() {
                                             &mOptions[RSK_SHUFFLE_CRAWL],
                                             &mOptions[RSK_SHUFFLE_SPEAK],
                                             &mOptions[RSK_SHUFFLE_OPEN_CHEST],
+                                            &mOptions[RSK_SHUFFLE_SILVER_RUPEES],
                                             &mOptions[RSK_SHUFFLE_WEIRD_EGG],
                                             &mOptions[RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD],
                                             &mOptions[RSK_SHUFFLE_MERCHANTS],

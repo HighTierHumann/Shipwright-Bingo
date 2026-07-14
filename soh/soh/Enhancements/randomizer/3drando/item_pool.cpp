@@ -446,6 +446,23 @@ void GenerateItemPool() {
         AddItemToPool(RG_SPEAK_ZORA, 2, 1, 1, 1);
     }
 
+    if (ctx->GetOption(RSK_SHUFFLE_SILVER_RUPEES)) {
+        AddItemToPool(RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE, 6, 5, 5, 5);
+        AddItemToPool(RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE, 6, 5, 5, 5);
+    }
+
     if (ctx->GetOption(RSK_SHUFFLE_BEEHIVES)) {
         PlaceItemsForType(RCTYPE_BEEHIVE, true, true);
     }

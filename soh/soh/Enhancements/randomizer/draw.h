@@ -36,6 +36,7 @@ void Randomizer_DrawBombchuBagInLogic(PlayState* play, GetItemEntry* getItemEntr
 void Randomizer_DrawBombchuBag(PlayState* play, GetItemEntry* getItemEntry);
 void Randomizer_DrawOverworldKey(PlayState* play, GetItemEntry* getItemEntry);
 void Randomizer_DrawRocsFeather(PlayState* play, GetItemEntry* getItemEntry);
+void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getItemEntry);
 
 #define GET_ITEM_MYSTERY                                                                                 \
     {                                                                                                    \

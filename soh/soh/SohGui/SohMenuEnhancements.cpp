@@ -1459,6 +1459,36 @@ void SohMenu::AddMenuEnhancements() {
             "around them, preventing you from hitting them again until you damage the other sister."
             "\n\nPhase 2 Twinrova must be struck by both arrows to become stunned."
         ));
+    AddWidget(path, "\"Immortal Snail\" Mimic Mode", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("MimicMode"))
+        .Options(CheckboxOptions().Tooltip(
+            "Adds a mimic player that will imitate your actions in the game.\n\n"
+            "Touching the mimic will instantly kill you, so be careful!"
+        ));
+    AddWidget(path, "Mimic Delay: %d", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("MimicDelay"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
+        })
+        .Options(IntSliderOptions()
+        .Min(5)
+        .Max(20)
+        .DefaultValue(5)
+        .Format("%d seconds").Tooltip(
+            "The number of seconds before the mimic spawns and imitates your actions"
+        ));
+    AddWidget(path, "Number of Mimics: %d", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("MimicCount"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
+        })
+        .Options(IntSliderOptions()
+        .Min(1)
+        .Max(3)
+        .DefaultValue(1)
+        .Format("%d mimics").Tooltip(
+            "The number of mimics to spawn. There is a 10 second delay between each mimic spawning"
+        ));
     AddWidget(path, "Enable Visual Guard Vision", WIDGET_CVAR_CHECKBOX).CVar(CVAR_ENHANCEMENT("GuardVision"));
     AddWidget(path, "Leever Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("LeeverSpawnRate"))

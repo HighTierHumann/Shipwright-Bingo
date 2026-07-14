@@ -14,10 +14,13 @@
 #include <ship/window/gui/GuiWindow.h>
 #include "randomizerTypes.h"
 
+#define HINT_TRACKER_ITEM(id) { id, #id, #id "_Faded" }
+
 typedef enum {
     TYPE_GOSSIP_STONE,
     TYPE_BOSS_KEY,
     TYPE_ITEM,
+    TYPE_ALTAR
 } HintTypes;
 
 struct HintEntry {
@@ -27,6 +30,14 @@ struct HintEntry {
     bool revealed = false;
     std::string areaName;
     std::string hintType;
+    std::string iconTexture;
+    std::string iconTextureFaded;
+};
+
+struct HintTrackerItem {
+    uint32_t id;
+    std::string name;
+    std::string nameFaded;
 };
 
 namespace HintTracker {

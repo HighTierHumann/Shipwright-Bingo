@@ -677,6 +677,9 @@ extern "C" void Randomizer_InitSaveFile() {
     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected = 0;
     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected = 0;
 
+    // Reset lose condition flag
+    gSaveContext.ship.quest.data.randomizer.loseCon = false;
+
     // Reset Bombchu Bag Upgrade
     gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = 0;
 

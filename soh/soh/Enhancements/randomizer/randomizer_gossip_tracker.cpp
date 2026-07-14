@@ -11,6 +11,10 @@
 #include "soh/Enhancements/randomizer/RCToRandInf.h"
 #include "soh/Enhancements/randomizer/randomizer_check_objects.h"
 
+#include "soh/SohGui/ImGuiUtils.h"
+#include <ship/Context.h>
+#include <fast/Fast3dGui.h>
+
 #include "soh/cvar_prefixes.h"
 
 extern "C" {
@@ -103,69 +107,74 @@ struct HintAreaInfo {
     RandomizerCheckArea area;
     HintTypes type;
     RandomizerSettingKey settingKey;
+    HintTrackerItem trackerItemIcon;
 };
 
 std::unordered_map<RandomizerHint, HintAreaInfo> hintMetadata = {
-    { RH_COLOSSUS_GOSSIP_STONE, { RCAREA_DESERT_COLOSSUS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_DMC_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_CRATER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_DMC_UPPER_GROTTO_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_CRATER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_DMT_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_DMT_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_DODONGOS_CAVERN_GOSSIP_STONE, { RCAREA_DODONGOS_CAVERN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZF_FAIRY_GOSSIP_STONE, { RCAREA_ZORAS_FOUNTAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZF_JABU_GOSSIP_STONE, { RCAREA_ZORAS_FOUNTAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_GC_MAZE_GOSSIP_STONE, { RCAREA_GORON_CITY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_GC_MEDIGORON_GOSSIP_STONE, { RCAREA_GORON_CITY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_GV_GOSSIP_STONE, { RCAREA_GERUDO_VALLEY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_GRAVEYARD_GOSSIP_STONE, { RCAREA_GRAVEYARD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HC_MALON_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HC_ROCK_WALL_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HC_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HF_COW_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HF_NEAR_MARKET_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HF_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_HF_SOUTHEAST_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_KF_DEKU_TREE_LEFT_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_KF_DEKU_TREE_RIGHT_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_KF_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_KF_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_KAK_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_KAKARIKO_VILLAGE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_LH_LAB_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_LH_SOUTHEAST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_LH_SOUTHWEST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_LW_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_LW_NEAR_SHORTCUTS_GROTTO_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_SFM_MAZE_NEAR_LW_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_SFM_MAZE_CENTER_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_SFM_SARIA_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_TOT_LEFT_CENTER_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_TOT_LEFTMOST_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_TOT_RIGHT_CENTER_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_TOT_RIGHTMOST_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZD_GOSSIP_STONE, { RCAREA_ZORAS_DOMAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZR_NEAR_DOMAIN_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZR_NEAR_GROTTOS_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_ZR_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS } },
-    { RH_FOREST_BOSS_KEY_HINT, { RCAREA_FOREST_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_FIRE_BOSS_KEY_HINT, { RCAREA_FIRE_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_WATER_BOSS_KEY_HINT, { RCAREA_WATER_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_SPIRIT_BOSS_KEY_HINT, { RCAREA_SPIRIT_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_SHADOW_BOSS_KEY_HINT, { RCAREA_SHADOW_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_GANONS_BOSS_KEY_HINT, { RCAREA_GANONS_CASTLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT } },
-    { RH_STORMS_HINT, { RCAREA_KAKARIKO_VILLAGE, TYPE_ITEM, RSK_STORMS_HINT } },
-    { RH_EPONAS_HINT, { RCAREA_LON_LON_RANCH, TYPE_ITEM, RSK_EPONAS_HINT } },
-    { RH_LULLABY_HINT, { RCAREA_HYRULE_CASTLE, TYPE_ITEM, RSK_LULLABY_HINT } },
-    { RH_GREG_RUPEE, { RCAREA_MARKET, TYPE_ITEM, RSK_GREG_HINT } },
-    { RH_DAMPES_DIARY, { RCAREA_GRAVEYARD, TYPE_ITEM, RSK_DAMPES_DIARY_HINT } },
-    { RH_SCALE_HINT, { RCAREA_ZORAS_DOMAIN, TYPE_ITEM, RSK_SCALE_HINT } },
-    { RH_SARIA_HINT, { RCAREA_SACRED_FOREST_MEADOW, TYPE_ITEM, RSK_SARIA_HINT } },
-    { RH_MIDO_HINT, { RCAREA_KOKIRI_FOREST, TYPE_ITEM, RSK_MIDO_HINT } },
-    { RH_STRENGTH_HINT, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_ITEM, RSK_STRENGTH_HINT } },
-    { RH_BOOMERANG_HINT, { RCAREA_JABU_JABUS_BELLY, TYPE_ITEM, RSK_BOOMERANG_HINT } },
-    { RH_HAMMER_HINT, { RCAREA_FIRE_TEMPLE, TYPE_ITEM, RSK_HAMMER_HINT } },
-    { RH_MIRROR_HINT, { RCAREA_SPIRIT_TEMPLE, TYPE_ITEM, RSK_MIRROR_HINT } },
-    { RH_HOVERS_HINT, { RCAREA_SHADOW_TEMPLE, TYPE_ITEM, RSK_HOVERS_HINT } },
-    { RH_GANONDORF_HINT, { RCAREA_GANONS_CASTLE, TYPE_ITEM, RSK_GANONDORF_HINT } },
+    { RH_COLOSSUS_GOSSIP_STONE, { RCAREA_DESERT_COLOSSUS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_DMC_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_CRATER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_DMC_UPPER_GROTTO_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_CRATER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_DMT_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_DMT_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_DODONGOS_CAVERN_GOSSIP_STONE, { RCAREA_DODONGOS_CAVERN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZF_FAIRY_GOSSIP_STONE, { RCAREA_ZORAS_FOUNTAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZF_JABU_GOSSIP_STONE, { RCAREA_ZORAS_FOUNTAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_GC_MAZE_GOSSIP_STONE, { RCAREA_GORON_CITY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_GC_MEDIGORON_GOSSIP_STONE, { RCAREA_GORON_CITY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_GV_GOSSIP_STONE, { RCAREA_GERUDO_VALLEY, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_GRAVEYARD_GOSSIP_STONE, { RCAREA_GRAVEYARD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HC_MALON_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HC_ROCK_WALL_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HC_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_CASTLE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HF_COW_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HF_NEAR_MARKET_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HF_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_HF_SOUTHEAST_GROTTO_GOSSIP_STONE, { RCAREA_HYRULE_FIELD, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_KF_DEKU_TREE_LEFT_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_KF_DEKU_TREE_RIGHT_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_KF_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_KF_STORMS_GROTTO_GOSSIP_STONE, { RCAREA_KOKIRI_FOREST, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_KAK_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_KAKARIKO_VILLAGE, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LH_LAB_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LH_SOUTHEAST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LH_SOUTHWEST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LW_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LW_NEAR_SHORTCUTS_GROTTO_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_SFM_MAZE_NEAR_LW_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_SFM_MAZE_CENTER_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_SFM_SARIA_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_TOT_LEFT_CENTER_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_TOT_LEFTMOST_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_TOT_RIGHT_CENTER_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_TOT_RIGHTMOST_GOSSIP_STONE, { RCAREA_MARKET, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZD_GOSSIP_STONE, { RCAREA_ZORAS_DOMAIN, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZR_NEAR_DOMAIN_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZR_NEAR_GROTTOS_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ZR_OPEN_GROTTO_GOSSIP_STONE, { RCAREA_ZORAS_RIVER, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+
+    { RH_FOREST_BOSS_KEY_HINT, { RCAREA_FOREST_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+    { RH_FIRE_BOSS_KEY_HINT, { RCAREA_FIRE_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+    { RH_WATER_BOSS_KEY_HINT, { RCAREA_WATER_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+    { RH_SPIRIT_BOSS_KEY_HINT, { RCAREA_SPIRIT_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+    { RH_SHADOW_BOSS_KEY_HINT, { RCAREA_SHADOW_TEMPLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+    { RH_GANONS_BOSS_KEY_HINT, { RCAREA_GANONS_CASTLE, TYPE_BOSS_KEY, RSK_BOSS_KEY_HINT, HINT_TRACKER_ITEM(ITEM_KEY_BOSS) } },
+
+    { RH_STORMS_HINT, { RCAREA_KAKARIKO_VILLAGE, TYPE_ITEM, RSK_STORMS_HINT, HINT_TRACKER_ITEM(QUEST_SONG_STORMS) } },
+    { RH_EPONAS_HINT, { RCAREA_LON_LON_RANCH, TYPE_ITEM, RSK_EPONAS_HINT, HINT_TRACKER_ITEM(QUEST_SONG_EPONA) } },
+    { RH_LULLABY_HINT, { RCAREA_HYRULE_CASTLE, TYPE_ITEM, RSK_LULLABY_HINT, HINT_TRACKER_ITEM(QUEST_SONG_LULLABY) } },
+    { RH_GREG_RUPEE, { RCAREA_MARKET, TYPE_ITEM, RSK_GREG_HINT, HINT_TRACKER_ITEM(ITEM_RUPEE_GREEN) } },
+    { RH_DAMPES_DIARY, { RCAREA_GRAVEYARD, TYPE_ITEM, RSK_DAMPES_DIARY_HINT, HINT_TRACKER_ITEM(ITEM_HOOKSHOT) } },
+    { RH_SCALE_HINT, { RCAREA_ZORAS_DOMAIN, TYPE_ITEM, RSK_SCALE_HINT, HINT_TRACKER_ITEM(ITEM_SCALE_SILVER) } },
+    { RH_SARIA_HINT, { RCAREA_SACRED_FOREST_MEADOW, TYPE_ITEM, RSK_SARIA_HINT, HINT_TRACKER_ITEM(ITEM_MAGIC_LARGE) } },
+    { RH_MIDO_HINT, { RCAREA_KOKIRI_FOREST, TYPE_ITEM, RSK_MIDO_HINT, HINT_TRACKER_ITEM(ITEM_SWORD_KOKIRI) } },
+    { RH_STRENGTH_HINT, { RCAREA_DEATH_MOUNTAIN_TRAIL, TYPE_ITEM, RSK_STRENGTH_HINT, HINT_TRACKER_ITEM(ITEM_BRACELET) } },
+    { RH_BOOMERANG_HINT, { RCAREA_JABU_JABUS_BELLY, TYPE_ITEM, RSK_BOOMERANG_HINT, HINT_TRACKER_ITEM(ITEM_BOOMERANG) } },
+    { RH_HAMMER_HINT, { RCAREA_FIRE_TEMPLE, TYPE_ITEM, RSK_HAMMER_HINT, HINT_TRACKER_ITEM(ITEM_HAMMER) } },
+    { RH_MIRROR_HINT, { RCAREA_SPIRIT_TEMPLE, TYPE_ITEM, RSK_MIRROR_HINT, HINT_TRACKER_ITEM(ITEM_SHIELD_MIRROR) } },
+    { RH_HOVERS_HINT, { RCAREA_SHADOW_TEMPLE, TYPE_ITEM, RSK_HOVERS_HINT, HINT_TRACKER_ITEM(ITEM_BOOTS_HOVER) } },
+    { RH_GANONDORF_HINT, { RCAREA_GANONS_CASTLE, TYPE_ITEM, RSK_GANONDORF_HINT, HINT_TRACKER_ITEM(ITEM_SWORD_MASTER) } },
+    { RH_ALTAR_CHILD, { RCAREA_MARKET, TYPE_ALTAR, RSK_NONE, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_ALTAR_ADULT, { RCAREA_MARKET, TYPE_ALTAR, RSK_NONE, HINT_TRACKER_ITEM(ITEM_NONE) } },
 };
 
 static constexpr std::array<RandomizerCheckArea, SPOILER_ENTRANCE_GROUP_COUNT> AreaFromEntranceGroup = {
@@ -210,7 +219,7 @@ void InitHintTrackingData() {
 
     // Create a HintEntry for each hint whose gating setting is currently enabled.
     for (const auto& [hint, info] : hintMetadata) {
-        if (!ctx->GetOption(info.settingKey)) {
+        if (!ctx->GetOption(info.settingKey) && info.type != TYPE_ALTAR) {
             continue;
         }
 
@@ -219,6 +228,8 @@ void InitHintTrackingData() {
         e.name = Rando::StaticData::hintNames.at(hint).GetForCurrentLanguage(MF_CLEAN);
         e.areaName = RandomizerCheckObjects::GetRCAreaName(info.area);
         e.revealed = IsHintDiscovered(static_cast<s16>(hint));
+        e.iconTexture = info.trackerItemIcon.name;
+        e.iconTextureFaded = info.trackerItemIcon.nameFaded;
         if (hint == RH_GANONDORF_HINT) {
             cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW, 2);
         } else {
@@ -236,6 +247,9 @@ void InitHintTrackingData() {
                 break;
             case TYPE_ITEM:
                 e.hintType = "Item";
+                break;
+            case TYPE_ALTAR:
+                e.hintType = "Altar";
                 break;
             default:
                 e.hintType = "Unknown";
@@ -295,6 +309,21 @@ struct HintColorSegment {
     ImU32 color;
 };
 
+static const std::unordered_map<std::string, ItemID> altarIcons = {
+    { "0", ITEM_KOKIRI_EMERALD },  { "1", ITEM_GORON_RUBY },       { "2", ITEM_ZORA_SAPPHIRE },
+    { "8", ITEM_MEDALLION_LIGHT }, { "3", ITEM_MEDALLION_FOREST }, { "4", ITEM_MEDALLION_FIRE },
+    { "5", ITEM_MEDALLION_WATER }, { "6", ITEM_MEDALLION_SPIRIT }, { "7", ITEM_MEDALLION_SHADOW },
+    { "l", ITEM_ARROW_LIGHT },     { "b", ITEM_KEY_BOSS },         { "o", ITEM_SWORD_MASTER },
+    { "c", ITEM_OCARINA_FAIRY },   { "i", ITEM_OCARINA_TIME },     { "L", ITEM_BOW_ARROW_LIGHT },
+    { "k", ITEM_TUNIC_KOKIRI },    { "m", ITEM_DUNGEON_MAP },      { "C", ITEM_COMPASS },
+    { "s", ITEM_SKULL_TOKEN },     { "g", ITEM_MASK_GORON },       { "w", ITEM_CUSTOM },
+};
+
+struct AltarIconSegment {
+    std::string text;
+    std::string icon;
+};
+
 // Splits `text` on "%<letter>" tokens (matching MF_RAW's output) into runs of text
 // paired with the color that should be applied to them. Any text preceding the first
 // token, or an unrecognized "%<letter>" sequence, uses `defaultColor`.
@@ -314,13 +343,46 @@ static std::vector<HintColorSegment> ParseHintColorSegments(const std::string& t
             continue;
         }
 
-        text.at(i) == '^' ? current += ' ' : // Remove next-page markers
+        (text.at(i) == '^' || text.at(i) == '&') ? current += ' ' : // Remove next-page markers
         current += text[i];
         i++;
     }
 
     if (!current.empty()) {
         segments.push_back({ current, currentColor });
+    }
+
+    return segments;
+}
+
+// TODO figure out how to parse altar icons and return icon
+static std::vector<AltarIconSegment> ParseAltarIconSegments(const std::string& text) {
+    std::vector<AltarIconSegment> segments;
+    std::string current;
+
+    for (size_t i = 0; i < text.size();) {
+        if (text[i] == '$' && i + 1 < text.size()) {
+            std::string key(1, text[i + 1]);
+            if (altarIcons.contains(key)) {
+                if (!current.empty()) {
+                    segments.push_back({ current, "" });
+                    current.clear();
+                }
+                ItemID itemId = altarIcons.at(key);
+                const char* tex = GetTextureForItemId(static_cast<uint32_t>(itemId));
+                segments.push_back({ "", tex ? tex : "" });
+                i += 2;
+                continue;
+            }
+        }
+
+        (text.at(i) == '^' || text.at(i) == '&') ? current += ' ' : // Remove next-page markers
+        current += text[i];
+        i++;
+    }
+
+    if (!current.empty()) {
+        segments.push_back({ current, "" });
     }
 
     return segments;
@@ -369,6 +431,54 @@ static void DrawHintColorSegments(const std::vector<HintColorSegment>& segments,
 
             lineWidth += wordWidth;
             startOfLine = false;
+        }
+    }
+}
+
+static void DrawAltarIconSegments(const std::vector<AltarIconSegment>& segments, float fullLineWidth) {
+    // Render icons inline with text. Icons appear immediately before the following text segment.
+    auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
+    constexpr float kIconSize = 24.0f;
+
+    for (const auto& segment : segments) {
+        // If this segment is an icon, draw it inline and keep same line for following text.
+        if (!segment.icon.empty()) {
+            void* tex = gui->GetTextureByName(segment.icon.c_str());
+            if (tex) {
+                ImGui::Image(tex, ImVec2(kIconSize, kIconSize));
+                ImGui::SameLine(0.0f, 4.0f);
+            }
+            continue;
+        }
+
+        // Otherwise, this is a text segment; parse color codes and render.
+        if (!segment.text.empty()) {
+            auto colorSegments = ParseHintColorSegments(segment.text, IM_COL32_WHITE);
+            DrawHintColorSegments(colorSegments, fullLineWidth);
+        }
+    }
+}
+
+static void DrawHintIcons(const std::vector<AltarIconSegment>& segments, float fullLineWidth) {
+    // Render icons inline with text. Icons appear immediately before the following text segment.
+    auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
+    constexpr float kIconSize = 24.0f;
+
+    for (const auto& segment : segments) {
+        // If this segment is an icon, draw it inline and keep same line for following text.
+        if (!segment.icon.empty()) {
+            void* tex = gui->GetTextureByName(segment.icon.c_str());
+            if (tex) {
+                ImGui::Image(tex, ImVec2(kIconSize, kIconSize));
+                ImGui::SameLine(0.0f, 4.0f);
+            }
+            continue;
+        }
+
+        // Otherwise, this is a text segment; parse color codes and render.
+        if (!segment.text.empty()) {
+            auto colorSegments = ParseHintColorSegments(segment.text, IM_COL32_WHITE);
+            DrawHintColorSegments(colorSegments, fullLineWidth);
         }
     }
 }
@@ -422,6 +532,12 @@ void HintTrackerSettingsWindow::DrawElement() {
         CVarRadioButton("Type", CVAR_TRACKER_HINTS("GroupBy"), 1,
                         RadioButtonsOptions().Color(THEME_COLOR));
 
+        ImGui::Text("Display Type");
+        CVarRadioButton("Text", CVAR_TRACKER_HINTS("DisplayType"), 0,
+                        RadioButtonsOptions().Color(THEME_COLOR));
+        CVarRadioButton("Icon", CVAR_TRACKER_HINTS("DisplayType"), 1,
+                        RadioButtonsOptions().Color(THEME_COLOR));
+
         ImGui::EndTable();
     }
 }
@@ -469,6 +585,7 @@ void HintTrackerWindow::DrawElement() {
         ImGui::BeginChild("HintList", ImVec2(0, -8));
 
         const int8_t groupByArea = CVarGetInteger(CVAR_TRACKER_HINTS("GroupBy"), 0);
+        const int8_t displayType = CVarGetInteger(CVAR_TRACKER_HINTS("DisplayType"), 0);
 
         // Group entries by area
         std::map<std::string, std::vector<const HintEntry*>> grouped;
@@ -531,10 +648,23 @@ void HintTrackerWindow::DrawElement() {
                 // Display revealed entries first, then undiscovered
                 for (const auto* sPtr : displayEntries) {
                     const HintEntry& s = *sPtr;
+                    auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
+                    void* tex = gui->GetTextureByName(s.iconTexture);
+                    void* texFaded = gui->GetTextureByName(s.iconTextureFaded);
 
                     if (!s.revealed) {
                         ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GRAY);
-                        ImGui::TextWrapped("%s\u00A0-> \"???\"", s.name.c_str());
+                        if (displayType == 0) {
+                            ImGui::TextWrapped("%s\u00A0-> \"???\"", s.name.c_str());
+                        } else {
+                            if (texFaded) {
+                                ImGui::Image(texFaded, ImVec2(24.0f, 24.0f));
+                                ImGui::SameLine();
+                                ImGui::TextWrapped(" -> \"???\"");
+                            } else {
+                                ImGui::TextWrapped("%s\u00A0-> \"???\"", s.name.c_str());
+                            }
+                        }
                         ImGui::PopStyleColor();
                         continue;
                     }
@@ -545,12 +675,22 @@ void HintTrackerWindow::DrawElement() {
                     const float fullLineWidth = ImGui::GetContentRegionAvail().x;
 
                     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32_WHITE);
-                    ImGui::TextWrapped("%s\u00A0-> ", s.name.c_str());
+                    if (displayType == 0) {
+                        ImGui::TextWrapped("%s\u00A0-> ", s.name.c_str());
+                    } else {
+                        if (tex) {
+                            ImGui::Image(tex, ImVec2(24.0f, 24.0f));
+                            ImGui::SameLine(0.0f, 4.0f);
+                            ImGui::TextWrapped("-> ");
+                        } else {
+                            ImGui::TextWrapped("%s\u00A0-> ", s.name.c_str());
+                        }
+                    }
                     ImGui::PopStyleColor();
                     ImGui::SameLine(0.0f, 0.0f);
 
-                    DrawHintColorSegments(ParseHintColorSegments("\"" + s.hintText + "\"", IM_COL32_WHITE),
-                                          fullLineWidth);
+                    auto altarSegments = ParseAltarIconSegments("\"" + s.hintText + "\"");
+                    DrawAltarIconSegments(altarSegments, fullLineWidth);
                 }
 
                 ImGui::Spacing();

@@ -230,6 +230,7 @@ void SaveManager::LoadRandomizer() {
                                     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected);
     SaveManager::Instance->LoadData("triforcePowerPiecesCollected",
                                     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
+    SaveManager::Instance->LoadData("loseCon", gSaveContext.ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->LoadData("bombchuUpgradeLevel", gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel);
 
     SaveManager::Instance->LoadData("pendingIceTrapCount", gSaveContext.ship.pendingIceTrapCount);
@@ -386,6 +387,7 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
                                     saveContext->ship.quest.data.randomizer.triforcePiecesCollected);
     SaveManager::Instance->SaveData("triforcePowerPiecesCollected",
                                     saveContext->ship.quest.data.randomizer.triforcePowerPiecesCollected);
+    SaveManager::Instance->SaveData("loseCon", saveContext->ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->SaveData("bombchuUpgradeLevel", saveContext->ship.quest.data.randomizer.bombchuUpgradeLevel);
 
     SaveManager::Instance->SaveData("pendingIceTrapCount", saveContext->ship.pendingIceTrapCount);
@@ -623,6 +625,7 @@ void SaveManager::InitMeta(int fileNum) {
         IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected : 0;
     fileMetaInfo[fileNum].triforcePowerPieces =
         IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected : 0;
+    fileMetaInfo[fileNum].loseCon = IS_RANDO ? gSaveContext.ship.quest.data.randomizer.loseCon : false;
     fileMetaInfo[fileNum].hasFishingRod = Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) || !IS_RANDO;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;
     fileMetaInfo[fileNum].health = gSaveContext.health;

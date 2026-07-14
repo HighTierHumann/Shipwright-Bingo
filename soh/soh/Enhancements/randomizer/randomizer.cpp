@@ -545,6 +545,10 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
                        : (gSaveContext.magicLevel < 2 ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE);
         case RG_FISHING_POLE:
             return !Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+            return !Flags_GetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+            return !Flags_GetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
 
         // Songs
         case RG_ZELDAS_LULLABY:
@@ -1159,18 +1163,27 @@ static void DeleteFileOnLoseCondition() {
         return;
     }
 
-    if (gPlayState->gameOverCtx.state == GAMEOVER_DEATH_MENU && gPlayState->pauseCtx.state == 9
-        && gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected ==
-        (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1)) {
-        SaveManager::Instance->DeleteZeldaFile(gSaveContext.fileNum);
-        std::reinterpret_pointer_cast<Ship::ConsoleWindow>(
-            Ship::Context::GetRawInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
-            ->Dispatch("reset");
+    if (gPlayState->gameOverCtx.state == GAMEOVER_DEATH_MENU && gPlayState->pauseCtx.state == 9) {
+        if (gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected ==
+            (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED) + 1) || gSaveContext.ship.quest.data.randomizer.loseCon) {
+            SaveManager::Instance->DeleteZeldaFile(gSaveContext.fileNum);
+            std::reinterpret_pointer_cast<Ship::ConsoleWindow>(
+                Ship::Context::GetRawInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
+                ->Dispatch("reset");
+        }
     }
 }
 
 static void RegisterDeleteFileOnLoseCondition() {
     COND_HOOK(OnGameFrameUpdate, true, DeleteFileOnLoseCondition);
+}
+
+static void PlaySilverRupeeSound(int8_t collectedCount) {
+    static s8 majorScale[] = { 0, 2, 4, 5, 7, 9, 11, 13, 15, 17 };
+
+    if (collectedCount < (CVarGetInteger(CVAR_ENHANCEMENT("SilverRupeeJingleExtend"), 0) ? 10 : 5)) {
+        Audio_PlaySoundTransposed(&gSfxDefaultPos, NA_SE_EV_FIVE_COUNT_LUPY, majorScale[collectedCount]);
+    }
 }
 
 extern "C" u8 Return_Item_Entry(GetItemEntry itemEntry, u8 returnItem);
@@ -1449,6 +1462,118 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             } else {
                 Audio_PlaySoundGeneral(NA_SE_EN_FANTOM_ST_LAUGH, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            }
+            break;
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS);
+            }
+            break;
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
+            }
+            break;
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVERS);
+            }
+            break;
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVERS);
+            }
+            break;
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_REDEAD_SILVERS);
+            }
+            break;
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVERS);
+            }
+            break;
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVERS);
+            }
+            break;
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVERS);
+            }
+            break;
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS);
+            }
+            break;
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_SCYTHE_SILVERS);
+            }
+            break;
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVERS);
+            }
+            break;
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_BOULDER_SILVERS);
+            }
+            break;
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_TOILET_SILVERS);
+            }
+            break;
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS);
             }
             break;
         case RG_PROGRESSIVE_BOMBCHU_BAG:

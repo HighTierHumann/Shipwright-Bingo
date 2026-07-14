@@ -137,6 +137,7 @@ RANDO_ENUM_ITEM(RCTYPE_SIGN)                       // Signs
 RANDO_ENUM_ITEM(RCTYPE_BEGGAR)                     // Beggar
 RANDO_ENUM_ITEM(RCTYPE_ICICLE)                     // Icicles
 RANDO_ENUM_ITEM(RCTYPE_RED_ICE)                    // Red Ice
+RANDO_ENUM_ITEM(RCTYPE_SILVER_RUPEE)               // Silver Rupee
 RANDO_ENUM_END(RandomizerCheckType)
 
 RANDO_ENUM_BEGIN(RandomizerCheckQuest)

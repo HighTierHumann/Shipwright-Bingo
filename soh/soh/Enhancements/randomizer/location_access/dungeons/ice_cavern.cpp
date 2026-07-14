@@ -57,6 +57,11 @@ void RegionTable_Init_IceCavern() {
         LOCATION(RC_ICE_CAVERN_SPINNING_BLADE_RIGHT_STALAGMITE,     logic->CanClearStalagmite()),
         LOCATION(RC_ICE_CAVERN_SPINNING_BLADE_EAST_RED_ICE,         logic->BlueFire()),
         LOCATION(RC_ICE_CAVERN_SPINNING_BLADE_WEST_RED_ICE,         logic->BlueFire()),
+        LOCATION(RC_ICE_CAVERN_SCYTHE_SILVER_RUPEE_1,               logic->IsAdult),
+        LOCATION(RC_ICE_CAVERN_SCYTHE_SILVER_RUPEE_2,               true),
+        LOCATION(RC_ICE_CAVERN_SCYTHE_SILVER_RUPEE_3,               true),
+        LOCATION(RC_ICE_CAVERN_SCYTHE_SILVER_RUPEE_4,               true),
+        LOCATION(RC_ICE_CAVERN_SCYTHE_SILVER_RUPEE_5,               true),
     }, {
         //Exits
         ENTRANCE(RR_ICE_CAVERN_BEGINNING,    true),
@@ -145,6 +150,11 @@ void RegionTable_Init_IceCavern() {
         LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_HALL_STALACTITE_2,            true),
         LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_HALL_STALACTITE_3,            true),
         LOCATION(RC_ICE_CAVERN_SILVER_RUPEE_RED_ICE,                    (logic->HasItem(RG_POWER_BRACELET) || (logic->IsAdult && (logic->CanGroundJump() || ctx->GetTrickOption(RT_SLIDE_JUMP)))) && logic->BlueFire()),
+        LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_1,               logic->HasItem(RG_POWER_BRACELET) && logic->BlueFire()),
+        LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_2,               logic->HasItem(RG_POWER_BRACELET) || logic->IsAdult),
+        LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_3,               logic->HasItem(RG_POWER_BRACELET) || logic->IsAdult),
+        LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_4,               logic->HasItem(RG_POWER_BRACELET) || logic->IsAdult),
+        LOCATION(RC_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_5,               logic->HasItem(RG_POWER_BRACELET) || logic->IsAdult),
     }, {
         //Exits
         ENTRANCE(RR_ICE_CAVERN_HUB,                  logic->CanClearStalagmite() || ctx->GetTrickOption(RT_ICE_STALAGMITE_CLIP)),

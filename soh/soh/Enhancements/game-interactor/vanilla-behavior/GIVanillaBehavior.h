@@ -1409,6 +1409,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // Flags_GetCollectible(play, this->collectibleFlag)
+    // ```
+    // #### `args`
+    // - `*EnGSwitch`
+    VB_EN_G_SWITCH_SPAWN_ITEM,
+
+    // #### `result`
+    // ```c
     // this->unk_15A > 0
     // ```
     // #### `args`

@@ -101,12 +101,14 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
 
 void BuildChildAltarMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg = RAND_GET_HINT(RH_ALTAR_CHILD)->GetHintMessage();
+    HintTracker::RevealHint(RH_ALTAR_CHILD);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }
 
 void BuildAdultAltarMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg = RAND_GET_HINT(RH_ALTAR_ADULT)->GetHintMessage();
+    HintTracker::RevealHint(RH_ALTAR_ADULT);
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
 }

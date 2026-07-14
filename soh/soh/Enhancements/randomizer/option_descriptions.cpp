@@ -145,6 +145,9 @@ void Settings::CreateOptionDescriptions() {
         "The amount of Triforce of Power pieces that will be placed in the world. "
         "Keep in mind seed generation can fail if more pieces are placed than there are junk items in the item pool.";
     mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED] = "The amount of Triforce of Power pieces required to lose.";
+    mOptionDescriptions[RSK_MIMIC_LOSE] =
+        "If \"Immortal Snail\" Mimic Mode is enabled and you touch the mimic, you will lose "
+        "the game and your save file will be deleted.";
     mOptionDescriptions[RSK_SHUFFLE_DUNGEON_ENTRANCES] =
         "Shuffle the pool of dungeon entrances, including Bottom of the Well, Ice Cavern and Gerudo Training Ground.\n"
         "\n"

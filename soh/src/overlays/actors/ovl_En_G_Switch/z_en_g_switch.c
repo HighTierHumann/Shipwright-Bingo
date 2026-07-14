@@ -13,6 +13,7 @@
 #include "objects/object_tsubo/object_tsubo.h"
 #include "objects/object_gi_rupy/object_gi_rupy.h"
 #include "soh/frame_interpolation.h"
+#include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
@@ -113,18 +114,22 @@ void EnGSwitch_Init(Actor* thisx, PlayState* play) {
             osSyncPrintf("\n\n");
             // "child switch spawn"
             osSyncPrintf(VT_FGCOL(GREEN) "☆☆☆☆☆ 子スイッチ発生 ☆☆☆☆☆ %x\n" VT_RST, this->actor.params);
-            this->colorIdx = 5;
-            this->numEffects = 20;
-            Collider_InitCylinder(play, &this->collider);
-            Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
-            this->actor.draw = EnGSwitch_DrawRupee;
-            this->actor.shape.yOffset = 700.0f;
-            if (Flags_GetSwitch(play, this->switchFlag)) {
-                osSyncPrintf(VT_FGCOL(GREEN) "☆☆☆☆☆ Ｙｏｕ ａｒｅ Ｓｈｏｃｋ！  ☆☆☆☆☆ %d\n" VT_RST, this->switchFlag);
-                Actor_Kill(&this->actor);
+            if (GameInteractor_Should(VB_EN_G_SWITCH_SPAWN_ITEM, true, this)) {
+                this->colorIdx = 5;
+                this->numEffects = 20;
+                Collider_InitCylinder(play, &this->collider);
+                Collider_SetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
+                this->actor.draw = EnGSwitch_DrawRupee;
+                this->actor.shape.yOffset = 700.0f;
+                if (Flags_GetSwitch(play, this->switchFlag)) {
+                    osSyncPrintf(VT_FGCOL(GREEN) "☆☆☆☆☆ Ｙｏｕ ａｒｅ Ｓｈｏｃｋ！  ☆☆☆☆☆ %d\n" VT_RST, this->switchFlag);
+                    Actor_Kill(&this->actor);
+                } else {
+                    Actor_SetScale(&this->actor, 0.03f);
+                    this->actionFunc = EnGSwitch_SilverRupeeIdle;
+                }
             } else {
-                Actor_SetScale(&this->actor, 0.03f);
-                this->actionFunc = EnGSwitch_SilverRupeeIdle;
+                Actor_Kill(&this->actor);
             }
             break;
         case ENGSWITCH_ARCHERY_POT:

@@ -38,7 +38,13 @@ void RegionTable_Init_GerudoTrainingGround() {
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_BOULDER_ROOM, AnyAgeTime([]{return logic->CanKillEnemy(RE_STALFOS, ED_CLOSE, true, 2, true);})),
     });
 
-    areaTable[RR_GERUDO_TRAINING_GROUND_BOULDER_ROOM] = Region("Gerudo Training Ground Boulder Room", SCENE_GERUDO_TRAINING_GROUND, {}, {}, {
+    areaTable[RR_GERUDO_TRAINING_GROUND_BOULDER_ROOM] = Region("Gerudo Training Ground Boulder Room", SCENE_GERUDO_TRAINING_GROUND, {}, {
+        LOCATION(RC_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_1, true),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_2, true),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_3, AnyAgeTime([]{return logic->CanUse(logic->IsAdult ? RG_HOOKSHOT : RG_LONGSHOT) || ctx->GetTrickOption(RT_GTG_WITHOUT_HOOKSHOT);})),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_4, true),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_5, true),
+    }, {
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_SAND_ROOM,        true),
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_HEAVY_BLOCK_ROOM, AnyAgeTime([]{return logic->CanUse(logic->IsAdult ? RG_HOOKSHOT : RG_LONGSHOT) || ctx->GetTrickOption(RT_GTG_WITHOUT_HOOKSHOT);})),
     });
@@ -149,7 +155,13 @@ void RegionTable_Init_GerudoTrainingGround() {
 
     areaTable[RR_GERUDO_TRAINING_GROUND_LAVA_ROOM] = Region("Gerudo Training Ground Lava Room", SCENE_GERUDO_TRAINING_GROUND, {
         EVENT_ACCESS(LOGIC_GTG_PLATFORM_SILVER_RUPEES, logic->CanUse(RG_HOOKSHOT) && (logic->CanUse(RG_HOVER_BOOTS) || logic->CanUse(RG_SONG_OF_TIME) || logic->IsChild)),
-    }, {}, {
+    }, {
+        LOCATION(RC_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_1, logic->Get(LOGIC_GTG_PLATFORM_SILVER_RUPEES)),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_2, logic->Get(LOGIC_GTG_PLATFORM_SILVER_RUPEES)),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_3, logic->Get(LOGIC_GTG_PLATFORM_SILVER_RUPEES)),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_4, logic->Get(LOGIC_GTG_PLATFORM_SILVER_RUPEES)),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_5, logic->Get(LOGIC_GTG_PLATFORM_SILVER_RUPEES)),
+    }, {
         //Exits
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_DINALFOS,              true),
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_CENTRAL_MAZE_RIGHT,    logic->CanUse(RG_SONG_OF_TIME) || logic->IsChild),
@@ -166,6 +178,11 @@ void RegionTable_Init_GerudoTrainingGround() {
     areaTable[RR_GERUDO_TRAINING_GROUND_UNDERWATER] = Region("Gerudo Training Ground Underwater", SCENE_GERUDO_TRAINING_GROUND, {}, {
         //Locations
         LOCATION(RC_GERUDO_TRAINING_GROUND_UNDERWATER_SILVER_RUPEE_CHEST, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24 && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_1, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_2, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_3, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_4, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24),
+        LOCATION(RC_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_5, logic->CanUse(RG_SONG_OF_TIME) && logic->CanUse(RG_IRON_BOOTS) && logic->HasItem(RG_BRONZE_SCALE) && logic->WaterTimer() >= 24),
     }, {
         //Exits
         ENTRANCE(RR_GERUDO_TRAINING_GROUND_LAVA_ROOM, true),
