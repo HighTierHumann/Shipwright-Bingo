@@ -15,6 +15,7 @@
 #include "vt.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/savestate_serialize.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -416,7 +417,7 @@ void EnXc_SetWalkingSFX(EnXc* this, PlayState* play) {
     s32 pad2;
 
     if (Animation_OnFrame(&this->skelAnime, 11.0f) || Animation_OnFrame(&this->skelAnime, 23.0f)) {
-        if (this->actor.bgCheckFlags & 1) {
+        if (this->actor.bgCheckFlags & BGCHECKFLAG_GROUND) {
             sfxId = SFX_FLAG;
             sfxId += SurfaceType_GetSfx(&play->colCtx, this->actor.floorPoly, this->actor.floorBgId);
             Sfx_PlaySfxAtPos(&this->actor.projectedPos, sfxId);
@@ -430,7 +431,7 @@ void EnXc_SetNutThrowSFX(EnXc* this, PlayState* play) {
     s32 pad2;
 
     if (Animation_OnFrame(&this->skelAnime, 7.0f)) {
-        if (this->actor.bgCheckFlags & 1) {
+        if (this->actor.bgCheckFlags & BGCHECKFLAG_GROUND) {
             sfxId = SFX_FLAG;
             sfxId += SurfaceType_GetSfx(&play->colCtx, this->actor.floorPoly, this->actor.floorBgId);
             Sfx_PlaySfxAtPos(&this->actor.projectedPos, sfxId);
@@ -491,7 +492,7 @@ void func_80B3D118(PlayState* play) {
 
 static Vec3f D_80B42DA0;
 
-s32 D_80B41D90 = 0;
+static s32 D_80B41D90 = 0;
 void EnXc_SetColossusWindSFX(PlayState* play) {
     if (gSaveContext.sceneLayer == 4) {
         static Vec3f sPos = { 0.0f, 0.0f, 0.0f };
@@ -528,17 +529,17 @@ void EnXc_SetColossusWindSFX(PlayState* play) {
     }
 }
 
-s32 sEnXcFlameSpawned = false;
+static s32 sFlameSpawned = false;
 void EnXc_SpawnFlame(EnXc* this, PlayState* play) {
 
-    if (!sEnXcFlameSpawned) {
+    if (!sFlameSpawned) {
         CsCmdActorCue* npcAction = EnXc_GetCsCmd(play, 0);
         f32 xPos = npcAction->startPos.x;
         f32 yPos = npcAction->startPos.y;
         f32 zPos = npcAction->startPos.z;
 
         this->flameActor = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_LIGHT, xPos, yPos, zPos, 0, 0, 0, 5);
-        sEnXcFlameSpawned = true;
+        sFlameSpawned = true;
     }
 }
 
@@ -563,7 +564,7 @@ void EnXc_DestroyFlame(EnXc* this) {
     Actor_Kill(&this->actor);
 }
 
-s32 D_80B41DA8 = 1;
+static s32 D_80B41DA8 = 1;
 void EnXc_InitFlame(EnXc* this, PlayState* play) {
     s32 pad;
     s16 sceneNum = play->sceneNum;
@@ -1442,7 +1443,16 @@ void func_80B3F534(PlayState* play) {
     }
 }
 
-s32 D_80B41DAC = 1;
+static s32 D_80B41DAC = 1;
+
+#define EN_XC_SHIP_SAVESTATE_FIELDS(F) \
+    F(D_80B41D90)                      \
+    F(sFlameSpawned)                   \
+    F(D_80B41DA8)                      \
+    F(D_80B41DAC)
+
+SHIP_SAVESTATE_DEFINE(EnXc, EN_XC_SHIP_SAVESTATE_FIELDS)
+
 void func_80B3F59C(EnXc* this, PlayState* play) {
     CsCmdActorCue* npcAction = EnXc_GetCsCmd(play, 0);
 
@@ -2479,7 +2489,7 @@ const ActorInit En_Xc_InitVars = {
 
 void EnXc_Reset(void) {
     D_80B41D90 = 0;
-    sEnXcFlameSpawned = false;
+    sFlameSpawned = false;
     D_80B41DA8 = 1;
     D_80B41DAC = 1;
 }

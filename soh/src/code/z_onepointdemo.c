@@ -2,12 +2,52 @@
 #include "vt.h"
 #include "overlays/actors/ovl_En_Sw/z_en_sw.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/savestate_serialize.h"
 
 static s16 sDisableAttention = false;
 static s16 sUnused = -1;
-s32 sPrevFrameCs1100 = -4096;
+static s32 sPrevFrameCs1100 = -4096;
 
 #include "z_onepointdemo_data.inc"
+
+#define ONE_POINT_CUTSCENE_SHIP_SAVESTATE_FIELDS(F) \
+    F(sPrevFrameCs1100)                             \
+    F(D_8012013C)                                   \
+    F(D_8012021C)                                   \
+    F(D_801204D4)                                   \
+    F(D_801205B4)                                   \
+    F(D_801208EC)                                   \
+    F(D_80120964)                                   \
+    F(D_801209B4)                                   \
+    F(D_80120ACC)                                   \
+    F(D_80120B94)                                   \
+    F(D_80120D4C)                                   \
+    F(D_80120FA4)                                   \
+    F(D_80121184)                                   \
+    F(D_801211D4)                                   \
+    F(D_8012133C)                                   \
+    F(D_801213B4)                                   \
+    F(D_8012151C)                                   \
+    F(D_8012156C)                                   \
+    F(D_801215BC)                                   \
+    F(D_80121C24)                                   \
+    F(D_80121D3C)                                   \
+    F(D_80121F1C)                                   \
+    F(D_80121FBC)                                   \
+    F(D_801220D4)                                   \
+    F(D_80122714)                                   \
+    F(D_80122CB4)                                   \
+    F(D_80122D04)                                   \
+    F(D_80122E44)                                   \
+    F(D_8012313C)                                   \
+    F(D_801231B4)                                   \
+    F(D_80123254)                                   \
+    F(D_801232A4)                                   \
+    F(D_80123894)                                   \
+    F(D_8012390C)                                   \
+    F(D_8012395C)                                   \
+    F(D_801239D4)
+SHIP_SAVESTATE_DEFINE(OnePointCutscene, ONE_POINT_CUTSCENE_SHIP_SAVESTATE_FIELDS)
 
 void OnePointCutscene_AddVecSphToVec3f(Vec3f* dst, Vec3f* src, VecSph* vecSph) {
     Vec3f out;
@@ -962,7 +1002,7 @@ s32 OnePointCutscene_SetInfo(PlayState* play, s16 camIdx, s16 csId, Actor* actor
         } break;
         case 9806:
             csCam->timer = -99;
-            if (func_800C0CB8(play)) {
+            if (Play_CamIsNotFixed(play)) {
                 func_800C0808(play, camIdx, player, CAM_SET_TURN_AROUND);
                 csCam->data2 = 0xC;
             } else {
@@ -971,7 +1011,7 @@ s32 OnePointCutscene_SetInfo(PlayState* play, s16 camIdx, s16 csId, Actor* actor
             }
             break;
         case 9908:
-            if (func_800C0CB8(play)) {
+            if (Play_CamIsNotFixed(play)) {
                 D_801231B4[0].eyeTargetInit.z = D_801231B4[1].eyeTargetInit.z = !LINK_IS_ADULT ? 100.0f : 120.0f;
 
                 if (player->stateFlags1 & PLAYER_STATE1_IN_WATER) {
@@ -1187,7 +1227,7 @@ s16 OnePointCutscene_Init(PlayState* play, s16 csId, s16 timer, Actor* actor, s1
         OnePointCutscene_SetAsChild(play, vChildCamIdx, csCamIdx);
         vCsStatus = CAM_STAT_WAIT;
     } else {
-        Interface_ChangeAlpha(2);
+        Interface_ChangeHudVisibilityMode(2);
     }
     OnePointCutscene_SetAsChild(play, csCamIdx, parentCamIdx);
 

@@ -1755,7 +1755,7 @@ void EnHorse_Inactive(EnHorse* this, PlayState* play2) {
 
             // Focus the camera on Epona
             Camera_SetParam(play->cameraPtrs[0], 8, this);
-            Camera_ChangeSetting(play->cameraPtrs[0], 0x38);
+            Camera_RequestSetting(play->cameraPtrs[0], 0x38);
             Camera_SetCameraData(play->cameraPtrs[0], 4, NULL, NULL, 0x51, 0, 0);
         }
     }
@@ -1829,7 +1829,7 @@ void EnHorse_Idle(EnHorse* this, PlayState* play) {
                 this->followTimer = 0;
                 EnHorse_SetFollowAnimation(this, play);
                 Camera_SetParam(play->cameraPtrs[0], 8, this);
-                Camera_ChangeSetting(play->cameraPtrs[0], 0x38);
+                Camera_RequestSetting(play->cameraPtrs[0], 0x38);
                 Camera_SetCameraData(play->cameraPtrs[0], 4, NULL, NULL, 0x51, 0, 0);
             }
         } else {
@@ -2519,14 +2519,17 @@ void EnHorse_UpdateHorsebackArchery(EnHorse* this, PlayState* play) {
     if (this->animationIdx == ENHORSE_ANIM_WALK) {
         EnHorse_PlayWalkingSfx(this);
     }
-    if (play->interfaceCtx.hbaAmmo == 0) {
+
+    if (GameInteractor_Should(VB_PREVENT_HBA_FANFARE_SOFTLOCK_TIMER, play->interfaceCtx.hbaAmmo == 0, this)) {
         this->hbaTimer++;
     }
 
     isFanfarePlaying = Audio_IsSequencePlaying(NA_BGM_HORSE_GOAL);
+
     EnHorse_UpdateHbaRaceInfo(this, play, &sHbaInfo);
     if (this->hbaFlags & 1 || this->hbaTimer >= 46) {
-        if (isFanfarePlaying != 1 && gSaveContext.minigameState != 3) {
+        if (GameInteractor_Should(VB_PREVENT_HBA_FANFARE_SOFTLOCK_BUTTONS,
+                                  (isFanfarePlaying != 1 && gSaveContext.minigameState != 3), this)) {
             gSaveContext.cutsceneIndex = 0;
             play->nextEntranceIndex = ENTR_GERUDOS_FORTRESS_16;
             play->transitionTrigger = TRANS_TRIGGER_START;

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Enhancements/savestate_serialize.h"
 
 #define FLAGS                                                                                  \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -89,7 +90,7 @@ sEnFrPointers.flags = 12
      - Deactivate frogs, frogs will jump back into the water
 */
 
-EnFrPointers sEnFrPointers = {
+static EnFrPointers sEnFrPointers = {
     0x00,
     {
         NULL,
@@ -99,6 +100,10 @@ EnFrPointers sEnFrPointers = {
         NULL,
     },
 };
+
+#define EN_FR_SHIP_SAVESTATE_FIELDS(F) F(sEnFrPointers)
+
+SHIP_SAVESTATE_DEFINE(EnFr, EN_FR_SHIP_SAVESTATE_FIELDS)
 
 // Flags for gSaveContext.eventChkInf[13]
 static u16 sSongIndex[] = {
@@ -877,7 +882,7 @@ void EnFr_OcarinaMistake(EnFr* this, PlayState* play) {
     Message_CloseTextbox(play);
     this->reward = GI_NONE;
     Sfx_PlaySfxCentered(NA_SE_SY_OCARINA_ERROR);
-    Audio_OcaSetInstrument(0);
+    AudioOcarina_SetInstrument(0);
     sEnFrPointers.flags = 12;
     EnFr_DeactivateButterfly();
     this->actionFunc = EnFr_Deactivate;
@@ -947,7 +952,7 @@ void EnFr_SetupReward(EnFr* this, PlayState* play, u8 unkCondition) {
         Sfx_PlaySfxCentered(NA_SE_SY_CORRECT_CHIME);
     }
 
-    Audio_OcaSetInstrument(0);
+    AudioOcarina_SetInstrument(0);
     play->msgCtx.msgMode = MSGMODE_PAUSED;
     this->actionFunc = EnFr_PrintTextBox;
 }

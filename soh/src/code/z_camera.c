@@ -9,6 +9,7 @@
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/controls/Mouse.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/savestate_serialize.h"
 
 s16 Camera_ChangeSettingFlags(Camera* camera, s16 setting, s16 flags);
 s32 Camera_ChangeModeFlags(Camera* camera, s16 mode, u8 flags);
@@ -573,9 +574,9 @@ s16 Camera_XZAngle(Vec3f* to, Vec3f* from) {
     return DEGF_TO_BINANG(RADF_TO_DEGF(Math_FAtan2F(from->x - to->x, from->z - to->z)));
 }
 
-f32 D_8015CE50;
-f32 D_8015CE54;
-CamColChk D_8015CE58;
+static f32 D_8015CE50;
+static f32 D_8015CE54;
+static CamColChk D_8015CE58;
 s16 func_80044ADC(Camera* camera, s16 yaw, s16 arg2) {
     Vec3f playerPos;
     Vec3f rotatedPos;
@@ -775,7 +776,7 @@ void Camera_UpdateInterface(s16 flags) {
         if (flags & SHRINKWIN_CURVAL) {
             ShrinkWindow_SetCurrentVal(sCameraShrinkWindowVal);
         } else {
-            ShrinkWindow_SetVal(sCameraShrinkWindowVal);
+            Letterbox_SetSizeTarget(sCameraShrinkWindowVal);
         }
     }
 
@@ -786,7 +787,7 @@ void Camera_UpdateInterface(s16 flags) {
         }
         if (interfaceAlpha != sCameraInterfaceAlpha) {
             sCameraInterfaceAlpha = interfaceAlpha;
-            Interface_ChangeAlpha(sCameraInterfaceAlpha);
+            Interface_ChangeHudVisibilityMode(sCameraInterfaceAlpha);
         }
     }
 }
@@ -1450,15 +1451,16 @@ s32 Camera_Free(Camera* camera) {
     Parallel1* para1 = (Parallel1*)camera->paramData;
     f32 playerHeight;
 
-    // SOH [Enhancement] If free-look is resuming after a scene-forced/fixed camera drove the view
-    // (Camera_Free didn't run last frame while manualCamera stayed set, e.g. exiting a Spirit Temple
-    // alcove), re-seed the free-look angles from the camera's current orientation so the view continues
-    // from where it was left instead of snapping back to the pre-interruption angle.
+    // SOH [Enhancement] If free-look resuming after another camera drove view (e.g. Spirit Temple alcove,
+    // or crawling), re-seed free-look angles so view continues from where it was left instead of snapping
+    // back to the pre-interruption angle. Seed from play->view (what was actually on screen last frame),
+    // not camera->at/eye: for a subcamera-driven OnePoint cutscene like crawlspace exit, main camera's own
+    // eye is left stale and aims re-seed at sky, while play->view still holds cutscene's final framing of Link.
     static s32 sFreeLastFrame = 0;
     s32 curFrame = camera->play->state.frames;
     if (curFrame - sFreeLastFrame > 1) {
         VecSph eyeAdjustment;
-        OLib_Vec3fDiffToVecSphGeo(&eyeAdjustment, &camera->at, &camera->eye);
+        OLib_Vec3fDiffToVecSphGeo(&eyeAdjustment, &camera->play->view.lookAt, &camera->play->view.eye);
         camera->play->camX = eyeAdjustment.yaw;
         camera->play->camY = eyeAdjustment.pitch;
     }
@@ -7416,7 +7418,7 @@ s32 Camera_DbgChangeMode(Camera* camera) {
         }
         if (changeDir != 0) {
             sDbgModeIdx = (sDbgModeIdx + changeDir) % 6;
-            if (Camera_ChangeSetting(camera, D_8011DAFC[sDbgModeIdx]) > 0) {
+            if (Camera_RequestSetting(camera, D_8011DAFC[sDbgModeIdx]) > 0) {
                 osSyncPrintf("camera: force change SET to %s!\n", sCameraSettingNames[D_8011DAFC[sDbgModeIdx]]);
             }
         }
@@ -7424,8 +7426,8 @@ s32 Camera_DbgChangeMode(Camera* camera) {
     return true;
 }
 
-s16 depthPhase = 0x3F0;
-s16 screenPlanePhase = 0x156;
+static s16 depthPhase = 0x3F0;
+static s16 screenPlanePhase = 0x156;
 void Camera_UpdateDistortion(Camera* camera) {
     f32 scaleFactor;
     f32 speedFactor;
@@ -7509,7 +7511,7 @@ void Camera_UpdateDistortion(Camera* camera) {
     }
 }
 
-s32 sOOBTimer = 0;
+static s32 sOOBTimer = 0;
 Vec3s Camera_Update(Camera* camera) {
     Vec3f viewAt;
     Vec3f viewEye;
@@ -8023,7 +8025,7 @@ s16 Camera_ChangeSettingFlags(Camera* camera, s16 setting, s16 flags) {
     return setting;
 }
 
-s32 Camera_ChangeSetting(Camera* camera, s16 setting) {
+s32 Camera_RequestSetting(Camera* camera, s16 setting) {
     return Camera_ChangeSettingFlags(camera, setting, 0);
 }
 
@@ -8225,14 +8227,14 @@ s32 Camera_ChangeDoorCam(Camera* camera, Actor* doorActor, s16 camDataIdx, f32 a
     }
 
     if (camDataIdx == -1) {
-        Camera_ChangeSetting(camera, CAM_SET_DOORC);
+        Camera_RequestSetting(camera, CAM_SET_DOORC);
         osSyncPrintf(".... change default door camera (set %d)\n", CAM_SET_DOORC);
     } else {
         s32 setting = Camera_GetCamDataSetting(camera, camDataIdx);
 
         camera->unk_14A |= 0x40;
 
-        if (Camera_ChangeSetting(camera, setting) >= 0) {
+        if (Camera_RequestSetting(camera, setting) >= 0) {
             camera->camDataIdx = camDataIdx;
             camera->unk_14A |= 4;
         }
@@ -8353,3 +8355,31 @@ s16 func_8005B1A4(Camera* camera) {
 
     return camera->thisIdx;
 }
+
+#define CAMERA_SHIP_SAVESTATE_FIELDS(F) \
+    F(sInitRegs)                        \
+    F(gDbgCamEnabled)                   \
+    F(sDbgModeIdx)                      \
+    F(sNextUID)                         \
+    F(sCameraInterfaceFlags)            \
+    F(sCameraInterfaceAlpha)            \
+    F(sCameraShrinkWindowVal)           \
+    F(D_8011D3AC)                       \
+    F(sDemo5PrevAction12Frame)          \
+    F(sDemo5PrevSfxFrame)               \
+    F(D_8011D3F0)                       \
+    F(D_8011D6AC)                       \
+    F(D_8011D724)                       \
+    F(D_8011D79C)                       \
+    F(D_8011D83C)                       \
+    F(D_8011D88C)                       \
+    F(D_8011D8DC)                       \
+    F(D_8011D954)                       \
+    F(D_8011D9F4)                       \
+    F(depthPhase)                       \
+    F(screenPlanePhase)                 \
+    F(sOOBTimer)                        \
+    F(D_8015CE50)                       \
+    F(D_8015CE54)                       \
+    F(D_8015CE58)
+SHIP_SAVESTATE_DEFINE(Camera, CAMERA_SHIP_SAVESTATE_FIELDS)

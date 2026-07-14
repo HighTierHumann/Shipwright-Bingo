@@ -13,6 +13,7 @@
 #include "objects/object_zl2_anime2/object_zl2_anime2.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Enhancements/savestate_serialize.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -47,7 +48,7 @@ static void* sEyeTextures[] = { gZelda2EyeOpenTex, gZelda2EyeHalfTex, gZelda2Eye
 
 static void* sMouthTextures[] = { gZelda2MouthSeriousTex, gZelda2MouthHappyTex, gZelda2MouthOpenTex };
 
-s32 D_80B5A468 = 0;
+static s32 D_80B5A468 = 0;
 
 static Vec3f D_80B5A46C = { 0.0f, 0.0f, 0.0f };
 
@@ -57,7 +58,7 @@ static f32 D_80B5A484 = 0.0f;
 
 static Vec3f D_80B5A488 = { 0.0f, 0.0f, 0.0f };
 
-s32 D_80B5A494 = -1;
+static s32 D_80B5A494 = -1;
 
 static Vec3f D_80B5A498 = { 148.0f, 260.0f, -87.0f };
 
@@ -65,7 +66,14 @@ static Vec3f D_80B5A4A4 = { -12.0f, 260.0f, -147.0f };
 
 static Vec3f D_80B5A4B0 = { 42.0f, 260.0f, 13.0f };
 
-u32 D_80B5A4BC = 0;
+static u32 D_80B5A4BC = 0;
+
+#define EN_ZL3_SHIP_SAVESTATE_FIELDS(F) \
+    F(D_80B5A468)                       \
+    F(D_80B5A494)                       \
+    F(D_80B5A4BC)
+
+SHIP_SAVESTATE_DEFINE(EnZl3, EN_ZL3_SHIP_SAVESTATE_FIELDS)
 
 void func_80B533B0(Actor* thisx, PlayState* play) {
     EnZl3* this = (EnZl3*)thisx;
@@ -1555,7 +1563,8 @@ void func_80B56E38(EnZl3* this, PlayState* play) {
     s32 sfxId;
     SkelAnime* sp20 = &this->skelAnime;
 
-    if ((Animation_OnFrame(sp20, 6.0f) || Animation_OnFrame(sp20, 0.0f)) && (this->actor.bgCheckFlags & 1)) {
+    if ((Animation_OnFrame(sp20, 6.0f) || Animation_OnFrame(sp20, 0.0f)) &&
+        (this->actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
         sfxId = 0x800;
         sfxId += SurfaceType_GetSfx(&play->colCtx, this->actor.floorPoly, this->actor.floorBgId);
         Sfx_PlaySfxAtPos(&this->actor.projectedPos, sfxId);
@@ -2202,7 +2211,7 @@ s32 func_80B58938(EnZl3* this, PlayState* play) {
 }
 
 s32 func_80B5899C(EnZl3* this, PlayState* play) {
-    if ((this->actor.bgCheckFlags & 1)) {
+    if ((this->actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
         Player* player = GET_PLAYER(play);
         s8 invincibilityTimer = player->invincibilityTimer;
 
