@@ -51,7 +51,6 @@ static WidgetInfo enableDraggingWidget;
 static WidgetInfo onlyPausedWidget;
 static WidgetInfo ammoTracking;
 static WidgetInfo keyTracking;
-static WidgetInfo silverRupeeTracking;
 static WidgetInfo silverRupeeDisplayWidget;
 static WidgetInfo triforcePieceCount;
 static WidgetInfo dungeonItemTracking;
@@ -471,12 +470,6 @@ typedef enum {
     KEYS_CURRENT_COLLECTED_MAX,
     KEYS_CURRENT_MAX,
 } ItemTrackerKeysNumberOption;
-
-typedef enum {
-    SILVER_RUPEES_COLLECTED_MAX,
-    SILVER_RUPEES_CURRENT_COLLECTED_MAX,
-    SILVER_RUPEES_CURRENT_MAX,
-} ItemTrackerSilverRupeeNumberOption;
 
 typedef enum {
     TRIFORCE_PIECE_COLLECTED_REQUIRED,
@@ -1531,72 +1524,32 @@ void DrawSilverRupee(ItemTrackerItem item) {
         }
     }
 
-    // Draw number under icon according to SilverRupeeCounts setting
+    // Draw number under icon
     if (GameInteractor::IsSaveLoaded() && IsValidSaveFile()) {
-        int mode = CVarGetInteger(CVAR_TRACKER_ITEM("SilverRupeeCounts"), SILVER_RUPEES_COLLECTED_MAX);
         int max = 5;
-        int currentRupees = gSaveContext.rupees;
 
-        if (mode == SILVER_RUPEES_COLLECTED_MAX) {
-            std::string currentString = std::to_string(count);
-            std::string maxString = std::to_string(max);
-            ImU32 currentColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
-            ImU32 maxColor = IM_COL_GREEN;
+        std::string currentString = std::to_string(count);
+        std::string maxString = std::to_string(max);
+        ImU32 currentColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
+        ImU32 maxColor = IM_COL_GREEN;
 
-            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) -
-                                             (ImGui::CalcTextSize((currentString + "/" + maxString).c_str()).x / 2),
-                                             p.y + 25));
-            ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
-            ImGui::Text("%s/", currentString.c_str());
-            ImGui::PopStyleColor();
-            ImGui::SameLine(0, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
-            ImGui::Text("%s", maxString.c_str());
-            ImGui::PopStyleColor();
-        } else if (mode == SILVER_RUPEES_CURRENT_COLLECTED_MAX) {
-            std::string cur = std::to_string(currentRupees) + "/";
-            std::string collected = std::to_string(count) + "/";
-            std::string maxString = std::to_string(max);
-            ImU32 curColor = IM_COL_WHITE;
-            ImU32 collectedColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
-            ImU32 maxColor = IM_COL_GREEN;
-
-            std::string total = cur + collected + maxString;
-            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize(total.c_str()).x / 2), p.y + 25));
-            ImGui::PushStyleColor(ImGuiCol_Text, curColor);
-            ImGui::Text("%s", cur.c_str());
-            ImGui::PopStyleColor();
-            ImGui::SameLine(0, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_Text, collectedColor);
-            ImGui::Text("%s", collected.c_str());
-            ImGui::PopStyleColor();
-            ImGui::SameLine(0, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
-            ImGui::Text("%s", maxString.c_str());
-            ImGui::PopStyleColor();
-        } else if (mode == SILVER_RUPEES_CURRENT_MAX) {
-            std::string cur = std::to_string(currentRupees);
-            std::string maxString = std::to_string(max);
-            ImU32 curColor = IM_COL_WHITE;
-            ImU32 maxColor = IM_COL_GREEN;
-
-            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize((cur + "/" + maxString).c_str()).x / 2),
-                                             p.y + 25));
-            ImGui::PushStyleColor(ImGuiCol_Text, curColor);
-            ImGui::Text("%s/", cur.c_str());
-            ImGui::PopStyleColor();
-            ImGui::SameLine(0, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
-            ImGui::Text("%s", maxString.c_str());
-            ImGui::PopStyleColor();
-        }
+        ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) -
+                                         (ImGui::CalcTextSize((currentString + "/" + maxString).c_str()).x / 2),
+                                         p.y + 25));
+        ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
+        ImGui::Text("%s/", currentString.c_str());
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
+        ImGui::Text("%s", maxString.c_str());
+        ImGui::PopStyleColor();
     }
 
     // Draw short dungeon label above icon
     if (itemTrackerSilverRupeeShortNames.find(item.id) != itemTrackerSilverRupeeShortNames.end()) {
         std::string label = itemTrackerSilverRupeeShortNames[item.id];
         ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize(label.c_str()).x / 2), p.y - (iconSize) + 30));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_WHITE);
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_LIGHT_YELLOW);
         ImGui::Text("%s", label.c_str());
         ImGui::PopStyleColor();
     }
@@ -2301,11 +2254,6 @@ static std::map<int32_t, const char*> itemTrackerKeyTrackOptions = {
     { KEYS_CURRENT_COLLECTED_MAX, "Current / Collected / Max" },
     { KEYS_CURRENT_MAX, "Current / Max" },
 };
-static std::map<int32_t, const char*> itemTrackerSilverRupeeTrackOptions = {
-    { SILVER_RUPEES_COLLECTED_MAX, "Collected / Max" },
-    { SILVER_RUPEES_CURRENT_COLLECTED_MAX, "Current / Collected / Max" },
-    { SILVER_RUPEES_CURRENT_MAX, "Current / Max" },
-};
 static std::map<int32_t, const char*> itemTrackerTriforcePieceTrackOptions = {
     { TRIFORCE_PIECE_COLLECTED_REQUIRED, "Collected / Required" },
     { TRIFORCE_PIECE_COLLECTED_REQUIRED_MAX, "Collected / Required / Max" },
@@ -2395,7 +2343,6 @@ void ItemTrackerSettingsWindow::DrawElement() {
 
         SohGui::mSohMenu->MenuDrawItem(keyTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(triforcePieceCount, 250, THEME_COLOR);
-        SohGui::mSohMenu->MenuDrawItem(silverRupeeTracking, 250, THEME_COLOR);
 
         ImGui::TableNextColumn();
 
@@ -2566,17 +2513,6 @@ void RegisterItemTrackerWidgets() {
                      .ComboMap(displayTypes))
         .Callback([](WidgetInfo& info) { shouldUpdateVectors = true; });
     SohGui::mSohMenu->AddSearchWidget({ triforcePowerPieceTracking, "Randomizer", "Item Tracker", "General Settings" });
-    
-    silverRupeeTracking = { .name = "Silver Rupee Count Tracking", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
-    silverRupeeTracking.CVar(CVAR_TRACKER_ITEM("SilverRupeeCounts"))
-        .Options(ComboboxOptions()
-                     .DefaultIndex(SILVER_RUPEES_COLLECTED_MAX)
-                     .ComponentAlignment(ComponentAlignments::Right)
-                     .LabelPosition(LabelPositions::Far)
-                     .Color(THEME_COLOR)
-                     .ComboMap(itemTrackerSilverRupeeTrackOptions)
-                     .Tooltip("Customize what numbers are shown for Silver Rupee tracking."));
-    SohGui::mSohMenu->AddSearchWidget({ silverRupeeTracking, "Randomizer", "Item Tracker", "General Settings" });
 
     silverRupeeDisplayWidget = { .name = "Silver Rupees", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
     silverRupeeDisplayWidget.CVar(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"))
