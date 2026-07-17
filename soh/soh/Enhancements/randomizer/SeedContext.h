@@ -32,6 +32,7 @@ class TrialInfo;
 class Trials;
 class Kaleido;
 class ItemLocation;
+class SilverRupeeAreas;
 
 class Context {
   public:
@@ -91,6 +92,10 @@ class Context {
     DungeonInfo* GetDungeon(size_t key) const;
     std::shared_ptr<Logic> GetLogic();
     std::shared_ptr<Trials> GetTrials();
+    std::shared_ptr<SilverRupeeAreas> GetSilverRupeeAreas();
+    /// @brief Returns whether the Silver Rupee area associated with the given hint text key
+    /// (i.e. a RCTYPE_SILVER_RUPEE Location's GetHintKey()) has been selected for shuffling.
+    bool IsSilverRupeeAreaShuffled(RandomizerHintTextKey hintKey);
     std::shared_ptr<Kaleido> GetKaleido();
     TrialInfo* GetTrial(size_t key) const;
     TrialInfo* GetTrial(TrialKey key) const;
@@ -195,6 +200,7 @@ class Context {
     std::shared_ptr<Logic> mLogic;
     std::shared_ptr<Trials> mTrials;
     std::shared_ptr<Fishsanity> mFishsanity;
+    std::shared_ptr<SilverRupeeAreas> mSilverRupeeAreas;
     std::shared_ptr<Kaleido> mKaleido;
     bool mSeedGenerated = false;
     bool mSpoilerLoaded = false;

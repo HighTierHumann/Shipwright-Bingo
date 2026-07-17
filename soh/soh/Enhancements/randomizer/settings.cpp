@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "trial.h"
 #include "dungeon.h"
+#include "ShuffleSilverRupees.h"
 #include "soh/Enhancements/randomizer/randomizerTypes.h"
 #include "soh/Enhancements/randomizer/3drando/random.hpp"
 #include "soh/OTRGlobals.h"
@@ -874,7 +875,6 @@ void Settings::CreateOptions() {
     });
     OPT_BOOL(RSK_SHUFFLE_SPEAK, "Shuffle Jabber Nuts", CVAR_RANDOMIZER_SETTING("ShuffleSpeak"), mOptionDescriptions[RSK_SHUFFLE_SPEAK]);
     OPT_BOOL(RSK_SHUFFLE_OPEN_CHEST, "Shuffle Open Chest", CVAR_RANDOMIZER_SETTING("ShuffleOpenChest"), mOptionDescriptions[RSK_SHUFFLE_OPEN_CHEST]);
-    OPT_BOOL(RSK_SHUFFLE_SILVER_RUPEES, "Shuffle Silver Rupees", CVAR_RANDOMIZER_SETTING("ShuffleSilverRupees"), mOptionDescriptions[RSK_SHUFFLE_SILVER_RUPEES]);
     OPT_BOOL(RSK_SHUFFLE_WEIRD_EGG, "Shuffle Weird Egg", CVAR_RANDOMIZER_SETTING("ShuffleWeirdEgg"), mOptionDescriptions[RSK_SHUFFLE_WEIRD_EGG]);
     OPT_BOOL(RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD, "Shuffle Gerudo Membership Card", CVAR_RANDOMIZER_SETTING("ShuffleGerudoToken"), mOptionDescriptions[RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD]);
     OPT_U8(RSK_SHUFFLE_POTS, "Shuffle Pots", {"Off", "Dungeons", "Overworld", "All Pots"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShufflePots"), mOptionDescriptions[RSK_SHUFFLE_POTS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_POTS_OFF);
@@ -1076,21 +1076,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_SHUFFLE_BEAN_SOULS, "Shuffle Bean Souls", CVAR_RANDOMIZER_SETTING("ShuffleBeanSouls"), mOptionDescriptions[RSK_SHUFFLE_BEAN_SOULS], IMFLAG_SEPARATOR_BOTTOM, WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_U8(RSK_SHUFFLE_BOSS_SOULS, "Shuffle Boss Souls", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleBossSouls"), mOptionDescriptions[RSK_SHUFFLE_BOSS_SOULS], WIDGET_CVAR_COMBOBOX);
     OPT_BOOL(RSK_SHUFFLE_DEKU_STICK_BAG, "Shuffle Deku Stick Bag", CVAR_RANDOMIZER_SETTING("ShuffleDekuStickBag"), mOptionDescriptions[RSK_SHUFFLE_DEKU_STICK_BAG], IMFLAG_SEPARATOR_BOTTOM, WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
-    OPT_CALLBACK(RSK_SHUFFLE_DEKU_STICK_BAG, {
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDekuStickBag"), 0)) {
-            mOptions[RSK_STARTING_STICKS].Disable("Disabled because Shuffle Deku Stick Bag is on.");
-        } else {
-            mOptions[RSK_STARTING_STICKS].Enable();
-        }
-    });
     OPT_BOOL(RSK_SHUFFLE_DEKU_NUT_BAG, "Shuffle Deku Nut Bag", CVAR_RANDOMIZER_SETTING("ShuffleDekuNutBag"), mOptionDescriptions[RSK_SHUFFLE_DEKU_NUT_BAG], IMFLAG_SEPARATOR_BOTTOM, WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
-    OPT_CALLBACK(RSK_SHUFFLE_DEKU_NUT_BAG, {
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDekuNutBag"), 0)) {
-            mOptions[RSK_STARTING_NUTS].Disable("Disabled because Shuffle Deku Nut Bag is on.");
-        } else {
-            mOptions[RSK_STARTING_NUTS].Enable();
-        }
-    });
     OPT_U8(RSK_SHUFFLE_FREESTANDING, "Shuffle Freestanding Items", {"Off", "Dungeons", "Overworld", "All Items"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleFreestanding"), mOptionDescriptions[RSK_SHUFFLE_FREESTANDING], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_FREESTANDING_OFF);
     OPT_U8(RSK_SHUFFLE_WONDER_ITEMS, "Shuffle Wonder Items", {"Off", "Dungeons", "Overworld", "All Items"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleWonderItems"), mOptionDescriptions[RSK_SHUFFLE_WONDER_ITEMS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_WONDER_ITEMS_OFF);
     OPT_U8(RSK_FISHSANITY, "Fishsanity", {"Off", "Shuffle only Hyrule Loach", "Shuffle Fishing Pond", "Shuffle Overworld Fish", "Shuffle Both"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("Fishsanity"), mOptionDescriptions[RSK_FISHSANITY], WIDGET_CVAR_COMBOBOX, RO_FISHSANITY_OFF);
@@ -1364,6 +1350,85 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_KEYRINGS_BOTTOM_OF_THE_WELL, "Bottom of the Well Keyring", {"No", "Random", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleKeyRingsBottomOfTheWell"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_KEYRINGS_GTG, "Gerudo Training Ground Keyring", {"No", "Random", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleKeyRingsGTG"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_KEYRINGS_GANONS_CASTLE, "Ganon's Castle Keyring", {"No", "Random", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleKeyRingsGanonsCastle"), "", WIDGET_CVAR_COMBOBOX, 0);
+    
+    OPT_U8(RSK_SILVER_RUPEES, "Shuffle Silver Rupees", {"Off", "Random", "Count", "Count w/ Bags", "Selection"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilverRupees"), mOptionDescriptions[RSK_SILVER_RUPEES], WIDGET_CVAR_COMBOBOX, RO_SILVERS_OFF);
+    OPT_CALLBACK(RSK_SILVER_RUPEES, {
+        switch (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSilverRupees"), RO_SILVERS_OFF)) {
+            case RO_SILVERS_COUNT:
+            case RO_SILVERS_COUNT_WITH_BAGS:
+                // Show count slider.
+                mOptions[RSK_SILVERS_RANDOM_COUNT].Unhide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Hide();
+                mOptions[RSK_SILVERS_FOREST_TRIAL].Hide();
+                mOptions[RSK_SILVERS_FIRE_TRIAL].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TRIAL].Hide();
+                mOptions[RSK_SILVERS_LIGHT_TRIAL].Hide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE].Hide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK].Hide();
+                mOptions[RSK_SILVERS_GTG_BOULDERS].Hide();
+                mOptions[RSK_SILVERS_GTG_LAVA].Hide();
+                mOptions[RSK_SILVERS_GTG_TOILET].Hide();
+                mOptions[RSK_SILVERS_BOTW].Hide();
+                break;
+            case RO_SILVERS_SELECTION:
+                // Show checkboxes for each dungeon with keys.
+                mOptions[RSK_SILVERS_RANDOM_COUNT].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Unhide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Unhide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Unhide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Unhide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Unhide();
+                mOptions[RSK_SILVERS_FOREST_TRIAL].Unhide();
+                mOptions[RSK_SILVERS_FIRE_TRIAL].Unhide();
+                mOptions[RSK_SILVERS_SPIRIT_TRIAL].Unhide();
+                mOptions[RSK_SILVERS_LIGHT_TRIAL].Unhide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE].Unhide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK].Unhide();
+                mOptions[RSK_SILVERS_GTG_BOULDERS].Unhide();
+                mOptions[RSK_SILVERS_GTG_LAVA].Unhide();
+                mOptions[RSK_SILVERS_GTG_TOILET].Unhide();
+                mOptions[RSK_SILVERS_BOTW].Unhide();
+                break;
+            default:
+                mOptions[RSK_SILVERS_RANDOM_COUNT].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Hide();
+                mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Hide();
+                mOptions[RSK_SILVERS_FOREST_TRIAL].Hide();
+                mOptions[RSK_SILVERS_FIRE_TRIAL].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TRIAL].Hide();
+                mOptions[RSK_SILVERS_LIGHT_TRIAL].Hide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE].Hide();
+                mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK].Hide();
+                mOptions[RSK_SILVERS_GTG_BOULDERS].Hide();
+                mOptions[RSK_SILVERS_GTG_LAVA].Hide();
+                mOptions[RSK_SILVERS_GTG_TOILET].Hide();
+                mOptions[RSK_SILVERS_BOTW].Hide();
+                break;
+        }
+    });
+    OPT_U8(RSK_SILVERS_RANDOM_COUNT, "Silver Rupee sets or bags to randomize:", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversRandomCount"), "", WIDGET_CVAR_SLIDER_INT, 8);
+    OPT_U8(RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS, "Spirit Temple Boulder Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTempleBoulders"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SPIRIT_TEMPLE_CHILD, "Spirit Temple Child Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTempleChild"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_SCYTHE, "Shadow Temple Scythe Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleScythe"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_BEAMOS, "Shadow Temple Beamos Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleBeamos"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_REDEAD, "Shadow Temple ReDead Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleReDead"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_FOREST_TRIAL, "Forest Trial Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversForestTrial"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_FIRE_TRIAL, "Fire Trial Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversFireTrial"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SPIRIT_TRIAL, "Spirit Trial Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTrial"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_LIGHT_TRIAL, "Light Trial Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversLightTrial"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_ICE_CAVERN_SCYTHE, "Ice Cavern Scythe Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversIceCavernScythe"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK, "Ice Cavern Push Block Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversIceCavernPushBlock"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_GTG_BOULDERS, "Gerudo Training Ground Boulder Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversGTGBoulders"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_GTG_LAVA, "Gerudo Training Ground Lava Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversGTGLava"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_GTG_TOILET, "Gerudo Training Ground Toilet Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversGTGToilet"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_BOTW, "Bottom of the Well Basement Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversBOTW"), "", WIDGET_CVAR_COMBOBOX, 0);
     //Dummied out due to redundancy with TimeSavers.SkipChildStealth until such a time that logic needs to consider child stealth e.g. because it's freestanding checks are added to freestanding shuffle.
     //To undo this dummying, readd this setting to an OptionGroup so it appears in the UI, then edit the timesaver check hooks to look at this, and the timesaver setting to lock itself as needed.
     OPT_BOOL(RSK_SKIP_CHILD_STEALTH, "Skip Child Stealth", {"Don't Skip", "Skip"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("SkipChildStealth"), mOptionDescriptions[RSK_SKIP_CHILD_STEALTH], WIDGET_CVAR_CHECKBOX, RO_GENERIC_DONT_SKIP);
@@ -2160,12 +2225,22 @@ void Settings::CreateOptions() {
     mOptionGroups[RSG_MENU_COLUMN_MQ] =
         OptionGroup::SubGroup("", { &mOptionGroups[RSG_MENU_SECTION_MQ] }, WidgetContainerType::COLUMN);
     mOptionGroups[RSG_MENU_SECTION_KEYRINGS] = OptionGroup::SubGroup(
-        "Keyrings",
+        "Keyrings and Silver Rupees",
         { &mOptions[RSK_KEYRINGS], &mOptions[RSK_KEYRINGS_RANDOM_COUNT], &mOptions[RSK_KEYRINGS_FOREST_TEMPLE],
           &mOptions[RSK_KEYRINGS_FIRE_TEMPLE], &mOptions[RSK_KEYRINGS_WATER_TEMPLE],
           &mOptions[RSK_KEYRINGS_SPIRIT_TEMPLE], &mOptions[RSK_KEYRINGS_SHADOW_TEMPLE],
           &mOptions[RSK_KEYRINGS_BOTTOM_OF_THE_WELL], &mOptions[RSK_KEYRINGS_GTG],
-          &mOptions[RSK_KEYRINGS_GANONS_CASTLE], &mOptions[RSK_KEYRINGS_GERUDO_FORTRESS] },
+          &mOptions[RSK_KEYRINGS_GANONS_CASTLE], &mOptions[RSK_KEYRINGS_GERUDO_FORTRESS],
+          &mOptions[RSK_SILVER_RUPEES],                  &mOptions[RSK_SILVERS_RANDOM_COUNT],
+          &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS], &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
+          &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],   &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
+          &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],   &mOptions[RSK_SILVERS_FOREST_TRIAL],
+          &mOptions[RSK_SILVERS_FIRE_TRIAL],             &mOptions[RSK_SILVERS_SPIRIT_TRIAL],
+          &mOptions[RSK_SILVERS_LIGHT_TRIAL],            &mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE],
+          &mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK],  &mOptions[RSK_SILVERS_GTG_BOULDERS],
+          &mOptions[RSK_SILVERS_GTG_LAVA],               &mOptions[RSK_SILVERS_GTG_TOILET],
+          &mOptions[RSK_SILVERS_BOTW],
+        },
         WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_KEYRINGS] =
         OptionGroup::SubGroup("", { &mOptionGroups[RSG_MENU_SECTION_KEYRINGS] }, WidgetContainerType::COLUMN);
@@ -2273,7 +2348,6 @@ void Settings::CreateOptions() {
                                                                                  &mOptions[RSK_SHUFFLE_CRAWL],
                                                                                  &mOptions[RSK_SHUFFLE_SPEAK],
                                                                                  &mOptions[RSK_SHUFFLE_OPEN_CHEST],
-                                                                                 &mOptions[RSK_SHUFFLE_SILVER_RUPEES],
                                                                                  &mOptions[RSK_SHUFFLE_BEAN_SOULS],
                                                                                  &mOptions[RSK_ROCS_FEATHER],
                                                                                  &mOptions[RSK_BOMBCHU_BAG],
@@ -2357,6 +2431,7 @@ void Settings::CreateOptions() {
                                          &mOptions[RSK_STARTING_HYLIAN_SHIELD],  &mOptions[RSK_STARTING_MIRROR_SHIELD],
                                          &mOptions[RSK_STARTING_GORON_TUNIC],    &mOptions[RSK_STARTING_ZORA_TUNIC],
                                          &mOptions[RSK_STARTING_IRON_BOOTS],     &mOptions[RSK_STARTING_HOVER_BOOTS],
+                                         &mOptions[RSK_STARTING_STICKS],         &mOptions[RSK_STARTING_NUTS],
                                          &mOptions[RSK_STARTING_MEGATON_HAMMER], &mOptions[RSK_STARTING_BOOMERANG],
                                          &mOptions[RSK_STARTING_LENS_OF_TRUTH],  &mOptions[RSK_STARTING_DINS_FIRE],
                                          &mOptions[RSK_STARTING_FARORES_WIND],   &mOptions[RSK_STARTING_NAYRUS_LOVE],
@@ -2514,7 +2589,6 @@ void Settings::CreateOptions() {
                                             &mOptions[RSK_SHUFFLE_CRAWL],
                                             &mOptions[RSK_SHUFFLE_SPEAK],
                                             &mOptions[RSK_SHUFFLE_OPEN_CHEST],
-                                            &mOptions[RSK_SHUFFLE_SILVER_RUPEES],
                                             &mOptions[RSK_SHUFFLE_WEIRD_EGG],
                                             &mOptions[RSK_SHUFFLE_GERUDO_MEMBERSHIP_CARD],
                                             &mOptions[RSK_SHUFFLE_MERCHANTS],
@@ -2587,6 +2661,23 @@ void Settings::CreateOptions() {
                                                  &mOptions[RSK_KEYRINGS_BOTTOM_OF_THE_WELL],
                                                  &mOptions[RSK_KEYRINGS_GTG],
                                                  &mOptions[RSK_KEYRINGS_GANONS_CASTLE],
+                                                 &mOptions[RSK_SILVER_RUPEES],
+                                                 &mOptions[RSK_SILVERS_RANDOM_COUNT],
+                                                 &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS],
+                                                 &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
+                                                 &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],
+                                                 &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
+                                                 &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],
+                                                 &mOptions[RSK_SILVERS_FOREST_TRIAL],
+                                                 &mOptions[RSK_SILVERS_FIRE_TRIAL],
+                                                 &mOptions[RSK_SILVERS_SPIRIT_TRIAL],
+                                                 &mOptions[RSK_SILVERS_LIGHT_TRIAL],
+                                                 &mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE],
+                                                 &mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK],
+                                                 &mOptions[RSK_SILVERS_GTG_BOULDERS],
+                                                 &mOptions[RSK_SILVERS_GTG_LAVA],
+                                                 &mOptions[RSK_SILVERS_GTG_TOILET],
+                                                 &mOptions[RSK_SILVERS_BOTW],
                                              });
     mOptionGroups[RSG_STARTING_ITEMS] =
         OptionGroup::SubGroup("Items", { &mOptions[RSK_STARTING_OCARINA],        &mOptions[RSK_STARTING_KOKIRI_SWORD],
@@ -2594,6 +2685,7 @@ void Settings::CreateOptions() {
                                          &mOptions[RSK_STARTING_HYLIAN_SHIELD],  &mOptions[RSK_STARTING_MIRROR_SHIELD],
                                          &mOptions[RSK_STARTING_GORON_TUNIC],    &mOptions[RSK_STARTING_ZORA_TUNIC],
                                          &mOptions[RSK_STARTING_IRON_BOOTS],     &mOptions[RSK_STARTING_HOVER_BOOTS],
+                                         &mOptions[RSK_STARTING_STICKS],         &mOptions[RSK_STARTING_NUTS],
                                          &mOptions[RSK_STARTING_MEGATON_HAMMER], &mOptions[RSK_STARTING_BOOMERANG],
                                          &mOptions[RSK_STARTING_LENS_OF_TRUTH],  &mOptions[RSK_STARTING_DINS_FIRE],
                                          &mOptions[RSK_STARTING_FARORES_WIND],   &mOptions[RSK_STARTING_NAYRUS_LOVE],
@@ -2941,12 +3033,13 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
         }
     }
 
-    if (mOptions[RSK_SHUFFLE_DEKU_STICK_BAG]) {
-        mOptions[RSK_STARTING_STICKS].Set(false);
-    }
-    if (mOptions[RSK_SHUFFLE_DEKU_NUT_BAG]) {
-        mOptions[RSK_STARTING_NUTS].Set(false);
-    }
+    // It's silly, but allow starting with sticks even with bag shuffled
+    // if (mOptions[RSK_SHUFFLE_DEKU_STICK_BAG]) {
+    //     mOptions[RSK_STARTING_STICKS].Set(false);
+    // }
+    // if (mOptions[RSK_SHUFFLE_DEKU_NUT_BAG]) {
+    //     mOptions[RSK_STARTING_NUTS].Set(false);
+    // }
     if (mOptions[RSK_SHUFFLE_SWIM]) {
         mOptions[RSK_STARTING_SCALE].Set(0);
     }
@@ -3150,6 +3243,77 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
         if (mOptions[RSK_KEYRINGS_GANONS_CASTLE].Is(RO_KEYRING_FOR_DUNGEON_ON) ||
             (mOptions[RSK_KEYRINGS_GANONS_CASTLE].Is(RO_KEYRING_FOR_DUNGEON_RANDOM) && Random(0, 2) == 0)) {
             this->GetDungeon(GANONS_CASTLE)->SetKeyRing();
+        }
+    }
+
+    // Set which Silver Rupee areas are shuffled
+    auto silverRupeeAreas = this->GetSilverRupeeAreas();
+    silverRupeeAreas->ClearAllShuffled();
+
+    const std::vector<OptionValue*> silverRupeeOptions = {
+        &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS], &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
+        &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],   &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
+        &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],   &mOptions[RSK_SILVERS_FOREST_TRIAL],
+        &mOptions[RSK_SILVERS_FIRE_TRIAL],             &mOptions[RSK_SILVERS_SPIRIT_TRIAL],
+        &mOptions[RSK_SILVERS_LIGHT_TRIAL],            &mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE],
+        &mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK],  &mOptions[RSK_SILVERS_GTG_BOULDERS],
+        &mOptions[RSK_SILVERS_GTG_LAVA],               &mOptions[RSK_SILVERS_GTG_TOILET],
+        &mOptions[RSK_SILVERS_BOTW],
+    };
+
+    if (mOptions[RSK_SILVER_RUPEES]) {
+        // Random Silver Rupees
+        auto silvers = silverRupeeOptions;
+
+        if (mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_RANDOM) ||
+            mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_COUNT) ||
+            mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_COUNT_WITH_BAGS)) {
+            const uint32_t silverRupeeCount = (mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_COUNT) ||
+                                               mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_COUNT_WITH_BAGS))
+                                              ? mOptions[RSK_SILVERS_RANDOM_COUNT].Get()
+                                              : Random(0, static_cast<int>(silvers.size()));
+            Shuffle(silvers);
+            for (size_t i = 0; i < silverRupeeCount; i++) {
+                if (mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_COUNT_WITH_BAGS)) {
+                    silvers[i]->Set(RO_SILVERS_FOR_DUNGEON_ROOM_BAG);
+                } else if (mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_RANDOM)) {
+                    if (Random(0, 2) == 0) {
+                        silvers[i]->Set(RO_SILVERS_FOR_DUNGEON_ROOM_ON);
+                    } else {
+                        silvers[i]->Set(RO_SILVERS_FOR_DUNGEON_ROOM_BAG);
+                    }
+                } else {
+                    silvers[i]->Set(RO_SILVERS_FOR_DUNGEON_ROOM_ON);
+                }
+            }
+            for (size_t i = silverRupeeCount; i < silvers.size(); i++) {
+                silvers[i]->Set(RO_SILVERS_FOR_DUNGEON_ROOM_OFF);
+            }
+        }
+
+        // Each Silver Rupee area's setting (either resolved above from Random/Count, or set
+        // directly by the player in Selection mode) determines whether that area's Silver
+        // Rupees get shuffled into the item pool as freestanding items. "Random" per-area
+        // resolves to a 50% chance, either as 5 individual items ("Random") or as a single
+        // Silver Rupee Bag item ("Random Bag").
+        for (auto* area : silverRupeeAreas->GetAreaList()) {
+            const OptionValue& areaOption = mOptions[area->GetSettingKey()];
+            if (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_ON) ||
+                (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_RANDOM_SET) && Random(0, 2) == 0)) {
+                area->SetShuffled();
+            } else if (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_BAG) ||
+                       (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_RANDOM_BAG) && Random(0, 2) == 0)) {
+                area->SetShuffled(true);
+            
+            // If "True Random" is selected, first determine if the area should be shuffled at all
+            // then decide whether it should be shuffled normally or as a bag.
+            } else if (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_TRUE_RANDOM) && Random(0, 2) == 0) {
+                if (Random(0, 2) == 0) {
+                    area->SetShuffled();
+                } else {
+                    area->SetShuffled(true);
+                }
+            }
         }
     }
 

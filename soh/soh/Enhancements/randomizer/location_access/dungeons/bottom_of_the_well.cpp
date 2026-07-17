@@ -210,6 +210,11 @@ void RegionTable_Init_BottomOfTheWell() {
         LOCATION(RC_BOTW_BOULDER_4,                        logic->BlastOrSmash()),
         LOCATION(RC_BOTW_BOULDER_5,                        logic->BlastOrSmash()),
         LOCATION(RC_BOTW_BOULDER_6,                        logic->BlastOrSmash()),
+        LOCATION(RC_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_1, true),
+        LOCATION(RC_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_2, true),
+        LOCATION(RC_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_3, true),
+        LOCATION(RC_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_4, true),
+        LOCATION(RC_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5, true),
     }, {
         //Exits
         ENTRANCE(RR_BOTW_HIDDEN_POTS,      logic->CanClimbHighLadder()),

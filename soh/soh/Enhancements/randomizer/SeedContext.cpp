@@ -8,6 +8,7 @@
 #include "settings.h"
 #include "rando_hash.h"
 #include "fishsanity.h"
+#include "ShuffleSilverRupees.h"
 #include "macros.h"
 #include "3drando/hints.hpp"
 #include "soh/util.h"
@@ -38,6 +39,7 @@ Context::Context() {
     mLogic = std::make_shared<Logic>();
     mTrials = std::make_shared<Trials>();
     mFishsanity = std::make_shared<Fishsanity>();
+    mSilverRupeeAreas = std::make_shared<SilverRupeeAreas>();
 }
 
 RandomizerArea Context::GetAreaFromString(std::string str) {
@@ -209,7 +211,11 @@ void Context::GenerateLocationPool() {
              mOptions[RSK_SHUFFLE_WONDER_ITEMS].Is(RO_SHUFFLE_WONDER_ITEMS_OFF)) ||
             (location.GetRCType() == RCTYPE_FREESTANDING &&
              mOptions[RSK_SHUFFLE_FREESTANDING].Is(RO_SHUFFLE_FREESTANDING_OFF)) ||
-            (location.GetRCType() == RCTYPE_BEEHIVE && !mOptions[RSK_SHUFFLE_BEEHIVES])) {
+            (location.GetRCType() == RCTYPE_BEEHIVE && !mOptions[RSK_SHUFFLE_BEEHIVES]) ||
+            (location.GetRCType() == RCTYPE_SILVER_RUPEE &&
+             (mOptions[RSK_SILVER_RUPEES].Is(RO_SILVERS_OFF) ||
+              !IsSilverRupeeAreaShuffled(location.GetHintKey())))
+        ) {
             continue;
         }
         if (location.IsOverworld()) {
@@ -505,6 +511,15 @@ std::shared_ptr<Logic> Context::GetLogic() {
 
 std::shared_ptr<Trials> Context::GetTrials() {
     return mTrials;
+}
+
+std::shared_ptr<SilverRupeeAreas> Context::GetSilverRupeeAreas() {
+    return mSilverRupeeAreas;
+}
+
+bool Context::IsSilverRupeeAreaShuffled(const RandomizerHintTextKey hintKey) {
+    const auto area = mSilverRupeeAreas->GetAreaForHintKey(hintKey);
+    return area != nullptr && area->IsShuffled();
 }
 
 TrialInfo* Context::GetTrial(size_t key) const {

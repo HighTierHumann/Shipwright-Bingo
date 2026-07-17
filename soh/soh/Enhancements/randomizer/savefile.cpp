@@ -79,8 +79,8 @@ void StartingItemGive(GetItemEntry getItemEntry, RandomizerCheck randomizerCheck
 void GiveLinkDekuSticks(int howManySticks) {
     int maxStickCount = 0;
     if (CUR_UPG_VALUE(UPG_STICKS) == 0) {
-        INV_CONTENT(ITEM_STICK) = ITEM_STICK;
         Inventory_ChangeUpgrade(UPG_STICKS, 1);
+        INV_CONTENT(ITEM_STICK) = ITEM_STICK;
         maxStickCount = 10;
     } else if (CUR_UPG_VALUE(UPG_STICKS) == 1) {
         INV_CONTENT(ITEM_STICK) = ITEM_STICK;
@@ -103,8 +103,8 @@ void GiveLinkDekuSticks(int howManySticks) {
 void GiveLinkDekuNuts(int howManyNuts) {
     int maxNutCount = 0;
     if (CUR_UPG_VALUE(UPG_NUTS) == 0) {
-        INV_CONTENT(ITEM_NUT) = ITEM_NUT;
         Inventory_ChangeUpgrade(UPG_NUTS, 1);
+        INV_CONTENT(ITEM_NUT) = ITEM_NUT;
         maxNutCount = 20;
     } else if (CUR_UPG_VALUE(UPG_NUTS) == 1) {
         INV_CONTENT(ITEM_NUT) = ITEM_NUT;
@@ -427,9 +427,10 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_QUIVER_40);
     if (startBow >= 3)
         Item_Give(NULL, ITEM_QUIVER_50);
-    if (startBow >= 4)
+    if (startBow >= 4) {
         Item_Give(NULL, ITEM_QUIVER_50);
         Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_QUIVER);
+    }
 
     uint8_t startSlingshot = Randomizer_GetSettingValue(RSK_STARTING_SLINGSHOT);
     if (startSlingshot >= 1)
@@ -438,9 +439,10 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_BULLET_BAG_40);
     if (startSlingshot >= 3)
         Item_Give(NULL, ITEM_BULLET_BAG_50);
-    if (startSlingshot >= 4)
+    if (startSlingshot >= 4) {
         Item_Give(NULL, ITEM_BULLET_BAG_50);
         Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BULLET_BAG);
+    }
 
     uint8_t startBombBag = Randomizer_GetSettingValue(RSK_STARTING_BOMB_BAG);
     if (startBombBag >= 1)
@@ -449,41 +451,36 @@ void SetStartingItems() {
         Item_Give(NULL, ITEM_BOMB_BAG_30);
     if (startBombBag >= 3)
         Item_Give(NULL, ITEM_BOMB_BAG_40);
-    if (startBombBag >= 4)
+    if (startBombBag >= 4) {
         Item_Give(NULL, ITEM_BOMB_BAG_40);
         Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_BOMB_BAG);
+    }
 
     uint8_t startSticks = Randomizer_GetSettingValue(RSK_STARTING_STICKS);
-    if (startSticks >= 1)
-        if (Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_STICK_BAG)) {
-            Inventory_ChangeUpgrade(UPG_STICKS, 1);
-            INV_CONTENT(ITEM_STICK) = ITEM_STICK;
-            AMMO(ITEM_STICK) = static_cast<int8_t>(CUR_CAPACITY(UPG_STICKS));
-        }
+    if (startSticks >= 1) {
+        Inventory_ChangeUpgrade(UPG_STICKS, 1);
         GiveLinkDekuSticks(10);
+    }
     if (startSticks >= 2)
         Inventory_ChangeUpgrade(UPG_STICKS, 2);
     if (startSticks >= 3)
         Inventory_ChangeUpgrade(UPG_STICKS, 3);
-    if (startSticks >= 4)
+    if (startSticks >= 4) {
         Inventory_ChangeUpgrade(UPG_STICKS, 3);
         Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_STICK_UPGRADE);
+    }
     
     uint8_t startNuts = Randomizer_GetSettingValue(RSK_STARTING_NUTS);
     if (startNuts >= 1)
-        if (Randomizer_GetSettingValue(RSK_SHUFFLE_DEKU_NUT_BAG)) {
-            Inventory_ChangeUpgrade(UPG_NUTS, 1);
-            INV_CONTENT(ITEM_NUT) = ITEM_NUT;
-            AMMO(ITEM_NUT) = static_cast<int8_t>(CUR_CAPACITY(UPG_NUTS));
-        }
         GiveLinkDekuNuts(20);
     if (startNuts >= 2)
         Inventory_ChangeUpgrade(UPG_NUTS, 2);
     if (startNuts >= 3)
         Inventory_ChangeUpgrade(UPG_NUTS, 3);
-    if (startNuts >= 4)
+    if (startNuts >= 4) {
         Inventory_ChangeUpgrade(UPG_NUTS, 3);
         Flags_SetRandomizerInf(RAND_INF_HAS_INFINITE_NUT_UPGRADE);
+    }
 
     switch (Randomizer_GetSettingValue(RSK_STARTING_STRENGTH)) {
         case 3:
@@ -676,6 +673,23 @@ extern "C" void Randomizer_InitSaveFile() {
     // Reset triforce pieces collected.
     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected = 0;
     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected = 0;
+
+    // Reset silver rupees obtained
+    gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected = 0;
+    gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected = 0;
 
     // Reset lose condition flag
     gSaveContext.ship.quest.data.randomizer.loseCon = false;

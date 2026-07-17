@@ -243,8 +243,9 @@ typedef struct ShipRandomizerSaveContextData {
     u8 iceCavernScytheSilversCollected;
     u8 iceCavernPushBlockSilversCollected;
     u8 gtgBoulderSilversCollected;
-    u8 gtgToiletSilversCollected;
     u8 gtgLavaSilversCollected;
+    u8 gtgToiletSilversCollected;
+    u8 botwBasementSilversCollected;
     bool loseCon;
     u8 bombchuUpgradeLevel;
 } ShipRandomizerSaveContextData;

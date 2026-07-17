@@ -5,6 +5,7 @@
 
 #include "soh/Enhancements/randomizer/3drando/random.hpp"
 
+#include <spdlog/spdlog.h>
 #include <vector>
 
 static std::array<std::vector<Text>, RG_MAX> trickNameTable; // Table of trick names for ice traps
@@ -162,6 +163,14 @@ static void InitTrickNames() {
         Text{ "Crenel Bean Pack", "Paquet de Haricots Gonggle", "Gongolerbsen-Packung" }, // "Lote de alubias mágicas"
         Text{ "Mystical Seed Pack", "Pack de graines mystiques", "Saatbeutel" }, // "Paquete de semillas místicas"
     };
+
+    trickNameTable[RG_MAGIC_BEAN] = {
+        Text{ "Funky Beans", TODO_TRANSLATE, TODO_TRANSLATE },    // "Lote de frijoles mágicos"
+        Text{ "Grapple Berries", TODO_TRANSLATE, TODO_TRANSLATE },                 // "Bayas de garfio"
+        Text{ "Crenel Beans", TODO_TRANSLATE, TODO_TRANSLATE }, // "Lote de alubias mágicas"
+        Text{ "Mystical Seeds", TODO_TRANSLATE, TODO_TRANSLATE }, // "Paquete de semillas místicas"
+    };
+
     trickNameTable[RG_DOUBLE_DEFENSE] = {
         Text{ "Diamond Hearts", "Coeurs de Diamant", "Diamantherzen€" },            // "Contenedor de diamante"
         Text{ "Double Damage", "Double Souffrance", "Doppelte Angriffskraft" },     // "Doble daño receptivo"
@@ -1325,6 +1334,102 @@ static void InitTrickNames() {
         Text{ "Gerudo Training Ground Water Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
         Text{ "Dorito Training Ground Toilet Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
     };
+    trickNameTable[RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Bottom of the Whale Basement Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Bottom of the Well Basement Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Top of the Well Basement Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Rock Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Boulder Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Keese Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Torch Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Torch Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Statue Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple Scythe Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Armos Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple Beamos Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple Beamos Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Shadow Temple Zombie Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shadow Temple ReDead Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Shart Temple ReDead Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Forest Test Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Forest Trial Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Four Wrist Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Fire Test Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Fire Trial Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Far Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Test Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Trial Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Light Test Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Light Trial Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Lite Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Ice Cavern Spinning Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Ice Cavern Scythe Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spice Cavern Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Ice Cavern Ice Keese Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Ice Cavern Push Block Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spice Cavern Push Block Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Rock Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Lava Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Magma Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Lava Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Gerudo Torture Ground Toilet Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Gerudo Training Ground Water Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Dorito Training Ground Toilet Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Bottom of the Whale Basement Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Bottom of the Well Basement Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Top of the Well Basement Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
 
     /*
     //Names for individual upgrades, in case progressive names are replaced
@@ -1529,6 +1634,9 @@ Text Rando::Traps::GetTrapName(uint16_t id, uint64_t* state) {
 
     if (trickNameTable[id].empty()) {
         assert(false);
+        // Log missing trick names so we can add them later, and fall back to the actual item name.
+        SPDLOG_ERROR("No trick names registered for RandomizerGet {} ({})", id,
+                    StaticData::RetrieveItem(static_cast<RandomizerGet>(id)).GetName().GetEnglish());
         return Text{ "not an Ice Trap" };
     }
 

@@ -152,6 +152,53 @@ void BuildTriforcePowerPieceMessage(CustomMessage& msg) {
     msg.AutoFormat(ITEM_CUSTOM);
 }
 
+void BuildSilverRupeeMessage(Player* player, CustomMessage& msg) {
+    uint8_t remaining = 5;
+    int16_t rgid = player->getItemEntry.getItemId;
+    int16_t slot = rgid - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
+    uint8_t currentSilvers[] = {
+        gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected,
+        gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected
+    };
+
+    if (slot <= 15) {
+        remaining = 5 - (currentSilvers[slot] + 1);
+    } else {
+        remaining = 0;
+    }
+
+    if (remaining <= 0) {
+        msg = { "You found [[article]]%g[[name]]%w!&%cNow you have all 5%w!",
+                TODO_TRANSLATE,
+                TODO_TRANSLATE };
+    } else {
+        msg = { "You found [[article]]%g[[name]]%w!&%c[[remaining]] %wto go!",
+                TODO_TRANSLATE,
+                TODO_TRANSLATE };
+    }
+    msg.Replace("[[remaining]]", std::to_string(remaining));
+    CustomMessage article = CustomMessage(
+        Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(rgid)).GetArticle(), TEXTBOX_TYPE_BLUE);
+    msg.Replace("[[article]]", article);
+    CustomMessage name =
+        CustomMessage(Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(rgid)).GetName(), TEXTBOX_TYPE_BLUE);
+    msg.Replace("[[name]]", name);
+    msg.AutoFormat(ITEM_CUSTOM);
+}
+
 void BuildCustomItemMessage(Player* player, CustomMessage& msg) {
     int16_t rgid;
     msg = CustomMessage("You found [[article]][[color]][[name]]%w!",
@@ -240,8 +287,9 @@ void BuildItemMessage(u16* textId, bool* loadFromMessageTable) {
         BuildTriforcePieceMessage(msg);
     } else if (player->getItemEntry.getItemId == RG_TRIFORCE_POWER_PIECE) {
         BuildTriforcePowerPieceMessage(msg);
-    } else if (player->getItemEntry.getItemId == RG_TRIFORCE) {
-        BuildTriforceMessage(msg);
+    } else if (player->getItemEntry.objectId == OBJECT_GI_RUPY && player->getItemEntry.textId ==
+        TEXT_RANDOMIZER_CUSTOM_ITEM && (player->getItemEntry.getItemId != RG_GREG_RUPEE || player->getItemEntry.getItemId != RG_ICE_TRAP)) {
+        BuildSilverRupeeMessage(player, msg);
     } else {
         BuildCustomItemMessage(player, msg);
     }

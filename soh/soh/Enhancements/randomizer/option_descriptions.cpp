@@ -639,6 +639,22 @@ void Settings::CreateOptionDescriptions() {
         "If Gerudo Fortress Carpenters is set to Normal, and Gerudo Fortress Keys is set to anything "
         "other than Vanilla, then the maximum amount of Key Rings that can be selected by Random or "
         "Count will be 9. Otherwise, the maximum amount of Key Rings will be 8.";
+    mOptionDescriptions[RSK_SILVER_RUPEES] =
+        "Silver Rupees from a particular dungeon room will be replaced with freestanding items and "
+        "shuffled around the world.\n"
+        "\n"
+        "Off - No Silver Rupees will be shuffled and replaced.\n"
+        "\n"
+        "Random - A random amount of Silver Rupee sets (0-15) will be replaced with freestanding "
+        "items. Whether the Silver Rupees are shuffled as a set or as a bag is also randomly determined.\n"
+        "\n"
+        "Count - A specified amount of Silver Rupee sets will be replaced with freestanding items "
+        "and shuffled around the world.\n"
+        "\n"
+        "Count w/ Bags - A specified amount of Silver Rupee sets will be replaced with freestanding items "
+        "and Silver Rupee Bags will be shuffled around the world.\n"
+        "\n"
+        "Selection - Hand select which Silver Rupee sets will be shuffled.\n";
     mOptionDescriptions[RSK_GERUDO_KEYS] = "Vanilla - Thieves' Hideout Keys will appear in their vanilla locations.\n"
                                            "\n"
                                            "Any dungeon - Thieves' Hideout Keys can only appear inside of any dungon.\n"

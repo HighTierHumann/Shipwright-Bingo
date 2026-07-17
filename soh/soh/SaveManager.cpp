@@ -5,6 +5,7 @@
 #include "Enhancements/randomizer/entrance.h"
 #include "Enhancements/randomizer/dungeon.h"
 #include "Enhancements/randomizer/trial.h"
+#include "Enhancements/randomizer/ShuffleSilverRupees.h"
 #include "soh/util.h"
 #include "Enhancements/randomizer/hint.h"
 #include "Enhancements/randomizer/item.h"
@@ -230,6 +231,36 @@ void SaveManager::LoadRandomizer() {
                                     gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected);
     SaveManager::Instance->LoadData("triforcePowerPiecesCollected",
                                     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
+    SaveManager::Instance->LoadData("spiritBoulderSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected);
+    SaveManager::Instance->LoadData("spiritChildSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected);
+    SaveManager::Instance->LoadData("shadowScytheSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected);
+    SaveManager::Instance->LoadData("shadowBeamosSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected);
+    SaveManager::Instance->LoadData("shadowRedeadSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected);
+    SaveManager::Instance->LoadData("forestTrialSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected);
+    SaveManager::Instance->LoadData("fireTrialSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected);
+    SaveManager::Instance->LoadData("spiritTrialSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected);
+    SaveManager::Instance->LoadData("lightTrialSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected);
+    SaveManager::Instance->LoadData("iceCavernScytheSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected);
+    SaveManager::Instance->LoadData("iceCavernPushBlockSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected);
+    SaveManager::Instance->LoadData("gtgBoulderSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected);
+    SaveManager::Instance->LoadData("gtgLavaSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected);
+    SaveManager::Instance->LoadData("gtgToiletSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected);
+    SaveManager::Instance->LoadData("botwBasementSilversCollected",
+                                    gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected);
     SaveManager::Instance->LoadData("loseCon", gSaveContext.ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->LoadData("bombchuUpgradeLevel", gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel);
 
@@ -258,6 +289,20 @@ void SaveManager::LoadRandomizer() {
         uint8_t value = 0;
         SaveManager::Instance->LoadData("", value);
         randoContext->GetTrickOption(RandomizerTrick(i)).Set(value);
+    });
+
+    size_t shuffledSilverRupeeAreaCount;
+    SaveManager::Instance->LoadData("shuffledSilverRupeeAreaCount", shuffledSilverRupeeAreaCount, (size_t)0);
+
+    randoContext->GetSilverRupeeAreas()->ClearAllShuffled();
+    SaveManager::Instance->LoadArray("shuffledSilverRupeeAreas", shuffledSilverRupeeAreaCount, [&](size_t i) {
+        size_t areaId = 0;
+        bool asBag = false;
+        SaveManager::Instance->LoadStruct("", [&]() {
+            SaveManager::Instance->LoadData("areaId", areaId);
+            SaveManager::Instance->LoadData("bag", asBag, false);
+        });
+        randoContext->GetSilverRupeeAreas()->GetArea(static_cast<Rando::SilverRupeeAreaKey>(areaId))->SetShuffled(asBag);
     });
 }
 
@@ -387,6 +432,36 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
                                     saveContext->ship.quest.data.randomizer.triforcePiecesCollected);
     SaveManager::Instance->SaveData("triforcePowerPiecesCollected",
                                     saveContext->ship.quest.data.randomizer.triforcePowerPiecesCollected);
+    SaveManager::Instance->SaveData("spiritBoulderSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.spiritBoulderSilversCollected);
+    SaveManager::Instance->SaveData("spiritChildSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.spiritChildSilversCollected);
+    SaveManager::Instance->SaveData("shadowScytheSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.shadowScytheSilversCollected);
+    SaveManager::Instance->SaveData("shadowBeamosSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.shadowBeamosSilversCollected);
+    SaveManager::Instance->SaveData("shadowRedeadSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.shadowRedeadSilversCollected);
+    SaveManager::Instance->SaveData("forestTrialSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.forestTrialSilversCollected);
+    SaveManager::Instance->SaveData("fireTrialSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.fireTrialSilversCollected);
+    SaveManager::Instance->SaveData("spiritTrialSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.spiritTrialSilversCollected);
+    SaveManager::Instance->SaveData("lightTrialSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.lightTrialSilversCollected);
+    SaveManager::Instance->SaveData("iceCavernScytheSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.iceCavernScytheSilversCollected);
+    SaveManager::Instance->SaveData("iceCavernPushBlockSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.iceCavernPushBlockSilversCollected);
+    SaveManager::Instance->SaveData("gtgBoulderSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.gtgBoulderSilversCollected);
+    SaveManager::Instance->SaveData("gtgLavaSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.gtgLavaSilversCollected);
+    SaveManager::Instance->SaveData("gtgToiletSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.gtgToiletSilversCollected);
+    SaveManager::Instance->SaveData("botwBasementSilversCollected",
+                                    saveContext->ship.quest.data.randomizer.botwBasementSilversCollected);
     SaveManager::Instance->SaveData("loseCon", saveContext->ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->SaveData("bombchuUpgradeLevel", saveContext->ship.quest.data.randomizer.bombchuUpgradeLevel);
 
@@ -412,6 +487,25 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
     SaveManager::Instance->SaveArray("trickOptions", RT_MAX, [&](size_t i) {
         SaveManager::Instance->SaveData("", randoContext->GetTrickOption(RandomizerTrick(i)).Get());
     });
+
+    size_t shuffledSilverRupeeAreaCount = 0;
+    for (auto* area : randoContext->GetSilverRupeeAreas()->GetAreaList()) {
+        if (area->IsShuffled()) {
+            shuffledSilverRupeeAreaCount++;
+        }
+    }
+    SaveManager::Instance->SaveData("shuffledSilverRupeeAreaCount", shuffledSilverRupeeAreaCount);
+
+    SaveManager::Instance->SaveArray(
+        "shuffledSilverRupeeAreas", randoContext->GetSilverRupeeAreas()->GetAreaListSize(), [&](size_t i) {
+            auto* area = randoContext->GetSilverRupeeAreas()->GetArea(static_cast<Rando::SilverRupeeAreaKey>(i));
+            if (area->IsShuffled()) {
+                SaveManager::Instance->SaveStruct("", [&]() {
+                    SaveManager::Instance->SaveData("areaId", i);
+                    SaveManager::Instance->SaveData("bag", area->IsBag());
+                });
+            }
+        });
 }
 
 // Init() here is an extension of InitSram, and thus not truly an initializer for SaveManager itself. don't put any
@@ -561,6 +655,23 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
     fileMetaInfo[fileNum].hasWallet = !isRando;
     fileMetaInfo[fileNum].triforcePieces = 0;
     fileMetaInfo[fileNum].maxTriforcePieces = 0;
+    fileMetaInfo[fileNum].triforcePowerPieces = 0;
+    fileMetaInfo[fileNum].maxTriforcePowerPieces = 0;
+    fileMetaInfo[fileNum].spiritBoulderSilvers = 0;
+    fileMetaInfo[fileNum].spiritChildSilvers = 0;
+    fileMetaInfo[fileNum].shadowScytheSilvers = 0;
+    fileMetaInfo[fileNum].shadowBeamosSilvers = 0;
+    fileMetaInfo[fileNum].shadowRedeadSilvers = 0;
+    fileMetaInfo[fileNum].forestTrialSilvers = 0;
+    fileMetaInfo[fileNum].fireTrialSilvers = 0;
+    fileMetaInfo[fileNum].spiritTrialSilvers = 0;
+    fileMetaInfo[fileNum].lightTrialSilvers = 0;
+    fileMetaInfo[fileNum].iceCavernScytheSilvers = 0;
+    fileMetaInfo[fileNum].iceCavernPushBlockSilvers = 0;
+    fileMetaInfo[fileNum].gtgBoulderSilvers = 0;
+    fileMetaInfo[fileNum].gtgLavaSilvers = 0;
+    fileMetaInfo[fileNum].gtgToiletSilvers = 0;
+    fileMetaInfo[fileNum].botwBasementSilvers = 0;
     fileMetaInfo[fileNum].hasFishingRod = !isRando;
     fileMetaInfo[fileNum].fishingPoleShuffled = false;
     fileMetaInfo[fileNum].defense = baseBlock["inventory"]["defenseHearts"];
@@ -583,6 +694,23 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
         fileMetaInfo[fileNum].triforcePieces = randoBlock.value("triforcePiecesCollected", 0);
         nlohmann::json& randoSettings = randoBlock["randoSettings"];
         fileMetaInfo[fileNum].maxTriforcePieces = randoSettings[RSK_TRIFORCE_HUNT_PIECES_TOTAL].get<uint8_t>();
+        fileMetaInfo[fileNum].triforcePowerPieces = randoBlock.value("triforcePowerPiecesCollected", 0);
+        fileMetaInfo[fileNum].maxTriforcePowerPieces = randoSettings[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].get<uint8_t>();
+        fileMetaInfo[fileNum].spiritBoulderSilvers = randoBlock.value("spiritBoulderSilversCollected", 0);
+        fileMetaInfo[fileNum].spiritChildSilvers = randoBlock.value("spiritChildSilversCollected", 0);
+        fileMetaInfo[fileNum].shadowScytheSilvers = randoBlock.value("shadowScytheSilversCollected", 0);
+        fileMetaInfo[fileNum].shadowBeamosSilvers = randoBlock.value("shadowBeamosSilversCollected", 0);
+        fileMetaInfo[fileNum].shadowRedeadSilvers = randoBlock.value("shadowRedeadSilversCollected", 0);
+        fileMetaInfo[fileNum].forestTrialSilvers = randoBlock.value("forestTrialSilversCollected", 0);
+        fileMetaInfo[fileNum].fireTrialSilvers = randoBlock.value("fireTrialSilversCollected", 0);
+        fileMetaInfo[fileNum].spiritTrialSilvers = randoBlock.value("spiritTrialSilversCollected", 0);
+        fileMetaInfo[fileNum].lightTrialSilvers = randoBlock.value("lightTrialSilversCollected", 0);
+        fileMetaInfo[fileNum].iceCavernScytheSilvers = randoBlock.value("iceCavernScytheSilversCollected", 0);
+        fileMetaInfo[fileNum].iceCavernPushBlockSilvers = randoBlock.value("iceCavernPushBlockSilversCollected", 0);
+        fileMetaInfo[fileNum].gtgBoulderSilvers = randoBlock.value("gtgBoulderSilversCollected", 0);
+        fileMetaInfo[fileNum].gtgLavaSilvers = randoBlock.value("gtgLavaSilversCollected", 0);
+        fileMetaInfo[fileNum].gtgToiletSilvers = randoBlock.value("gtgToiletSilversCollected", 0);
+        fileMetaInfo[fileNum].botwBasementSilvers = randoBlock.value("botwBasementSilversCollected", 0);
         fileMetaInfo[fileNum].hasFishingRod = (int16_t)baseBlock["randomizerInf"][RAND_INF_FISHING_POLE_FOUND >> 4] &
                                               (1 << (RAND_INF_FISHING_POLE_FOUND & 0xF));
         fileMetaInfo[fileNum].fishingPoleShuffled = randoSettings[RSK_SHUFFLE_FISHING_POLE].get<uint8_t>() != 0;
@@ -625,6 +753,36 @@ void SaveManager::InitMeta(int fileNum) {
         IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePiecesCollected : 0;
     fileMetaInfo[fileNum].triforcePowerPieces =
         IS_RANDO ? gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected : 0;
+    fileMetaInfo[fileNum].spiritBoulderSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected : 0;
+    fileMetaInfo[fileNum].spiritChildSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected : 0;
+    fileMetaInfo[fileNum].shadowScytheSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected : 0;
+    fileMetaInfo[fileNum].shadowBeamosSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected : 0;
+    fileMetaInfo[fileNum].shadowRedeadSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected : 0;
+    fileMetaInfo[fileNum].forestTrialSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected : 0;
+    fileMetaInfo[fileNum].fireTrialSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected : 0;
+    fileMetaInfo[fileNum].spiritTrialSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected : 0;
+    fileMetaInfo[fileNum].lightTrialSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected : 0;
+    fileMetaInfo[fileNum].iceCavernScytheSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected : 0;
+    fileMetaInfo[fileNum].iceCavernPushBlockSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected : 0;
+    fileMetaInfo[fileNum].gtgBoulderSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected : 0;
+    fileMetaInfo[fileNum].gtgLavaSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected : 0;
+    fileMetaInfo[fileNum].gtgToiletSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected : 0;
+    fileMetaInfo[fileNum].botwBasementSilvers =
+        IS_RANDO ? gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected : 0;
     fileMetaInfo[fileNum].loseCon = IS_RANDO ? gSaveContext.ship.quest.data.randomizer.loseCon : false;
     fileMetaInfo[fileNum].hasFishingRod = Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) || !IS_RANDO;
     fileMetaInfo[fileNum].defense = gSaveContext.inventory.defenseHearts;

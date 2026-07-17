@@ -284,6 +284,16 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleFairySpots"), RO_GENERIC_NO)) &&
             (location.GetRCType() != RCTYPE_BUTTERFLY_FAIRY ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleButterflyFairies"), RO_GENERIC_NO)) &&
+            (location.GetRCType() != RCTYPE_ROCK ||
+             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleRocks"), RO_GENERIC_NO)) &&
+            (location.GetRCType() != RCTYPE_BOULDER ||
+             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBoulders"), RO_GENERIC_NO) == RO_SHUFFLE_BOULDERS_ALL) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBoulders"), RO_GENERIC_NO) == RO_SHUFFLE_BOULDERS_OVERWORLD) &&
+              RandomizerCheckObjects::AreaIsOverworld(location.GetArea())) ||
+             ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBoulders"), RO_GENERIC_NO) == RO_SHUFFLE_BOULDERS_DUNGEONS) &&
+              RandomizerCheckObjects::AreaIsDungeon(location.GetArea()))) &&
+            (location.GetRCType() != RCTYPE_SILVER_RUPEE ||
+             CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSilverRupees"), RO_GENERIC_NO)) &&
             ((location.GetRCType() != RCTYPE_MAP && location.GetRCType() != RCTYPE_COMPASS) ||
              CVarGetInteger(CVAR_RANDOMIZER_SETTING("StartingMapsCompasses"), RO_DUNGEON_ITEM_LOC_OWN_DUNGEON) !=
                  RO_DUNGEON_ITEM_LOC_VANILLA) &&

@@ -190,13 +190,6 @@ void SetupGuiElements() {
     mItemTrackerSettingsWindow = std::make_shared<ItemTrackerSettingsWindow>(CVAR_WINDOW("ItemTrackerSettings"),
                                                                              "Item Tracker Settings", ImVec2(733, 472));
     gui->AddGuiWindow(mItemTrackerSettingsWindow);
-    mHintTrackerWindow =
-        std::make_shared<HintTracker::HintTrackerWindow>(CVAR_WINDOW("HintTracker"),
-                                                                       "Hint Tracker", ImVec2(400, 420));
-    gui->AddGuiWindow(mHintTrackerWindow);
-    mHintTrackerSettingsWindow = std::make_shared<HintTracker::HintTrackerSettingsWindow>(
-        CVAR_WINDOW("HintTrackerSettings"), "Hint Tracker Settings", ImVec2(600, 375));
-    gui->AddGuiWindow(mHintTrackerSettingsWindow);
     mTimeSplitWindow = std::make_shared<TimeSplitWindow>(CVAR_WINDOW("TimeSplits"), "Time Splits", ImVec2(450, 660));
     gui->AddGuiWindow(mTimeSplitWindow);
     mPlandomizerWindow =

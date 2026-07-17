@@ -35,6 +35,7 @@ void DrawDungeonItem(ItemTrackerItem item);
 void DrawBottle(ItemTrackerItem item);
 void DrawQuest(ItemTrackerItem item);
 void DrawSong(ItemTrackerItem item);
+void DrawSilverRupee(ItemTrackerItem item);
 
 int itemTrackerSectionId;
 
@@ -50,6 +51,8 @@ static WidgetInfo enableDraggingWidget;
 static WidgetInfo onlyPausedWidget;
 static WidgetInfo ammoTracking;
 static WidgetInfo keyTracking;
+static WidgetInfo silverRupeeTracking;
+static WidgetInfo silverRupeeDisplayWidget;
 static WidgetInfo triforcePieceCount;
 static WidgetInfo dungeonItemTracking;
 static WidgetInfo gregTracking;
@@ -140,6 +143,25 @@ std::vector<ItemTrackerItem> triforcePieces = {
 
 std::vector<ItemTrackerItem> triforcePowerPieces = {
     ITEM_TRACKER_ITEM(RG_TRIFORCE_POWER_PIECE, 0, DrawItem),
+};
+
+// Silver rupee tracker items
+std::vector<ItemTrackerItem> silverRupeeItems = {
+    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE, 0, DrawSilverRupee),
 };
 
 std::vector<ItemTrackerItem> rocsFeather = {
@@ -351,6 +373,24 @@ std::map<uint16_t, std::string> itemTrackerOverworldKeyShortNames = {
     { RG_FISHING_HOLE_KEY, "FISH" },
 };
 
+std::map<uint16_t, std::string> itemTrackerSilverRupeeShortNames = {
+    { RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, "SPRT-B" },
+    { RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, "SPRT-C" },
+    { RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, "SHDW-S" },
+    { RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, "SHDW-B" },
+    { RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, "SHDW-R" },
+    { RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE, "IGC-FO" },
+    { RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE, "IGC-FI" },
+    { RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE, "IGC-S" },
+    { RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE, "IGC-L" },
+    { RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE, "ICE-S" },
+    { RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE, "ICE-P" },
+    { RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE, "GTG-B" },
+    { RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE, "GTG-L" },
+    { RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE, "GTG-T" },
+    { RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE, "BOTW" },
+};
+
 std::vector<ItemTrackerItem> dungeonItems = {};
 
 std::unordered_map<uint32_t, ItemTrackerItem> actualItemTrackerItemMap = {
@@ -431,6 +471,12 @@ typedef enum {
     KEYS_CURRENT_COLLECTED_MAX,
     KEYS_CURRENT_MAX,
 } ItemTrackerKeysNumberOption;
+
+typedef enum {
+    SILVER_RUPEES_COLLECTED_MAX,
+    SILVER_RUPEES_CURRENT_COLLECTED_MAX,
+    SILVER_RUPEES_CURRENT_MAX,
+} ItemTrackerSilverRupeeNumberOption;
 
 typedef enum {
     TRIFORCE_PIECE_COLLECTED_REQUIRED,
@@ -1424,6 +1470,140 @@ void DrawSong(ItemTrackerItem item) {
     Tooltip(SohUtils::GetQuestItemName(item.id).c_str());
 }
 
+void DrawSilverRupee(ItemTrackerItem item) {
+    float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_ITEM("IconSize"), 36));
+    ImVec2 p = ImGui::GetCursorScreenPos();
+
+    ImGui::Image(std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
+                     ->GetTextureByName(IsValidSaveFile() ? item.name : item.nameFaded),
+                 ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1));
+
+    // Determine collected count from save in the same order as z64save.h's ShipRandomizerSaveContextData
+    int count = 0;
+    if (GameInteractor::IsSaveLoaded()) {
+        auto& rnd = gSaveContext.ship.quest.data.randomizer;
+        switch (item.id) {
+            case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+                count = rnd.spiritBoulderSilversCollected;
+                break;
+            case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+                count = rnd.spiritChildSilversCollected;
+                break;
+            case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
+                count = rnd.shadowScytheSilversCollected;
+                break;
+            case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
+                count = rnd.shadowBeamosSilversCollected;
+                break;
+            case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
+                count = rnd.shadowRedeadSilversCollected;
+                break;
+            case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
+                count = rnd.forestTrialSilversCollected;
+                break;
+            case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
+                count = rnd.fireTrialSilversCollected;
+                break;
+            case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
+                count = rnd.spiritTrialSilversCollected;
+                break;
+            case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
+                count = rnd.lightTrialSilversCollected;
+                break;
+            case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
+                count = rnd.iceCavernScytheSilversCollected;
+                break;
+            case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
+                count = rnd.iceCavernPushBlockSilversCollected;
+                break;
+            case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
+                count = rnd.gtgBoulderSilversCollected;
+                break;
+            case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
+                count = rnd.gtgLavaSilversCollected;
+                break;
+            case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
+                count = rnd.gtgToiletSilversCollected;
+                break;
+            case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
+                count = rnd.botwBasementSilversCollected;
+                break;
+        }
+    }
+
+    // Draw number under icon according to SilverRupeeCounts setting
+    if (GameInteractor::IsSaveLoaded() && IsValidSaveFile()) {
+        int mode = CVarGetInteger(CVAR_TRACKER_ITEM("SilverRupeeCounts"), SILVER_RUPEES_COLLECTED_MAX);
+        int max = 5;
+        int currentRupees = gSaveContext.rupees;
+
+        if (mode == SILVER_RUPEES_COLLECTED_MAX) {
+            std::string currentString = std::to_string(count);
+            std::string maxString = std::to_string(max);
+            ImU32 currentColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
+            ImU32 maxColor = IM_COL_GREEN;
+
+            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) -
+                                             (ImGui::CalcTextSize((currentString + "/" + maxString).c_str()).x / 2),
+                                             p.y + 25));
+            ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
+            ImGui::Text("%s/", currentString.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(0, 0.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
+            ImGui::Text("%s", maxString.c_str());
+            ImGui::PopStyleColor();
+        } else if (mode == SILVER_RUPEES_CURRENT_COLLECTED_MAX) {
+            std::string cur = std::to_string(currentRupees) + "/";
+            std::string collected = std::to_string(count) + "/";
+            std::string maxString = std::to_string(max);
+            ImU32 curColor = IM_COL_WHITE;
+            ImU32 collectedColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
+            ImU32 maxColor = IM_COL_GREEN;
+
+            std::string total = cur + collected + maxString;
+            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize(total.c_str()).x / 2), p.y + 25));
+            ImGui::PushStyleColor(ImGuiCol_Text, curColor);
+            ImGui::Text("%s", cur.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(0, 0.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, collectedColor);
+            ImGui::Text("%s", collected.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(0, 0.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
+            ImGui::Text("%s", maxString.c_str());
+            ImGui::PopStyleColor();
+        } else if (mode == SILVER_RUPEES_CURRENT_MAX) {
+            std::string cur = std::to_string(currentRupees);
+            std::string maxString = std::to_string(max);
+            ImU32 curColor = IM_COL_WHITE;
+            ImU32 maxColor = IM_COL_GREEN;
+
+            ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize((cur + "/" + maxString).c_str()).x / 2),
+                                             p.y + 25));
+            ImGui::PushStyleColor(ImGuiCol_Text, curColor);
+            ImGui::Text("%s/", cur.c_str());
+            ImGui::PopStyleColor();
+            ImGui::SameLine(0, 0.0f);
+            ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
+            ImGui::Text("%s", maxString.c_str());
+            ImGui::PopStyleColor();
+        }
+    }
+
+    // Draw short dungeon label above icon
+    if (itemTrackerSilverRupeeShortNames.find(item.id) != itemTrackerSilverRupeeShortNames.end()) {
+        std::string label = itemTrackerSilverRupeeShortNames[item.id];
+        ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize(label.c_str()).x / 2), p.y - (iconSize) + 30));
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_WHITE);
+        ImGui::Text("%s", label.c_str());
+        ImGui::PopStyleColor();
+    }
+
+    Tooltip("Silver Rupees");
+}
+
 void DrawNotes(bool resizeable = false) {
     ImGui::BeginGroup();
     float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_ITEM("IconSize"), 36));
@@ -1761,6 +1941,21 @@ void UpdateVectors() {
         mainWindowItems.insert(mainWindowItems.end(), triforcePowerPieces.begin(), triforcePowerPieces.end());
     }
 
+    // If we're adding silver rupees to the main window
+    if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"), SECTION_DISPLAY_HIDDEN) ==
+        SECTION_DISPLAY_MAIN_WINDOW) {
+        // If Greg/Triforce/other rows haven't been added, align to a new row for silver rupees
+        if (!newRowAdded) {
+            while (mainWindowItems.size() % 6) {
+                mainWindowItems.push_back(ITEM_TRACKER_ITEM(ITEM_NONE, 0, DrawItem));
+            }
+            newRowAdded = true;
+        }
+
+        // Add silver rupee items
+        mainWindowItems.insert(mainWindowItems.end(), silverRupeeItems.begin(), silverRupeeItems.end());
+    }
+
     // if misc is separate and fishing pole isn't added, add fishing pole to misc
     if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.FishingPole"), SECTION_DISPLAY_EXTENDED_HIDDEN) ==
             SECTION_DISPLAY_EXTENDED_MISC_WINDOW &&
@@ -1923,6 +2118,8 @@ void ItemTrackerWindow::DrawElement() {
              SECTION_DISPLAY_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.TriforcePowerPieces"), SECTION_DISPLAY_HIDDEN) ==
              SECTION_DISPLAY_MAIN_WINDOW) ||
+            (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"), SECTION_DISPLAY_HIDDEN) ==
+             SECTION_DISPLAY_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.FishingPole"), SECTION_DISPLAY_EXTENDED_HIDDEN) ==
              SECTION_DISPLAY_EXTENDED_MAIN_WINDOW) ||
             (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.Notes"), SECTION_DISPLAY_HIDDEN) ==
@@ -2017,6 +2214,13 @@ void ItemTrackerWindow::DrawElement() {
             EndFloatingWindows();
         }
 
+        if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"), SECTION_DISPLAY_HIDDEN) ==
+            SECTION_DISPLAY_SEPARATE) {
+            BeginFloatingWindows("Silver Rupee Tracker");
+            DrawItemsInRows(silverRupeeItems, 12);
+            EndFloatingWindows();
+        }
+
         if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.BeanSouls"), SECTION_DISPLAY_HIDDEN) ==
             SECTION_DISPLAY_SEPARATE) {
             BeginFloatingWindows("Bean Soul Tracker");
@@ -2096,6 +2300,11 @@ static std::map<int32_t, const char*> itemTrackerKeyTrackOptions = {
     { KEYS_COLLECTED_MAX, "Collected / Max" },
     { KEYS_CURRENT_COLLECTED_MAX, "Current / Collected / Max" },
     { KEYS_CURRENT_MAX, "Current / Max" },
+};
+static std::map<int32_t, const char*> itemTrackerSilverRupeeTrackOptions = {
+    { SILVER_RUPEES_COLLECTED_MAX, "Collected / Max" },
+    { SILVER_RUPEES_CURRENT_COLLECTED_MAX, "Current / Collected / Max" },
+    { SILVER_RUPEES_CURRENT_MAX, "Current / Max" },
 };
 static std::map<int32_t, const char*> itemTrackerTriforcePieceTrackOptions = {
     { TRIFORCE_PIECE_COLLECTED_REQUIRED, "Collected / Required" },
@@ -2186,6 +2395,7 @@ void ItemTrackerSettingsWindow::DrawElement() {
 
         SohGui::mSohMenu->MenuDrawItem(keyTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(triforcePieceCount, 250, THEME_COLOR);
+        SohGui::mSohMenu->MenuDrawItem(silverRupeeTracking, 250, THEME_COLOR);
 
         ImGui::TableNextColumn();
 
@@ -2254,6 +2464,7 @@ void ItemTrackerSettingsWindow::DrawElement() {
         SohGui::mSohMenu->MenuDrawItem(gregTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(triforcePieceTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(triforcePowerPieceTracking, 250, THEME_COLOR);
+        SohGui::mSohMenu->MenuDrawItem(silverRupeeDisplayWidget, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(beanSoulsTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(bossSoulsTracking, 250, THEME_COLOR);
         SohGui::mSohMenu->MenuDrawItem(jabberNutsTracking, 250, THEME_COLOR);
@@ -2355,6 +2566,28 @@ void RegisterItemTrackerWidgets() {
                      .ComboMap(displayTypes))
         .Callback([](WidgetInfo& info) { shouldUpdateVectors = true; });
     SohGui::mSohMenu->AddSearchWidget({ triforcePowerPieceTracking, "Randomizer", "Item Tracker", "General Settings" });
+    
+    silverRupeeTracking = { .name = "Silver Rupee Count Tracking", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    silverRupeeTracking.CVar(CVAR_TRACKER_ITEM("SilverRupeeCounts"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(SILVER_RUPEES_COLLECTED_MAX)
+                     .ComponentAlignment(ComponentAlignments::Right)
+                     .LabelPosition(LabelPositions::Far)
+                     .Color(THEME_COLOR)
+                     .ComboMap(itemTrackerSilverRupeeTrackOptions)
+                     .Tooltip("Customize what numbers are shown for Silver Rupee tracking."));
+    SohGui::mSohMenu->AddSearchWidget({ silverRupeeTracking, "Randomizer", "Item Tracker", "General Settings" });
+
+    silverRupeeDisplayWidget = { .name = "Silver Rupees", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
+    silverRupeeDisplayWidget.CVar(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"))
+        .Options(ComboboxOptions()
+                     .DefaultIndex(SECTION_DISPLAY_HIDDEN)
+                     .ComponentAlignment(ComponentAlignments::Right)
+                     .LabelPosition(LabelPositions::Far)
+                     .Color(THEME_COLOR)
+                     .ComboMap(displayTypes))
+        .Callback([](WidgetInfo& info) { shouldUpdateVectors = true; });
+    SohGui::mSohMenu->AddSearchWidget({ silverRupeeDisplayWidget, "Randomizer", "Item Tracker", "General Settings" });
 
     dungeonItemTracking = { .name = "Dungeon Items", .type = WidgetType::WIDGET_CVAR_COMBOBOX };
     dungeonItemTracking.CVar(CVAR_TRACKER_ITEM("DisplayType.DungeonItems"))

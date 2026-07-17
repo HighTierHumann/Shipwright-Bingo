@@ -545,10 +545,52 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
                        : (gSaveContext.magicLevel < 2 ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE);
         case RG_FISHING_POLE:
             return !Flags_GetRandomizerInf(RAND_INF_FISHING_POLE_FOUND) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+
         case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG:
             return !Flags_GetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
         case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG:
             return !Flags_GetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_SHADOW_TEMPLE_REDEAD_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_ICE_CAVERN_SCYTHE_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_BOULDER_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_TOILET_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG:
+            return !Flags_GetRandomizerInf(RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVERS) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
 
         // Songs
         case RG_ZELDAS_LULLABY:
@@ -1575,6 +1617,89 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             if (gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS);
             }
+            break;
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected);
+            gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected++;
+            if (gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVERS);
+            }
+            break;
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS);
+            break;
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
+            break;
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVERS);
+            break;
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVERS);
+            break;
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_REDEAD_SILVERS);
+            break;
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVERS);
+            break;
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVERS);
+            break;
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVERS);
+            break;
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS);
+            break;
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_SCYTHE_SILVERS);
+            break;
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVERS);
+            break;
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_BOULDER_SILVERS);
+            break;
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS);
+            break;
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_TOILET_SILVERS);
+            break;
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected = 5;
+            Flags_SetRandomizerInf(RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVERS);
             break;
         case RG_PROGRESSIVE_BOMBCHU_BAG:
             OTRGlobals::Instance->gRandoContext->HandleGetBombchuBag();

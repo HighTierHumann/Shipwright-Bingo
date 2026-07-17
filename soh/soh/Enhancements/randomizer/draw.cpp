@@ -20,6 +20,8 @@ extern "C" {
 #include "objects/object_gi_fire/object_gi_fire.h"
 #include "objects/object_gi_rupy/object_gi_rupy.h"
 #include "objects/object_gi_gerudomask/object_gi_gerudomask.h"
+#include "objects/object_gi_redead_mask/object_gi_redead_mask.h"
+#include "objects/object_gi_purse/object_gi_purse.h"
 #include "objects/object_toki_objects/object_toki_objects.h"
 #include "objects/object_gi_bomb_2/object_gi_bomb_2.h"
 #include "objects/object_goma/object_goma.h"
@@ -1396,18 +1398,18 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
     Color_RGB8 silverRupeeColor =
         CVarGetColor24(CVAR_COSMETIC("Consumable.SilverRupee.Value"), Color_RGB8{ 255, 255, 255 });
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
-    
+        
     gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0x80, silverRupeeColor.r, silverRupeeColor.g, silverRupeeColor.b,
                     255);
     gDPSetEnvColor(POLY_OPA_DISP++, silverRupeeColor.r / 5, silverRupeeColor.g / 5, silverRupeeColor.b / 5,
-                   255);
+                255);
     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiRupeeInnerDL);
     Gfx_SetupDL_25Xlu(play->state.gfxCtx);
     gSPMatrix(POLY_XLU_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
     gDPSetPrimColor(POLY_XLU_DISP++, 0, 0x80, 255, 255, 255, 255);
     gDPSetEnvColor(POLY_XLU_DISP++, silverRupeeColor.r * 0.75f, silverRupeeColor.g * 0.75f,
-                   silverRupeeColor.b * 0.75f, 255);
+                silverRupeeColor.b * 0.75f, 255);
     gSPDisplayList(POLY_XLU_DISP++, (Gfx*)gGiRupeeOuterDL);
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -1424,7 +1426,7 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
         (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
         (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
         (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gGiGerudoMaskDL,
-        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,
+        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
     };
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -1448,9 +1450,10 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
 
             gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
         }
-            
+                
         if (slot == 8) {
-            gemColor = CVarGetColor24(CVAR_COSMETIC("WarpSong.Prelude.Value"), Color_RGB8{200, 255, 0}); // No "Light Temple" BK exists, so use Prelude
+             // No "Light Temple" BK exists, so use Prelude
+            gemColor = CVarGetColor24(CVAR_COSMETIC("WarpSong.Prelude.Value"), Color_RGB8{200, 255, 0});
 
             gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
         }
@@ -1467,6 +1470,81 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
 
         gSPDisplayList(POLY_OPA_DISP++, CustomdLists[slot]);
     }
+    CLOSE_DISPS(play->state.gfxCtx);
+}
 
+extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* getItemEntry) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Opa(play->state.gfxCtx);
+    gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
+    gDPSetPrimColor(POLY_OPA_DISP++, 0, 0x80, 85, 85, 85, 255);
+    gDPSetEnvColor(POLY_OPA_DISP++, 125, 125, 125, 255);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiWalletDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiAdultWalletRupeeOuterColorDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiWalletRupeeOuterDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiAdultWalletStringColorDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiWalletStringDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiAdultWalletRupeeInnerColorDL);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiWalletRupeeInnerDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+
+    s16 slot = getItemEntry->drawItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG;
+
+    std::string CvarValue[11] = {
+        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ShadowBoss",
+        "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ForestBoss", "gCosmetics.Key.FireBoss",   "gCosmetics.Key.SpiritBoss",
+        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.WaterBoss",  "gCosmetics.Key.WaterBoss",
+    };
+
+    Gfx* CustomdLists[] = {
+        (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
+        (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
+        (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gGiGerudoMaskDL,
+        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
+    };
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    const float gemScale = 1.0f;
+    const float maskScale = 0.2f;
+
+    if (slot < 11) {
+        Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+
+        Matrix_Translate(0.0f, 30.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_RotateZ(M_PI / 4, MTXMODE_APPLY);
+        Matrix_Scale(gemScale, gemScale, gemScale, MTXMODE_APPLY);
+
+        gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+                G_MTX_MODELVIEW | G_MTX_LOAD);
+
+        Color_RGB8 gemColor = { 255, 0, 0 };
+        if (slot < 8 || slot >= 9 && slot < 11) {
+            gemColor = CVarGetColor24((CvarValue[slot] + "Gem.Value").c_str(), gemColor);
+
+            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
+        }
+                
+        if (slot == 8) {
+            // No "Light Temple" BK exists, so use Prelude
+            gemColor = CVarGetColor24(CVAR_COSMETIC("WarpSong.Prelude.Value"), Color_RGB8{200, 255, 0});
+
+            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
+        }
+
+        gSPDisplayList(POLY_XLU_DISP++, CustomdLists[slot]);
+
+    } else {
+        Gfx_SetupDL_26Opa(play->state.gfxCtx);
+
+        Matrix_Translate(0.0f, 45.0f, 2.0f, MTXMODE_APPLY);
+        Matrix_Scale(maskScale, maskScale, maskScale, MTXMODE_APPLY);
+
+        gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
+
+        gSPDisplayList(POLY_OPA_DISP++, CustomdLists[slot]);
+    }
     CLOSE_DISPS(play->state.gfxCtx);
 }
