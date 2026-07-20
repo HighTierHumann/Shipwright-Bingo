@@ -675,21 +675,9 @@ extern "C" void Randomizer_InitSaveFile() {
     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected = 0;
 
     // Reset silver rupees obtained
-    gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected = 0;
-    gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected = 0;
+    std::fill(std::begin(gSaveContext.ship.quest.data.randomizer.silverRupees),
+              std::end(gSaveContext.ship.quest.data.randomizer.silverRupees), 0);
+
 
     // Reset lose condition flag
     gSaveContext.ship.quest.data.randomizer.loseCon = false;

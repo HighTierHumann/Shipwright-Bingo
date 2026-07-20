@@ -49,6 +49,9 @@ Color_RGBA8 Randomizer_GetParticleCMCColor(GetItemCategory colorIndex, ParticleC
         case ITEM_CATEGORY_LESSER:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.Lesser.Value"), Color_RGBA8{ 170, 50, 0, 255 });
             break;
+        case ITEM_CATEGORY_SILVER_RUPEE:
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.SilverRupee.Value"), Color_RGBA8{ 155, 0, 255, 255 });
+            break;
         case ITEM_CATEGORY_HEALTH:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.Health.Value"), Color_RGBA8{ 250, 0, 0, 255 });
             break;

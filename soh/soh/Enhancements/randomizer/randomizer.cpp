@@ -24,6 +24,7 @@
 #include "dungeon.h"
 #include "soh/SaveManager.h"
 #include "soh/Notification/Notification.h"
+#include "soh/Enhancements/randomizer/ShuffleSilverRupees.h"
 
 extern "C" {
 #include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
@@ -1508,197 +1509,197 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             break;
         case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS);
             }
             break;
         case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
             }
             break;
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVERS);
             }
             break;
         case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVERS);
             }
             break;
         case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_REDEAD_SILVERS);
             }
             break;
         case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FOREST_TRIAL]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FOREST_TRIAL]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FOREST_TRIAL] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVERS);
             }
             break;
         case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FIRE_TRIAL]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FIRE_TRIAL]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FIRE_TRIAL] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVERS);
             }
             break;
         case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_SPIRIT_TRIAL]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_SPIRIT_TRIAL]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_SPIRIT_TRIAL] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVERS);
             }
             break;
         case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_LIGHT_TRIAL]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_LIGHT_TRIAL]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_LIGHT_TRIAL] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS);
             }
             break;
         case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_SCYTHE]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_SCYTHE]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_SCYTHE] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_SCYTHE_SILVERS);
             }
             break;
         case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_PUSH_BLOCK]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_PUSH_BLOCK]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_PUSH_BLOCK] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVERS);
             }
             break;
         case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_BOULDERS]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_BOULDERS]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_BOULDERS] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_BOULDER_SILVERS);
             }
             break;
         case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_TOILET]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_TOILET]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_TOILET] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_TOILET_SILVERS);
             }
             break;
         case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_LAVA]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_LAVA]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_LAVA] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS);
             }
             break;
         case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
             Rupees_ChangeBy(5);
-            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected);
-            gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected++;
-            if (gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected >= 5) {
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_BOTTOM_OF_THE_WELL_BASEMENT]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_BOTTOM_OF_THE_WELL_BASEMENT]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_BOTTOM_OF_THE_WELL_BASEMENT] >= 5) {
                 Flags_SetRandomizerInf(RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVERS);
             }
             break;
         case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS] = 5;
             Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVERS);
             break;
         case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD] = 5;
             Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
             break;
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE] = 5;
             Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVERS);
             break;
         case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS] = 5;
             Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVERS);
             break;
         case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD] = 5;
             Flags_SetRandomizerInf(RAND_INF_SHADOW_TEMPLE_REDEAD_SILVERS);
             break;
         case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FOREST_TRIAL] = 5;
             Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVERS);
             break;
         case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FIRE_TRIAL] = 5;
             Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVERS);
             break;
         case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_SPIRIT_TRIAL] = 5;
             Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVERS);
             break;
         case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_LIGHT_TRIAL] = 5;
             Flags_SetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS);
             break;
         case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_SCYTHE] = 5;
             Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_SCYTHE_SILVERS);
             break;
         case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_PUSH_BLOCK] = 5;
             Flags_SetRandomizerInf(RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVERS);
             break;
         case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_BOULDERS] = 5;
             Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_BOULDER_SILVERS);
             break;
         case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_LAVA] = 5;
             Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_LAVA_SILVERS);
             break;
         case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_TOILET] = 5;
             Flags_SetRandomizerInf(RAND_INF_GERUDO_TRAINING_GROUND_TOILET_SILVERS);
             break;
         case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);
-            gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected = 5;
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_BOTTOM_OF_THE_WELL_BASEMENT] = 5;
             Flags_SetRandomizerInf(RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVERS);
             break;
         case RG_PROGRESSIVE_BOMBCHU_BAG:

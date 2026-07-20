@@ -37,6 +37,9 @@ extern "C" void ObjTsubo_RandomizerDraw(Actor* thisx, PlayState* play) {
                 case ITEM_CATEGORY_LESSER:
                     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotMinorDL);
                     break;
+                case ITEM_CATEGORY_SILVER_RUPEE:
+                    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotSilverRupeeDL);
+                    break;
                 case ITEM_CATEGORY_HEALTH:
                     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotHeartDL);
                     break;

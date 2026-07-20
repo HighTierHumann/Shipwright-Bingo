@@ -62,6 +62,9 @@ static const ALIGN_ASSET(2) char gPotMaskDL[] = dgPotMaskDL;
 #define dgPotMinorDL "__OTR__objects/object_tsubo/gPotMinorDL"
 static const ALIGN_ASSET(2) char gPotMinorDL[] = dgPotMinorDL;
 
+#define dgPotSilverRupeeDL "__OTR__objects/object_tsubo/gPotSilverRupeeDL"
+static const ALIGN_ASSET(2) char gPotSilverRupeeDL[] = dgPotSilverRupeeDL;
+
 #define dgPotRandomDL "__OTR__objects/object_tsubo/gPotRandomDL"
 static const ALIGN_ASSET(2) char gPotRandomDL[] = dgPotRandomDL;
 
@@ -125,6 +128,9 @@ static const ALIGN_ASSET(2) char gRandoBushSmallKeyDL[] = dgRandoBushSmallKeyDL;
 #define dgRandoBushBossKeyDL "__OTR__objects/gameplay_field_keep/gFieldBushBossKeyDL"
 static const ALIGN_ASSET(2) char gRandoBushBossKeyDL[] = dgRandoBushBossKeyDL;
 
+#define dgRandoBushSilverRupeeDL "__OTR__objects/gameplay_field_keep/gFieldBushSilverRupeeDL"
+static const ALIGN_ASSET(2) char gRandoBushSilverRupeeDL[] = dgRandoBushSilverRupeeDL;
+
 #define dgRandoBushTokenDL "__OTR__objects/gameplay_field_keep/gFieldBushTokenDL"
 static const ALIGN_ASSET(2) char gRandoBushTokenDL[] = dgRandoBushTokenDL;
 
@@ -154,6 +160,9 @@ static const ALIGN_ASSET(2) char gRandoCuttableGrassSmallKeyDL[] = dgRandoCuttab
 
 #define dgRandoCuttableGrassBossKeyDL "__OTR__objects/gameplay_keep/gRandoCuttableGrassBossKeyDL"
 static const ALIGN_ASSET(2) char gRandoCuttableGrassBossKeyDL[] = dgRandoCuttableGrassBossKeyDL;
+
+#define dgRandoCuttableGrassSilverRupeeDL "__OTR__objects/gameplay_keep/gRandoCuttableGrassSilverRupeeDL"
+static const ALIGN_ASSET(2) char gRandoCuttableGrassSilverRupeeDL[] = dgRandoCuttableGrassSilverRupeeDL;
 
 #define dgRandoCuttableGrassTokenDL "__OTR__objects/gameplay_keep/gRandoCuttableGrassTokenDL"
 static const ALIGN_ASSET(2) char gRandoCuttableGrassTokenDL[] = dgRandoCuttableGrassTokenDL;
@@ -233,6 +242,9 @@ static const ALIGN_ASSET(2) char gLargeTokenCrateDL[] = dgLargeTokenCrateDL;
 #define dgLargeBossKeyCrateDL "__OTR__objects/object_kibako2/gLargeBossKeyCrateDL"
 static const ALIGN_ASSET(2) char gLargeBossKeyCrateDL[] = dgLargeBossKeyCrateDL;
 
+#define dgLargeSilverRupeeCrateDL "__OTR__objects/object_kibako2/gLargeSilverRupeeCrateDL"
+static const ALIGN_ASSET(2) char gLargeSilverRupeeCrateDL[] = dgLargeSilverRupeeCrateDL;
+
 #define dgLargeHeartCrateDL "__OTR__objects/object_kibako2/gLargeHeartCrateDL"
 static const ALIGN_ASSET(2) char gLargeHeartCrateDL[] = dgLargeHeartCrateDL;
 
@@ -256,6 +268,9 @@ static const ALIGN_ASSET(2) char gSmallTokenCrateDL[] = dgSmallTokenCrateDL;
 
 #define dgSmallBossKeyCrateDL "__OTR__objects/object_kibako/gSmallBossKeyCrateDL"
 static const ALIGN_ASSET(2) char gSmallBossKeyCrateDL[] = dgSmallBossKeyCrateDL;
+
+#define dgSmallSilverRupeeCrateDL "__OTR__objects/object_kibako/gSmallSilverRupeeCrateDL"
+static const ALIGN_ASSET(2) char gSmallSilverRupeeCrateDL[] = dgSmallSilverRupeeCrateDL;
 
 #define dgSmallHeartCrateDL "__OTR__objects/object_kibako/gSmallHeartCrateDL"
 static const ALIGN_ASSET(2) char gSmallHeartCrateDL[] = dgSmallHeartCrateDL;

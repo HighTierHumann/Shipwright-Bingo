@@ -54,6 +54,9 @@ extern "C" void ObjKibako2_RandomizerDraw(Actor* thisx, PlayState* play) {
         case ITEM_CATEGORY_BOSS_KEY:
             Gfx_DrawDListOpa(play, (Gfx*)gLargeBossKeyCrateDL);
             break;
+        case ITEM_CATEGORY_SILVER_RUPEE:
+            Gfx_DrawDListOpa(play, (Gfx*)gLargeSilverRupeeCrateDL);
+            break;
         case ITEM_CATEGORY_HEALTH:
             Gfx_DrawDListOpa(play, (Gfx*)gLargeHeartCrateDL);
             break;
@@ -103,6 +106,9 @@ extern "C" void ObjKibako_RandomizerDraw(Actor* thisx, PlayState* play) {
             break;
         case ITEM_CATEGORY_BOSS_KEY:
             Gfx_DrawDListOpa(play, (Gfx*)gSmallBossKeyCrateDL);
+            break;
+        case ITEM_CATEGORY_SILVER_RUPEE:
+            Gfx_DrawDListOpa(play, (Gfx*)gSmallSilverRupeeCrateDL);
             break;
         case ITEM_CATEGORY_HEALTH:
             Gfx_DrawDListOpa(play, (Gfx*)gSmallHeartCrateDL);

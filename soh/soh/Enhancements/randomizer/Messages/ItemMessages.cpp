@@ -156,26 +156,9 @@ void BuildSilverRupeeMessage(Player* player, CustomMessage& msg) {
     uint8_t remaining = 5;
     int16_t rgid = player->getItemEntry.getItemId;
     int16_t slot = rgid - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
-    uint8_t currentSilvers[] = {
-        gSaveContext.ship.quest.data.randomizer.spiritBoulderSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.spiritChildSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.shadowScytheSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.shadowBeamosSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.shadowRedeadSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.forestTrialSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.fireTrialSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.spiritTrialSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.lightTrialSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.iceCavernScytheSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.iceCavernPushBlockSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.gtgBoulderSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.gtgLavaSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.gtgToiletSilversCollected,
-        gSaveContext.ship.quest.data.randomizer.botwBasementSilversCollected
-    };
 
     if (slot <= 15) {
-        remaining = 5 - (currentSilvers[slot] + 1);
+        remaining = 5 - (gSaveContext.ship.quest.data.randomizer.silverRupees[slot] + 1);
     } else {
         remaining = 0;
     }

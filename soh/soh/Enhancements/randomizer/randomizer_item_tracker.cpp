@@ -18,6 +18,7 @@
 #include "soh/util.h"
 #include "soh/Enhancements/randomizer/randomizer.h"
 #include "soh/Enhancements/randomizer/dungeon.h"
+#include "soh/Enhancements/randomizer/ShuffleSilverRupees.h"
 
 #include <fast/Fast3dGui.h>
 
@@ -146,21 +147,21 @@ std::vector<ItemTrackerItem> triforcePowerPieces = {
 
 // Silver rupee tracker items
 std::vector<ItemTrackerItem> silverRupeeItems = {
-    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE, 0, DrawSilverRupee),
-    ITEM_TRACKER_ITEM(RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE, 0, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FOREST_TRIAL, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_FIRE_TRIAL, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_SPIRIT_TRIAL, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GANONS_CASTLE_LIGHT_TRIAL, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_SCYTHE, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_ICE_CAVERN_PUSH_BLOCK, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_BOULDERS, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_LAVA, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_GERUDO_TRAINING_GROUND_TOILET, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_BOTTOM_OF_THE_WELL_BASEMENT, DrawSilverRupee),
 };
 
 std::vector<ItemTrackerItem> rocsFeather = {
@@ -668,6 +669,24 @@ ItemTrackerNumbers GetItemCurrentAndMax(ItemTrackerItem item) {
                         break;
                 }
             }
+            break;
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
+            result.currentAmmo = MAX(gSaveContext.ship.quest.data.randomizer.silverRupees[item.data], 0);
+            result.maxCapacity = 5; // MQ Silver Rupees haven't been added yet, so default to 5
             break;
     }
 
@@ -1465,96 +1484,106 @@ void DrawSong(ItemTrackerItem item) {
 
 void DrawSilverRupee(ItemTrackerItem item) {
     float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_ITEM("IconSize"), 36));
-    ImVec2 p = ImGui::GetCursorScreenPos();
+    int textSize = CVarGetInteger(CVAR_TRACKER_ITEM("TextSize"), 13);
+    ItemTrackerNumbers currentAndMax = GetItemCurrentAndMax(item);
+    auto currentColor = currentAndMax.currentAmmo >= 5 ? IM_COL_GREEN : IM_COL_WHITE;
 
-    ImGui::Image(std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                     ->GetTextureByName(IsValidSaveFile() ? item.name : item.nameFaded),
-                 ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1));
+    // Scale text consistently for measurements and rendering
+    float textScale = static_cast<float>(textSize) / 13.0f;
+    ImGui::SetWindowFontScale(textScale);
+    ImVec2 p = ImGui::GetCursorScreenPos();
 
     // Determine collected count from save in the same order as z64save.h's ShipRandomizerSaveContextData
     int count = 0;
     if (GameInteractor::IsSaveLoaded()) {
         auto& rnd = gSaveContext.ship.quest.data.randomizer;
-        switch (item.id) {
-            case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
-                count = rnd.spiritBoulderSilversCollected;
-                break;
-            case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
-                count = rnd.spiritChildSilversCollected;
-                break;
-            case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
-                count = rnd.shadowScytheSilversCollected;
-                break;
-            case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
-                count = rnd.shadowBeamosSilversCollected;
-                break;
-            case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
-                count = rnd.shadowRedeadSilversCollected;
-                break;
-            case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
-                count = rnd.forestTrialSilversCollected;
-                break;
-            case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
-                count = rnd.fireTrialSilversCollected;
-                break;
-            case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
-                count = rnd.spiritTrialSilversCollected;
-                break;
-            case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
-                count = rnd.lightTrialSilversCollected;
-                break;
-            case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
-                count = rnd.iceCavernScytheSilversCollected;
-                break;
-            case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
-                count = rnd.iceCavernPushBlockSilversCollected;
-                break;
-            case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
-                count = rnd.gtgBoulderSilversCollected;
-                break;
-            case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
-                count = rnd.gtgLavaSilversCollected;
-                break;
-            case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
-                count = rnd.gtgToiletSilversCollected;
-                break;
-            case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
-                count = rnd.botwBasementSilversCollected;
-                break;
+        // All silver-rupee cases map to the same slot in the save struct.
+        if (item.data < static_cast<uint32_t>(Rando::SRA_MAX)) {
+            count = rnd.silverRupees[item.data];
         }
     }
 
-    // Draw number under icon
-    if (GameInteractor::IsSaveLoaded() && IsValidSaveFile()) {
-        int max = 5;
-
-        std::string currentString = std::to_string(count);
-        std::string maxString = std::to_string(max);
-        ImU32 currentColor = count >= max ? IM_COL_GREEN : IM_COL_WHITE;
-        ImU32 maxColor = IM_COL_GREEN;
-
-        ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) -
-                                         (ImGui::CalcTextSize((currentString + "/" + maxString).c_str()).x / 2),
-                                         p.y + 25));
-        ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
-        ImGui::Text("%s/", currentString.c_str());
-        ImGui::PopStyleColor();
-        ImGui::SameLine(0, 0.0f);
-        ImGui::PushStyleColor(ImGuiCol_Text, maxColor);
-        ImGui::Text("%s", maxString.c_str());
-        ImGui::PopStyleColor();
+    ImGui::Image(std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
+                 ->GetTextureByName(count != 0 && IsValidSaveFile() ? item.name : item.nameFaded),
+                 ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1));
+    
+    switch (item.id) {
+        case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
+            item.name = "Spirit Temple Boulders Room";
+            break;
+        case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+            item.name = "Spirit Temple Child Torches Room";
+            break;
+        case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
+            item.name = "Shadow Temple Scythe Room";
+            break;
+        case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
+            item.name = "Shadow Temple Beamos Room";
+            break;
+        case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
+            item.name = "Shadow Temple Redead Room";
+            break;
+        case RG_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE:
+            item.name = "Forest Trial";
+            break;
+        case RG_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE:
+            item.name = "Fire Trial";
+            break;
+        case RG_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE:
+            item.name = "Spirit Trial";
+            break;
+        case RG_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE:
+            item.name = "Light Trial";
+            break;
+        case RG_ICE_CAVERN_SCYTHE_SILVER_RUPEE:
+            item.name = "Ice Cavern Scythe Room";
+            break;
+        case RG_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE:
+            item.name = "Ice Cavern Push Block Room";
+            break;
+        case RG_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE:
+            item.name = "GTG Boulders Room";
+            break;
+        case RG_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE:
+            item.name = "GTG Lava Room";
+            break;
+        case RG_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE:
+            item.name = "GTG Toilet Room";
+            break;
+        case RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE:
+            item.name = "BotW Basement Room";
+            break;
     }
+    Tooltip(item.name);
 
-    // Draw short dungeon label above icon
-    if (itemTrackerSilverRupeeShortNames.find(item.id) != itemTrackerSilverRupeeShortNames.end()) {
-        std::string label = itemTrackerSilverRupeeShortNames[item.id];
-        ImGui::SetCursorScreenPos(ImVec2(p.x + (iconSize / 2) - (ImGui::CalcTextSize(label.c_str()).x / 2), p.y - (iconSize) + 30));
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_LIGHT_YELLOW);
-        ImGui::Text("%s", label.c_str());
-        ImGui::PopStyleColor();
-    }
+    // Draw numbers centered horizontally and anchored to the bottom of the icon
+    std::string currentString = std::to_string(currentAndMax.currentAmmo) + "/";
+    std::string maxString = std::to_string(currentAndMax.maxCapacity);
+    std::string combinedNumbers = currentString + maxString;
+    ImVec2 numbersSz = ImGui::CalcTextSize(combinedNumbers.c_str());
+    float numbersX = p.x + (iconSize * 0.5f) - (numbersSz.x * 0.5f);
+    float numbersY = p.y + iconSize - numbersSz.y - (2.0f * textScale);
+    ImGui::SetCursorScreenPos(ImVec2(numbersX, numbersY + 10));
+    ImGui::PushStyleColor(ImGuiCol_Text, currentColor);
+    ImGui::Text("%s", currentString.c_str());
+    ImGui::PopStyleColor();
+    ImGui::SameLine(0, 0.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_GREEN);
+    ImGui::Text("%s", maxString.c_str());
+    ImGui::PopStyleColor();
 
-    Tooltip("Silver Rupees");
+    // Draw short dungeon label above icon using text height for consistent spacing
+    std::string label = itemTrackerSilverRupeeShortNames[item.id];
+    ImVec2 labelSz = ImGui::CalcTextSize(label.c_str());
+    float labelX = p.x + (iconSize * 0.5f) - (labelSz.x * 0.5f);
+    float labelY = p.y - labelSz.y - (2.0f * textScale);
+    ImGui::SetCursorScreenPos(ImVec2(labelX, labelY + 13));
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL_LIGHT_YELLOW);
+    ImGui::Text("%s", label.c_str());
+    ImGui::PopStyleColor();
+
+    // Reset font scale so other UI isn't affected
+    ImGui::SetWindowFontScale(1.0f);
 }
 
 void DrawNotes(bool resizeable = false) {
@@ -2170,7 +2199,7 @@ void ItemTrackerWindow::DrawElement() {
         if (CVarGetInteger(CVAR_TRACKER_ITEM("DisplayType.SilverRupees"), SECTION_DISPLAY_HIDDEN) ==
             SECTION_DISPLAY_SEPARATE) {
             BeginFloatingWindows("Silver Rupee Tracker");
-            DrawItemsInRows(silverRupeeItems, 12);
+            DrawItemsInRows(silverRupeeItems, 5);
             EndFloatingWindows();
         }
 

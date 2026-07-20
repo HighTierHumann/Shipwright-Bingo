@@ -4,6 +4,7 @@
 
 #include <nlohmann/json.hpp>
 #include "Anchor.h"
+#include <vector>
 
 extern "C" {
 #include "z64.h"
@@ -107,23 +108,17 @@ inline void from_json(const json& j, SohStats& sohStats) {
 }
 
 inline void to_json(json& j, const ShipRandomizerSaveContextData& shipRandomizerSaveContextData) {
+    std::vector<int> silverVec;
+    size_t silverCount = sizeof(shipRandomizerSaveContextData.silverRupees) / sizeof(shipRandomizerSaveContextData.silverRupees[0]);
+    silverVec.reserve(silverCount);
+    for (size_t i = 0; i < silverCount; ++i) {
+        silverVec.push_back(static_cast<int>(shipRandomizerSaveContextData.silverRupees[i]));
+    }
+
     j = json{
         { "triforcePiecesCollected", shipRandomizerSaveContextData.triforcePiecesCollected },
         { "triforcePowerPiecesCollected", shipRandomizerSaveContextData.triforcePowerPiecesCollected },
-        { "spiritBoulderSilversCollected", shipRandomizerSaveContextData.spiritBoulderSilversCollected },
-        { "spiritChildSilversCollected", shipRandomizerSaveContextData.spiritChildSilversCollected },
-        { "shadowScytheSilversCollected", shipRandomizerSaveContextData.shadowScytheSilversCollected },
-        { "shadowBeamosSilversCollected", shipRandomizerSaveContextData.shadowBeamosSilversCollected },
-        { "shadowRedeadSilversCollected", shipRandomizerSaveContextData.shadowRedeadSilversCollected },
-        { "forestTrialSilversCollected", shipRandomizerSaveContextData.forestTrialSilversCollected },
-        { "fireTrialSilversCollected", shipRandomizerSaveContextData.fireTrialSilversCollected },
-        { "spiritTrialSilversCollected", shipRandomizerSaveContextData.spiritTrialSilversCollected },
-        { "lightTrialSilversCollected", shipRandomizerSaveContextData.lightTrialSilversCollected },
-        { "iceCavernScytheSilversCollected", shipRandomizerSaveContextData.iceCavernScytheSilversCollected },
-        { "iceCavernPushBlockSilversCollected", shipRandomizerSaveContextData.iceCavernPushBlockSilversCollected },
-        { "gtgBoulderSilversCollected", shipRandomizerSaveContextData.gtgBoulderSilversCollected },
-        { "gtgLavaSilversCollected", shipRandomizerSaveContextData.gtgLavaSilversCollected },
-        { "gtgToiletSilversCollected", shipRandomizerSaveContextData.gtgToiletSilversCollected },
+        { "silverRupees", silverVec },
         { "bombchuUpgradeLevel", shipRandomizerSaveContextData.bombchuUpgradeLevel },
     };
 }
@@ -131,20 +126,11 @@ inline void to_json(json& j, const ShipRandomizerSaveContextData& shipRandomizer
 inline void from_json(const json& j, ShipRandomizerSaveContextData& shipRandomizerSaveContextData) {
     j.at("triforcePiecesCollected").get_to(shipRandomizerSaveContextData.triforcePiecesCollected);
     j.at("triforcePowerPiecesCollected").get_to(shipRandomizerSaveContextData.triforcePowerPiecesCollected);
-    j.at("spiritBoulderSilversCollected").get_to(shipRandomizerSaveContextData.spiritBoulderSilversCollected);
-    j.at("spiritChildSilversCollected").get_to(shipRandomizerSaveContextData.spiritChildSilversCollected);
-    j.at("shadowScytheSilversCollected").get_to(shipRandomizerSaveContextData.shadowScytheSilversCollected);
-    j.at("shadowBeamosSilversCollected").get_to(shipRandomizerSaveContextData.shadowBeamosSilversCollected);
-    j.at("shadowRedeadSilversCollected").get_to(shipRandomizerSaveContextData.shadowRedeadSilversCollected);
-    j.at("forestTrialSilversCollected").get_to(shipRandomizerSaveContextData.forestTrialSilversCollected);
-    j.at("fireTrialSilversCollected").get_to(shipRandomizerSaveContextData.fireTrialSilversCollected);
-    j.at("spiritTrialSilversCollected").get_to(shipRandomizerSaveContextData.spiritTrialSilversCollected);
-    j.at("lightTrialSilversCollected").get_to(shipRandomizerSaveContextData.lightTrialSilversCollected);
-    j.at("iceCavernScytheSilversCollected").get_to(shipRandomizerSaveContextData.iceCavernScytheSilversCollected);
-    j.at("iceCavernPushBlockSilversCollected").get_to(shipRandomizerSaveContextData.iceCavernPushBlockSilversCollected);
-    j.at("gtgBoulderSilversCollected").get_to(shipRandomizerSaveContextData.gtgBoulderSilversCollected);
-    j.at("gtgLavaSilversCollected").get_to(shipRandomizerSaveContextData.gtgLavaSilversCollected);
-    j.at("gtgToiletSilversCollected").get_to(shipRandomizerSaveContextData.gtgToiletSilversCollected);
+    std::vector<int> silverVec = j.at("silverRupees").get<std::vector<int>>();
+    size_t silverCount = sizeof(shipRandomizerSaveContextData.silverRupees) / sizeof(shipRandomizerSaveContextData.silverRupees[0]);
+    for (size_t i = 0; i < silverCount; ++i) {
+        shipRandomizerSaveContextData.silverRupees[i] = static_cast<s8>(i < silverVec.size() ? silverVec[i] : 0);
+    }
     j.at("bombchuUpgradeLevel").get_to(shipRandomizerSaveContextData.bombchuUpgradeLevel);
 }
 

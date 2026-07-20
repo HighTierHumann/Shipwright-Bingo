@@ -38,6 +38,7 @@ class DungeonInfo {
     int8_t GetUsedSmallKeys(SaveContext* saveContext) const;
     int8_t GetCurrentSmallKeys(SaveContext* saveContext) const;
     int8_t GetTotalSmallKeys(SaveContext* saveContext) const;
+    int8_t GetTotalSilverRupees(SaveContext* saveContext) const;
     RandomizerSettingKey GetMQSetting() const;
     const std::vector<uint8_t>* GetDoorFlags() const;
     void SetDungeonKnown(bool known);
@@ -74,6 +75,8 @@ class DungeonInfo {
 int8_t FindUsedSmallKeys(const SaveContext* saveContext, const SceneID scene, const std::vector<uint8_t>* DoorFlags);
 int8_t FindCurrentSmallKeys(const SaveContext* saveContext, const SceneID scene);
 int8_t FindTotalSmallKeys(const SaveContext* saveContext, const SceneID scene, const std::vector<uint8_t>* DoorFlags);
+
+int8_t FindTotalSilverRupees(const SaveContext* saveContext, const SceneID scene, const std::vector<uint8_t>* DoorFlags);
 
 typedef enum {
     DEKU_TREE,
