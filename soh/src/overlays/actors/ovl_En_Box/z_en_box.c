@@ -634,6 +634,10 @@ void EnBox_UpdateTexture(EnBox* this, PlayState* play) {
                 this->boxLidDL =
                     EnBox_LoadChestDL(gTreasureChestBossKeyChestSideAndTopDL, gTreasureChestChestSideAndLidDL);
                 break;
+            case ITEM_CATEGORY_SILVER_RUPEE:
+                this->boxBodyDL = EnBox_LoadChestDL(gChestBodySilverRupeeDL, gTreasureChestChestFrontDL);
+                this->boxLidDL = EnBox_LoadChestDL(gChestLidSilverRupeeDL, gTreasureChestChestSideAndLidDL);
+                break;
             case ITEM_CATEGORY_HEALTH:
                 this->boxBodyDL = EnBox_LoadChestDL(gChestBodyHeartDL, gTreasureChestChestFrontDL);
                 this->boxLidDL = EnBox_LoadChestDL(gChestLidHeartDL, gTreasureChestChestSideAndLidDL);

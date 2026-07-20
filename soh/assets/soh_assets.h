@@ -11,8 +11,14 @@
 #define dgChestBodyHeartDL "__OTR__objects/object_box/gChestBodyHeartDL"
 static const ALIGN_ASSET(2) char gChestBodyHeartDL[] = dgChestBodyHeartDL;
 
+#define dgChestBodySilverRupeeDL "__OTR__objects/object_box/gChestBodySilverRupeeDL"
+static const ALIGN_ASSET(2) char gChestBodySilverRupeeDL[] = dgChestBodySilverRupeeDL;
+
 #define dgChestLidHeartDL "__OTR__objects/object_box/gChestLidHeartDL"
 static const ALIGN_ASSET(2) char gChestLidHeartDL[] = dgChestLidHeartDL;
+
+#define dgChestLidSilverRupeeDL "__OTR__objects/object_box/gChestLidSilverRupeeDL"
+static const ALIGN_ASSET(2) char gChestLidSilverRupeeDL[] = dgChestLidSilverRupeeDL;
 
 #define dgChestBodyJunkDL "__OTR__objects/object_box/gChestBodyJunkDL"
 static const ALIGN_ASSET(2) char gChestBodyJunkDL[] = dgChestBodyJunkDL;
