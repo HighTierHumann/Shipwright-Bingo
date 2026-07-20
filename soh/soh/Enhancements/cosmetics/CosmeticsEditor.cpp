@@ -299,6 +299,8 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.SmallKey",                 "Small Key Particles",      COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(85, 220, 255, 255), false, true, false),
     COSMETIC_OPTION("CMC.BossKey",                  "Boss Key Particles",       COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(255, 255, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.Health",                   "Health Particles",         COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(250, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.SilverRupee",              "Silver Rupee Particles",   COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(155, 0, 255, 255), false, true, false),
+
     COSMETIC_OPTION("CMC.Skulltula",                "Skulltula Particles",      COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(0, 0, 0, 255), false, true, false),
 
     COSMETIC_OPTION("Key.WellSmallBody",            "Well Small Key",           COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(255, 255, 255, 255), false, true, false),
@@ -2444,6 +2446,12 @@ void CosmeticsEditorWindow::ApplyCMCParticleColors() {
     CVarSetInteger(cosmeticOptions["CMC.Health"].changedCvar, 1);
     cosmeticOptions["CMC.Health"].currentColor = { 250 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
     ResetColor(cosmeticOptions.at("CMC.Health"));
+
+    // Silver Rupee Particles
+    CVarSetColor(cosmeticOptions["CMC.SilverRupee"].valuesCvar, { 155, 0, 255, 255 });
+    CVarSetInteger(cosmeticOptions["CMC.SilverRupee"].changedCvar, 1);
+    cosmeticOptions["CMC.SilverRupee"].currentColor = { 155 / 255.0f, 0 / 255.0f, 255 / 255.0f, 255 / 255.0f };
+    ResetColor(cosmeticOptions.at("CMC.SilverRupee"));
 
     // Gold Skulltula Particles
     CVarSetColor(cosmeticOptions["CMC.Skulltula"].valuesCvar, { 109, 73, 143, 255 });
