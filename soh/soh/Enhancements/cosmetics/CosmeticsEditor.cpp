@@ -13,6 +13,7 @@
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/enhancementTypes.h"
 #include "soh/Enhancements/randomizer/SeedContext.h"
+#include "soh_assets.h"
 
 extern "C" {
 #include "z64.h"
@@ -48,6 +49,7 @@ extern "C" {
 #include "objects/object_gi_rabit_mask/object_gi_rabit_mask.h"
 #include "overlays/ovl_Magic_Wind/ovl_Magic_Wind.h"
 #include "objects/object_gi_melody/object_gi_melody.h"
+#include "objects/object_box/object_box.h"
 
 extern SaveContext gSaveContext;
 extern PlayState* gPlayState;
@@ -71,6 +73,13 @@ extern std::shared_ptr<SohMenu> mSohMenu;
         ResourceMgr_UnpatchGfxByName(path, name);                   \
     }
 
+#define PATCH_CUSTOM_GFX(path, name, cvar, index, instruction)            \
+    if (CVarGetInteger(cvar, 0)) {                                        \
+        ResourceMgr_PatchCustomGfxByName(path, name, index, instruction); \
+    } else {                                                              \
+        ResourceMgr_UnpatchGfxByName(path, name);                         \
+    }
+
 // This is used for the greg bridge
 #define dgEndGrayscaleAndEndDlistDL "__OTR__helpers/cosmetics/gEndGrayscaleAndEndDlistDL"
 static const ALIGN_ASSET(2) char gEndGrayscaleAndEndDlistDL[] = dgEndGrayscaleAndEndDlistDL;
@@ -86,6 +95,7 @@ std::map<CosmeticGroup, const char*> groupLabels = {
     { COSMETICS_GROUP_BOSS_KEYS, "Boss Keys" },
     { COSMETICS_GROUP_SONGS, "Songs" },
     { COSMETICS_GROUP_CMC_PARTICLES, "CMC Particles/Icicles" },
+    { COSMETICS_GROUP_CMC_TEXTURES, "CMC Textures" },
     { COSMETICS_GROUP_WARP_SONGS, "Warp Songs" },
     { COSMETICS_GROUP_CONSUMABLE, "Consumables" },
     { COSMETICS_GROUP_HUD, "HUD" },
@@ -300,8 +310,15 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.BossKey",                  "Boss Key Particles",       COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(255, 255, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.Health",                   "Health Particles",         COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(250, 0, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.SilverRupee",              "Silver Rupee Particles",   COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(155, 0, 255, 255), false, true, false),
-
     COSMETIC_OPTION("CMC.Skulltula",                "Skulltula Particles",      COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(0, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.JunkTex",                  "Junk Texture Color",           COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(255, 255, 255, 255), false, true, false),
+    COSMETIC_OPTION("CMC.LesserTex",                "Lesser Texture Color",         COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(170, 50, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.MajorTex",                 "Major Texture Color",          COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(250, 185, 40, 255), false, true, false),
+    COSMETIC_OPTION("CMC.SmallKeyTex",              "Small Key Texture Color",      COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(85, 220, 255, 255), false, true, false),
+    COSMETIC_OPTION("CMC.BossKeyTex",               "Boss Key Texture Color",       COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(255, 255, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.HealthTex",                "Health Texture Color",         COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(250, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.SilverRupeeTex",           "Silver Rupee Texture Color",   COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(155, 0, 255, 255), false, true, false),
+    COSMETIC_OPTION("CMC.SkulltulaTex",             "Skulltula Texture Color",      COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(0, 0, 0, 255), false, true, false),
 
     COSMETIC_OPTION("Key.WellSmallBody",            "Well Small Key",           COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(255, 255, 255, 255), false, true, false),
     COSMETIC_OPTION("Key.WellSmallEmblem",          "Well Small Key Emblem",    COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(227, 110, 255, 255), false, true, false),
@@ -1459,6 +1476,232 @@ void ApplyOrResetCustomGfxPatches(bool manualChange) {
         Color_RGBA8 color = CVarGetColor(songPrelude.valuesCvar, songPrelude.defaultColor);
         PATCH_GFX(gGiPreludeColorDL, "Prelude", songPrelude.changedCvar, 2,
                   gsDPSetEnvColor(color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& junkTexture = cosmeticOptions.at("CMC.JunkTex");
+    if (manualChange || CVarGetInteger(junkTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(junkTexture.valuesCvar, junkTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyJunkDL_JunkFront_layerOpaque", "Junk_Chest_Front",
+                         junkTexture.changedCvar, 16, gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyJunkDL_JunkSides_layerOpaque", "Junk_Chest_Sides", junkTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidJunkDL_JunkSides_layerOpaque", "Junk_Chest_Lid_Sides", junkTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallJunkCrateDL_f3dlite_smallcrate_junk", "Junk_Small_Crate", junkTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeJunkCrateDL_f3dlite_crate_side_junk", "Junk_Large_Crate_Side", junkTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeJunkCrateDL_f3dlite_crate_top_junk", "Junk_Large_Crate_Top", junkTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotStandardDL_f3dlite_potbase", "Junk_Pot_Base", junkTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotStandardDL_f3dlite_potbottom", "Junk_Pot_Bottom", junkTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotStandardDL_f3dlite_potface_standard", "Junk_Pot_Face", junkTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotStandardDL_f3dlite_potrim", "Junk_Pot_Rim", junkTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& lesserTexture = cosmeticOptions.at("CMC.LesserTex");
+    if (manualChange || CVarGetInteger(lesserTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(lesserTexture.valuesCvar, lesserTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassMinorDL_f3dlite_flower_bronze", "Lesser_Flower", lesserTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushMinorDL_f3dlite_flower_bronze", "Lesser_Field_Flower", lesserTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyMinorDL_MinorFront_layerOpaque", "Minor_Chest_Front", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyMinorDL_MinorSides_layerOpaque", "Minor_Chest_Sides", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidMinorDL_MinorSides_layerOpaque", "Minor_Chest_Lid_Sides", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallMinorCrateDL_f3dlite_smallcrate_minor", "Minor_Small_Crate", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeMinorCrateDL_f3dlite_crate_side_minor", "Minor_Large_Crate_Side", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeMinorCrateDL_f3dlite_crate_top_minor", "Minor_Large_Crate_Top", lesserTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMinorDL_f3dlite_potbase_minor", "Minor_Pot_Base", lesserTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMinorDL_f3dlite_potbottom", "Minor_Pot_Bottom", lesserTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMinorDL_f3dlite_potface_minor", "Minor_Pot_Face", lesserTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMinorDL_f3dlite_potrim_minor", "Minor_Pot_Rim", lesserTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& majorTexture = cosmeticOptions.at("CMC.MajorTex");
+    if (manualChange || CVarGetInteger(majorTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(majorTexture.valuesCvar, majorTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassMajorDL_f3dlite_flower_gold", "Major_Flower", majorTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushMajorDL_f3dlite_flower_gold", "Major_Field_Flower", majorTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyMajorDL_MajorFront_layerOpaque", "Major_Chest_Front", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyMajorDL_MajorSides_layerOpaque", "Major_Chest_Sides", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidMajorDL_MajorSides_layerOpaque", "Major_Chest_Lid_Sides", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallMajorCrateDL_f3dlite_smallcrate_major", "Major_Small_Crate", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeMajorCrateDL_f3dlite_crate_side_major", "Major_Large_Crate_Side", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeMajorCrateDL_f3dlite_crate_top_major", "Major_Large_Crate_Top", majorTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMajorDL_f3dlite_potbase_major", "Major_Pot_Base", majorTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMajorDL_f3dlite_potbottom", "Major_Pot_Bottom", majorTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMajorDL_f3dlite_potface_major", "Major_Pot_Face", majorTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotMajorDL_f3dlite_potrim_major", "Major_Pot_Rim", majorTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& smallKeyTexture = cosmeticOptions.at("CMC.SmallKeyTex");
+    if (manualChange || CVarGetInteger(smallKeyTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(smallKeyTexture.valuesCvar, smallKeyTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassSmallKeyDL_f3dlite_flower_silver", "Small_Key_Flower", smallKeyTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushSmallKeyDL_f3dlite_flower_silver", "Small_Key_Field_Flower", smallKeyTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodySmallKeyDL_SmallkeyFront_layerOpaque", "Small_Key_Chest_Front", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodySmallKeyDL_SmallkeySides_layerOpaque", "Small_Key_Chest_Sides", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidSmallKeyDL_SmallkeySides_layerOpaque", "Small_Key_Chest_Lid_Sides", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallSmallKeyCrateDL_f3dlite_smallcrate_smallkey", "Small_Key_Small_Crate", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeSmallKeyCrateDL_f3dlite_crate_side_smallkey", "Small_Key_Large_Crate_Side", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeSmallKeyCrateDL_f3dlite_crate_top_smallkey", "Small_Key_Large_Crate_Top", smallKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSmallKeyDL_f3dlite_potbase_Smallkey", "Small_Key_Pot_Base", smallKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSmallKeyDL_f3dlite_potbottom", "Small_Key_Pot_Bottom", smallKeyTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSmallKeyDL_f3dlite_potface_Smallkey", "Small_Key_Pot_Face", smallKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSmallKeyDL_f3dlite_potrim_Smallkey", "Small_Key_Pot_Rim", smallKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& bossKeyTexture = cosmeticOptions.at("CMC.BossKeyTex");
+    if (manualChange || CVarGetInteger(bossKeyTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(bossKeyTexture.valuesCvar, bossKeyTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassBossKeyDL_f3dlite_flower_bosskey", "Boss_Key_Flower", bossKeyTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushBossKeyDL_f3dlite_flower_bosskey", "Boss_Key_Field_Flower", bossKeyTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_GFX(gTreasureChestBossKeyChestFrontDL, "Boss_Key_Chest_Front", bossKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_GFX(gTreasureChestBossKeyChestSideAndTopDL, "Boss_Key_Chest_Side_Top", bossKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallBossKeyCrateDL_f3dlite_smallcrate_bosskey", "Boss_Key_Small_Crate", bossKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeBossKeyCrateDL_f3dlite_crate_side_bosskey", "Boss_Key_Large_Crate_Side", bossKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeBossKeyCrateDL_f3dlite_crate_top_bosskey", "Boss_Key_Large_Crate_Top", bossKeyTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBossKeyDL_f3dlite_potbase_Bosskey", "Boss_Key_Pot_Base", bossKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBossKeyDL_f3dlite_potbottom", "Boss_Key_Pot_Bottom", bossKeyTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBossKeyDL_f3dlite_potface_Bosskey", "Boss_Key_Pot_Face", bossKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBossKeyDL_f3dlite_potrim_Bosskey", "Boss_Key_Pot_Rim", bossKeyTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& healthTexture = cosmeticOptions.at("CMC.HealthTex");
+    if (manualChange || CVarGetInteger(healthTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(healthTexture.valuesCvar, healthTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassHeartDL_f3dlite_flower_heart", "Heart_Flower", healthTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushHeartDL_f3dlite_flower_heart", "Heart_Field_Flower", healthTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyHeartDL_HeartFront_layerOpaque", "Heart_Chest_Front", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyHeartDL_HeartSides_layerOpaque", "Heart_Chest_Sides", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidHeartDL_HeartSides_layerOpaque", "Heart_Chest_Lid_Sides", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallHeartCrateDL_f3dlite_smallcrate_heart", "Heart_Small_Crate", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeHeartCrateDL_f3dlite_crate_side_heart", "Heart_Large_Crate_Side", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeHeartCrateDL_f3dlite_crate_top_heart", "Heart_Large_Crate_Top", healthTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotHeartDL_f3dlite_potbase_heart", "Heart_Pot_Base", healthTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotHeartDL_f3dlite_potbottom", "Heart_Pot_Bottom", healthTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotHeartDL_f3dlite_potface_heart", "Heart_Pot_Face", healthTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotHeartDL_f3dlite_potrim_heart", "Heart_Pot_Rim", healthTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& silverRupeeTexture = cosmeticOptions.at("CMC.SilverRupeeTex");
+    if (manualChange || CVarGetInteger(silverRupeeTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(silverRupeeTexture.valuesCvar, silverRupeeTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassSilverRupeeDL_f3dlite_flower_silver_rupee", "Silver_Rupee_Flower", silverRupeeTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushSilverRupeeDL_f3dlite_flower_silver_rupee", "Silver_Rupee_Field_Flower", silverRupeeTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodySilverRupeeDL_SilverRupeeFront_layerOpaque", "Silver_Rupee_Chest_Front", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodySilverRupeeDL_SilverRupeeSides_layerOpaque", "Silver_Rupee_Chest_Sides", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidSilverRupeeDL_SilverRupeeSides_layerOpaque", "Silver_Rupee_Chest_Lid_Sides", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallSilverRupeeCrateDL_f3dlite_smallcrate_silver_rupee", "Silver_Rupee_Small_Crate", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeSilverRupeeCrateDL_f3dlite_crate_side_silver_rupee", "Silver_Rupee_Large_Crate_Side", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeSilverRupeeCrateDL_f3dlite_crate_top_silver_rupee", "Silver_Rupee_Large_Crate_Top", silverRupeeTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSilverRupeeDL_f3dlite_potbase_Silver_Rupee", "Silver_Rupee_Pot_Base", silverRupeeTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSilverRupeeDL_f3dlite_potbottom", "Silver_Rupee_Pot_Bottom", silverRupeeTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSilverRupeeDL_f3dlite_potface_Silver_Rupee", "Silver_Rupee_Pot_Face", silverRupeeTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotSilverRupeeDL_f3dlite_potrim_Silver_Rupee", "Silver_Rupee_Pot_Rim", silverRupeeTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& skulltulaTexture = cosmeticOptions.at("CMC.SkulltulaTex");
+    if (manualChange || CVarGetInteger(skulltulaTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(skulltulaTexture.valuesCvar, skulltulaTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassTokenDL_f3dlite_flower_token", "Token_Flower", skulltulaTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushTokenDL_f3dlite_flower_token", "Token_Field_Flower", skulltulaTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyTokenDL_TokenFront_layerOpaque", "Token_Chest_Front", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyTokenDL_TokenSides_layerOpaque", "Token_Chest_Sides", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidTokenDL_TokenSides_layerOpaque", "Token_Chest_Lid_Sides", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallTokenCrateDL_f3dlite_smallcrate_token", "Token_Small_Crate", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeTokenCrateDL_f3dlite_crate_side_token", "Token_Large_Crate_Side", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeTokenCrateDL_f3dlite_crate_top_token", "Token_Large_Crate_Top", skulltulaTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potbase_token", "Token_Pot_Base", skulltulaTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potbottom", "Token_Pot_Bottom", skulltulaTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potface_token", "Token_Pot_Face", skulltulaTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potrim_token", "Token_Pot_Rim", skulltulaTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
     }
 
     static CosmeticOption& npcGoldenSkulltula = cosmeticOptions.at("NPC.GoldenSkulltula");
@@ -2619,11 +2862,12 @@ void CosmeticsEditorWindow::DrawElement() {
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("CMC Particles")) {
+        if (ImGui::BeginTabItem("CMC Colors")) {
 
             UIWidgets::Separator(true, true, 2.0f, 2.0f);
 
             DrawCosmeticGroup(COSMETICS_GROUP_CMC_PARTICLES);
+            DrawCosmeticGroup(COSMETICS_GROUP_CMC_TEXTURES);
             ImGui::EndTabItem();
         }
 

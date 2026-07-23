@@ -108,17 +108,10 @@ inline void from_json(const json& j, SohStats& sohStats) {
 }
 
 inline void to_json(json& j, const ShipRandomizerSaveContextData& shipRandomizerSaveContextData) {
-    std::vector<int> silverVec;
-    size_t silverCount = sizeof(shipRandomizerSaveContextData.silverRupees) / sizeof(shipRandomizerSaveContextData.silverRupees[0]);
-    silverVec.reserve(silverCount);
-    for (size_t i = 0; i < silverCount; ++i) {
-        silverVec.push_back(static_cast<int>(shipRandomizerSaveContextData.silverRupees[i]));
-    }
-
     j = json{
         { "triforcePiecesCollected", shipRandomizerSaveContextData.triforcePiecesCollected },
         { "triforcePowerPiecesCollected", shipRandomizerSaveContextData.triforcePowerPiecesCollected },
-        { "silverRupees", silverVec },
+        { "silverRupees", shipRandomizerSaveContextData.silverRupees },
         { "bombchuUpgradeLevel", shipRandomizerSaveContextData.bombchuUpgradeLevel },
     };
 }
@@ -126,11 +119,7 @@ inline void to_json(json& j, const ShipRandomizerSaveContextData& shipRandomizer
 inline void from_json(const json& j, ShipRandomizerSaveContextData& shipRandomizerSaveContextData) {
     j.at("triforcePiecesCollected").get_to(shipRandomizerSaveContextData.triforcePiecesCollected);
     j.at("triforcePowerPiecesCollected").get_to(shipRandomizerSaveContextData.triforcePowerPiecesCollected);
-    std::vector<int> silverVec = j.at("silverRupees").get<std::vector<int>>();
-    size_t silverCount = sizeof(shipRandomizerSaveContextData.silverRupees) / sizeof(shipRandomizerSaveContextData.silverRupees[0]);
-    for (size_t i = 0; i < silverCount; ++i) {
-        shipRandomizerSaveContextData.silverRupees[i] = static_cast<s8>(i < silverVec.size() ? silverVec[i] : 0);
-    }
+    j.at("silverRupees").get_to(shipRandomizerSaveContextData.silverRupees);
     j.at("bombchuUpgradeLevel").get_to(shipRandomizerSaveContextData.bombchuUpgradeLevel);
 }
 

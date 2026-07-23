@@ -111,6 +111,9 @@ void RegisterAlwaysOnFixes() {
                 *camMode = CAM_MODE_AIM_CHILD;
             }
         } else if (*heldItemAction == PLAYER_IA_HOOKSHOT || *heldItemAction == PLAYER_IA_LONGSHOT) {
+            if (CVarGetInteger(CVAR_ENHANCEMENT("EquipmentAlwaysVisible"), false)) {
+                *camMode = CAM_MODE_AIM_ADULT;
+            }
             if (gPlayState->sceneNum == SCENE_LAKESIDE_LABORATORY) {
                 *camMode = CAM_MODE_AIM_ADULT; // Fix child Hookshot aiming in lab (CAM_MODE_AIM_CHILD is invalid there)
             }
