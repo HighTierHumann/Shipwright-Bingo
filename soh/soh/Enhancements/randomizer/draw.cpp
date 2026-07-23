@@ -1415,11 +1415,25 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
     CLOSE_DISPS(play->state.gfxCtx);
 
     s16 slot = getItemEntry->drawItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
+    
+    Color_RGB8 silverDefaults [11] = {
+        { 255, 85,  0   }, // Spirit Gem
+        { 255, 85,  0   },
+        { 153, 0,   255 }, // Shadow Gem
+        { 153, 0,   255 },
+        { 153, 0,   255 },
+        { 0,   255, 255 }, // Forest Trial Gem
+        { 255, 30,  0   }, // Fire Trial Gem
+        { 255, 85,  0   }, // Spirit Trial Gem
+        { 200, 255, 0   }, // Light Trial Gem
+        { 85,  100, 255 }, // Ice Gem
+        { 85,  100, 255 },
+    };
 
     std::string CvarValue[11] = {
-        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ShadowBoss",
-        "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ForestBoss", "gCosmetics.Key.FireBoss",   "gCosmetics.Key.SpiritBoss",
-        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.WaterBoss",  "gCosmetics.Key.WaterBoss",
+        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.ShadowGem",    "gCosmetics.SilverRupee.ShadowGem",
+        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem", "gCosmetics.SilverRupee.SpiritTrialGem",
+        "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
     };
 
     Gfx* CustomdLists[] = {
@@ -1444,20 +1458,9 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
         gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
                 G_MTX_MODELVIEW | G_MTX_LOAD);
 
-        Color_RGB8 gemColor = { 255, 0, 0 };
-        if (slot < 8 || slot >= 9 && slot < 11) {
-            gemColor = CVarGetColor24((CvarValue[slot] + "Gem.Value").c_str(), gemColor);
+        Color_RGB8 gemColor = CVarGetColor24((CvarValue[slot] + ".Value").c_str(), silverDefaults[slot]);
 
-            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
-        }
-                
-        if (slot == 8) {
-             // No "Light Temple" BK exists, so use Prelude
-            gemColor = CVarGetColor24(CVAR_COSMETIC("WarpSong.Prelude.Value"), Color_RGB8{200, 255, 0});
-
-            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
-        }
-
+        gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
         gSPDisplayList(POLY_XLU_DISP++, CustomdLists[slot]);
 
     } else {
@@ -1492,10 +1495,24 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
 
     s16 slot = getItemEntry->drawItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG;
 
+    Color_RGB8 silverDefaults [11] = {
+        { 255, 85,  0   }, // Spirit Gem
+        { 255, 85,  0   },
+        { 153, 0,   255 }, // Shadow Gem
+        { 153, 0,   255 },
+        { 153, 0,   255 },
+        { 0,   255, 255 }, // Forest Trial Gem
+        { 255, 30,  0   }, // Fire Trial Gem
+        { 255, 85,  0   }, // Spirit Trial Gem
+        { 200, 255, 0   }, // Light Trial Gem
+        { 85,  100, 255 }, // Ice Gem
+        { 85,  100, 255 },
+    };
+
     std::string CvarValue[11] = {
-        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ShadowBoss",
-        "gCosmetics.Key.ShadowBoss", "gCosmetics.Key.ForestBoss", "gCosmetics.Key.FireBoss",   "gCosmetics.Key.SpiritBoss",
-        "gCosmetics.Key.SpiritBoss", "gCosmetics.Key.WaterBoss",  "gCosmetics.Key.WaterBoss",
+        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.ShadowGem",    "gCosmetics.SilverRupee.ShadowGem",
+        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem", "gCosmetics.SilverRupee.SpiritTrialGem",
+        "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
     };
 
     Gfx* CustomdLists[] = {
@@ -1520,20 +1537,9 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
         gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
                 G_MTX_MODELVIEW | G_MTX_LOAD);
 
-        Color_RGB8 gemColor = { 255, 0, 0 };
-        if (slot < 8 || slot >= 9 && slot < 11) {
-            gemColor = CVarGetColor24((CvarValue[slot] + "Gem.Value").c_str(), gemColor);
+        Color_RGB8 gemColor = CVarGetColor24((CvarValue[slot] + ".Value").c_str(), silverDefaults[slot]);
 
-            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
-        }
-                
-        if (slot == 8) {
-            // No "Light Temple" BK exists, so use Prelude
-            gemColor = CVarGetColor24(CVAR_COSMETIC("WarpSong.Prelude.Value"), Color_RGB8{200, 255, 0});
-
-            gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
-        }
-
+        gDPSetEnvColor(POLY_XLU_DISP++, gemColor.r, gemColor.g, gemColor.b, 255);
         gSPDisplayList(POLY_XLU_DISP++, CustomdLists[slot]);
 
     } else {

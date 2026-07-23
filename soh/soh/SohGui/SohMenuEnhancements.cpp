@@ -1485,17 +1485,30 @@ void SohMenu::AddMenuEnhancements() {
             "Adds a mimic player that will imitate your actions in the game.\n\n"
             "Touching the mimic will instantly kill you, so be careful!"
         ));
-    AddWidget(path, "Mimic Delay: %d", WIDGET_CVAR_SLIDER_INT)
+    AddWidget(path, "First Mimic Spawn Delay: %d", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicDelay"))
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
         })
         .Options(IntSliderOptions()
-        .Min(5)
+        .Min(1)
         .Max(20)
         .DefaultValue(5)
         .Format("%d seconds").Tooltip(
-            "The number of seconds before the mimic spawns and imitates your actions"
+            "The number of seconds before the first mimic spawns and imitates your actions.\n\n"
+            "Values below 3 seconds may not be beatable."
+        ));
+    AddWidget(path, "Mimic Spawn Interval: %d", WIDGET_CVAR_SLIDER_INT)
+        .CVar(CVAR_ENHANCEMENT("MimicSpawnInterval"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
+        })
+        .Options(IntSliderOptions()
+        .Min(1)
+        .Max(20)
+        .DefaultValue(10)
+        .Format("%d seconds").Tooltip(
+            "The number of seconds between spawning each mimic after the first one."
         ));
     AddWidget(path, "Number of Mimics: %d", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicCount"))
@@ -1504,10 +1517,10 @@ void SohMenu::AddMenuEnhancements() {
         })
         .Options(IntSliderOptions()
         .Min(1)
-        .Max(3)
+        .Max(10)
         .DefaultValue(1)
         .Format("%d mimics").Tooltip(
-            "The number of mimics to spawn. There is a 10 second delay between each mimic spawning"
+            "The number of mimics to spawn."
         ));
     AddWidget(path, "Enable Visual Guard Vision", WIDGET_CVAR_CHECKBOX).CVar(CVAR_ENHANCEMENT("GuardVision"));
     AddWidget(path, "Leever Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)

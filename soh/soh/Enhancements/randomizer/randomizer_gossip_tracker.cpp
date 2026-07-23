@@ -138,7 +138,7 @@ std::unordered_map<RandomizerHint, HintAreaInfo> hintMetadata = {
     { RH_LH_LAB_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
     { RH_LH_SOUTHEAST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
     { RH_LH_SOUTHWEST_GOSSIP_STONE, { RCAREA_LAKE_HYLIA, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
-    { RH_LW_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
+    { RH_LW_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_OCARINA_TIME) } },
     { RH_LW_NEAR_SHORTCUTS_GROTTO_GOSSIP_STONE, { RCAREA_LOST_WOODS, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
     { RH_SFM_MAZE_NEAR_LW_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
     { RH_SFM_MAZE_CENTER_GOSSIP_STONE, { RCAREA_SACRED_FOREST_MEADOW, TYPE_GOSSIP_STONE, RSK_GOSSIP_STONE_HINTS, HINT_TRACKER_ITEM(ITEM_NONE) } },
@@ -235,6 +235,11 @@ void InitHintTrackingData() {
         } else {
             cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW);
         }
+
+        if (hint == RH_LW_GOSSIP_STONE && ctx->GetOption(RSK_OCARINA_HINT)) {
+            cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(RH_OCARINA_HINT)->GetHintMessage(MF_ENCODE);
+        }
+            
         std::string cleanTrackerMessage = cleanMsg.GetForCurrentLanguage(MF_ENCODE);
         e.hintText = cleanTrackerMessage;
 
@@ -254,6 +259,10 @@ void InitHintTrackingData() {
             default:
                 e.hintType = "Unknown";
                 break;
+        }
+
+        if (hint == RH_LW_GOSSIP_STONE && ctx->GetOption(RSK_OCARINA_HINT)) {
+            e.hintType = "Item";
         }
 
         gHintKeyToIndex[hint] = gHintEntries.size();
@@ -552,6 +561,7 @@ void HintTrackerWindow::Draw() {
 
 void HintTrackerWindow::DrawElement() {
     Color_Background = CVarGetColor(CVAR_TRACKER_HINTS("BgColor.Value"), Color_Bg_Default);
+    auto ctx = Rando::Context::GetInstance();
 
     if (Trackers::BeginFloatWindows(
             "Hint Tracker", mIsVisible, Color_Background,
@@ -651,6 +661,11 @@ void HintTrackerWindow::DrawElement() {
                     auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
                     void* tex = gui->GetTextureByName(s.iconTexture);
                     void* texFaded = gui->GetTextureByName(s.iconTextureFaded);
+
+                    if (s.hintKey == RH_LW_GOSSIP_STONE && !ctx->GetOption(RSK_OCARINA_HINT)) {
+                        tex = nullptr;
+                        texFaded = nullptr;
+                    }
 
                     if (!s.revealed) {
                         ImGui::PushStyleColor(ImGuiCol_Text, COLOR_GRAY);

@@ -21,19 +21,23 @@ static constexpr int32_t CVAR_MIMIC_PLAYER_DEFAULT = 0;
 #define CVAR_MIMIC_DELAY_NAME CVAR_ENHANCEMENT("MimicDelay")
 #define CVAR_MIMIC_DELAY_VALUE CVarGetInteger(CVAR_MIMIC_DELAY_NAME, 5)
 
+#define CVAR_MIMIC_SPAWN_INTERVAL_NAME CVAR_ENHANCEMENT("MimicSpawnInterval")
+#define CVAR_MIMIC_SPAWN_INTERVAL_VALUE CVarGetInteger(CVAR_MIMIC_SPAWN_INTERVAL_NAME, 10)
+
 #define CVAR_MIMIC_COUNT_NAME CVAR_ENHANCEMENT("MimicCount")
 #define CVAR_MIMIC_COUNT_VALUE CVarGetInteger(CVAR_MIMIC_COUNT_NAME, 1)
 
 // Guards against the ShouldActorInit hook hijacking the real player's own ACTOR_PLAYER spawn.
 // Only set to true for the duration of our own deliberate Actor_Spawn call below.
 static bool sSpawningMimicPlayer = false;
+// If true, the initial mimic spawn was deferred until we have enough recorded history
+// (see OnSceneSpawnActors). When set, the OnPlayerUpdate spawn hook will perform
+// the actual spawn once `sMimicRecording.size()` >= delayTicks.
+static bool sPendingSpawnFirstMimic = false;
 
 // The base game's actor/collision logic always runs at a fixed 20 ticks per second,
 // independent of the render frame rate, so this converts delays to tick counts.
 static constexpr int32_t MIMIC_TICKS_PER_SECOND = 20;
-
-static constexpr int32_t MIMIC_SPAWN_INTERVAL_SECONDS = 10;
-static constexpr int32_t MIMIC_SPAWN_INTERVAL_TICKS = MIMIC_SPAWN_INTERVAL_SECONDS * MIMIC_TICKS_PER_SECOND;
 
 // Number of mimics already spawned this scene, and ticks remaining until the next one spawns.
 // Both reset whenever a new scene is entered.
@@ -304,6 +308,8 @@ static void MimicPlayer_Spawn(PlayState* play, int32_t spawnIndex) {
     Actor_Spawn(&play->actorCtx, play, ACTOR_PLAYER, spawnX, realPlayer->actor.world.pos.y, spawnZ,
                 realPlayer->actor.shape.rot.x, realPlayer->actor.shape.rot.y, realPlayer->actor.shape.rot.z, 0);
     sSpawningMimicPlayer = false;
+    sMimicsSpawnedThisScene++;
+    sMimicSpawnCooldownTicks = (CVAR_MIMIC_SPAWN_INTERVAL_VALUE * MIMIC_TICKS_PER_SECOND);
 }
 
 void RegisterMimicPlayerHooks() {
@@ -331,6 +337,7 @@ void RegisterMimicPlayerHooks() {
         sMimicsSpawnedThisScene = 0;
         sMimicSpawnCooldownTicks = 0;
         sMimicRecording.clear();
+        sPendingSpawnFirstMimic = false;
     });
 
     // Records the real player's current state every tick into the single shared timeline that all
@@ -356,21 +363,48 @@ void RegisterMimicPlayerHooks() {
         sMimicRecording.push_back(snapshot);
     });
 
-    // Spawns the first mimic as soon as the scene's actors are set up.
+    // Spawns the first mimic as soon as the scene's actors are set up. If we don't yet
+    // have `CVAR_MIMIC_DELAY_VALUE` seconds worth of recorded history, defer the initial
+    // spawn until the history buffer is long enough so the mimic can immediately
+    // replay from the configured delayed offset.
     COND_HOOK(OnSceneSpawnActors, CVAR_MIMIC_PLAYER_VALUE, [&]() {
-        if (sMimicsSpawnedThisScene > 0 || gPlayState == NULL || CVAR_MIMIC_COUNT_VALUE <= 0) {
+        if (gPlayState == NULL || CVAR_MIMIC_COUNT_VALUE <= 0) {
+            return;
+        }
+
+        const size_t delayTicks = static_cast<size_t>(CVAR_MIMIC_DELAY_VALUE * MIMIC_TICKS_PER_SECOND);
+
+        if (sMimicRecording.size() < delayTicks) {
+            // Not enough history yet; mark that we should spawn the first mimic
+            // once the recording buffer reaches the required length.
+            sPendingSpawnFirstMimic = true;
             return;
         }
 
         MimicPlayer_Spawn(gPlayState, sMimicsSpawnedThisScene);
-        sMimicsSpawnedThisScene++;
-        sMimicSpawnCooldownTicks = MIMIC_SPAWN_INTERVAL_TICKS;
     });
 
     // Spawns each additional mimic (beyond the first) MIMIC_SPAWN_INTERVAL_SECONDS apart, until
-    // CVAR_MIMIC_COUNT_VALUE have been spawned for this scene.
+    // CVAR_MIMIC_COUNT_VALUE have been spawned for this scene. Also services a deferred
+    // initial spawn if OnSceneSpawnActors deferred it due to insufficient recording history.
     COND_HOOK(OnPlayerUpdate, CVAR_MIMIC_PLAYER_VALUE, [&]() {
-        if (gPlayState == NULL || sMimicsSpawnedThisScene <= 0 || sMimicsSpawnedThisScene >= CVAR_MIMIC_COUNT_VALUE) {
+        if (gPlayState == NULL || sMimicsSpawnedThisScene >= CVAR_MIMIC_COUNT_VALUE) {
+            return;
+        }
+
+        const size_t delayTicks = static_cast<size_t>(CVAR_MIMIC_DELAY_VALUE * MIMIC_TICKS_PER_SECOND);
+
+        // If the initial spawn was deferred, spawn it as soon as we have enough history.
+        if (sPendingSpawnFirstMimic) {
+            if (sMimicRecording.size() >= delayTicks) {
+                MimicPlayer_Spawn(gPlayState, sMimicsSpawnedThisScene);
+                sPendingSpawnFirstMimic = false;
+            }
+            return;
+        }
+
+        // If there are no mimics yet and we aren't pending the first, do nothing.
+        if (sMimicsSpawnedThisScene <= 0) {
             return;
         }
 
@@ -378,9 +412,12 @@ void RegisterMimicPlayerHooks() {
             return;
         }
 
+        // Ensure there's enough recorded history for the configured delay before spawning.
+        if (sMimicRecording.size() < delayTicks) {
+            return;
+        }
+
         MimicPlayer_Spawn(gPlayState, sMimicsSpawnedThisScene);
-        sMimicsSpawnedThisScene++;
-        sMimicSpawnCooldownTicks = MIMIC_SPAWN_INTERVAL_TICKS;
     });
 }
 

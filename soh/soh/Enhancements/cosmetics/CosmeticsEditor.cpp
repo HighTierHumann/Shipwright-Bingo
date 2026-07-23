@@ -96,6 +96,7 @@ std::map<CosmeticGroup, const char*> groupLabels = {
     { COSMETICS_GROUP_SONGS, "Songs" },
     { COSMETICS_GROUP_CMC_PARTICLES, "CMC Particles/Icicles" },
     { COSMETICS_GROUP_CMC_TEXTURES, "CMC Textures" },
+    { COSMETICS_GROUP_SILVER_RUPEES, "Silver Rupees" },
     { COSMETICS_GROUP_WARP_SONGS, "Warp Songs" },
     { COSMETICS_GROUP_CONSUMABLE, "Consumables" },
     { COSMETICS_GROUP_HUD, "HUD" },
@@ -319,6 +320,13 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.HealthTex",                "Health Texture Color",         COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(250, 0, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.SilverRupeeTex",           "Silver Rupee Texture Color",   COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(155, 0, 255, 255), false, true, false),
     COSMETIC_OPTION("CMC.SkulltulaTex",             "Skulltula Texture Color",      COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(0, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.SpiritGem",        "Spirit Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 85,  0,   255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.ShadowGem",        "Shadow Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(153, 0,   255, 255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.ForestTrialGem",   "Forest Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(0,   255, 255, 255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.FireTrialGem",     "Fire Trial Gem",           COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 30,  0,   255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.SpiritTrialGem",   "Spirit Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 85,  0,   255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.LightTrialGem",    "Light Trial Gem",          COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(200, 255, 0,   255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.IceGem",           "Ice Cavern Gem",           COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(85,  100, 255, 255), false, true, false),
 
     COSMETIC_OPTION("Key.WellSmallBody",            "Well Small Key",           COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(255, 255, 255, 255), false, true, false),
     COSMETIC_OPTION("Key.WellSmallEmblem",          "Well Small Key Emblem",    COSMETICS_GROUP_SMALL_KEYS,   ColorRGBA8(227, 110, 255, 255), false, true, false),
@@ -2614,95 +2622,6 @@ void CosmeticsEditorWindow::ApplyDungeonKeyColors() {
     ResetColor(cosmeticOptions.at("Key.FortSmallEmblem"));
 }
 
-void CosmeticsEditorWindow::ApplySongColors() {
-    // Zelda's Lullaby
-    CVarSetColor(cosmeticOptions["Song.ZeldasLullaby"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["Song.ZeldasLullaby"].changedCvar, 1);
-    cosmeticOptions["Song.ZeldasLullaby"].currentColor = { 109 / 255.0f, 73 / 255.0f, 143 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.ZeldasLullaby"));
-
-    // Epona's Song
-    CVarSetColor(cosmeticOptions["Song.EponasSong"].valuesCvar, { 217, 110, 48, 255 });
-    CVarSetInteger(cosmeticOptions["Song.EponasSong"].changedCvar, 1);
-    cosmeticOptions["Song.EponasSong"].currentColor = { 217 / 255.0f, 110 / 255.0f, 48 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.EponasSong"));
-
-    // Saria's Song
-    CVarSetColor(cosmeticOptions["Song.SariasSong"].valuesCvar, { 62, 109, 23, 255 });
-    CVarSetInteger(cosmeticOptions["Song.SariasSong"].changedCvar, 1);
-    cosmeticOptions["Song.SariasSong"].currentColor = { 62 / 255.0f, 109 / 255.0f, 23 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.SariasSong"));
-
-    // Sun's Song
-    CVarSetColor(cosmeticOptions["Song.SunsSong"].valuesCvar, { 237, 231, 62, 255 });
-    CVarSetInteger(cosmeticOptions["Song.SunsSong"].changedCvar, 1);
-    cosmeticOptions["Song.SunsSong"].currentColor = { 237 / 255.0f, 231 / 255.0f, 62 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.SunsSong"));
-
-    // Song of Time
-    CVarSetColor(cosmeticOptions["Song.SongOfTime"].valuesCvar, { 98, 177, 211, 255 });
-    CVarSetInteger(cosmeticOptions["Song.SongOfTime"].changedCvar, 1);
-    cosmeticOptions["Song.SongOfTime"].currentColor = { 98 / 255.0f, 177 / 255.0f, 211 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.SongOfTime"));
-
-    // Song of Storms
-    CVarSetColor(cosmeticOptions["Song.SongOfStorms"].valuesCvar, { 146, 146, 146, 255 });
-    CVarSetInteger(cosmeticOptions["Song.SongOfStorms"].changedCvar, 1);
-    cosmeticOptions["Song.SongOfStorms"].currentColor = { 146 / 255.0f, 146 / 255.0f, 146 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("Song.SongOfStorms"));
-}
-
-// CMC Particles
-void CosmeticsEditorWindow::ApplyCMCParticleColors() {
-    // Junk Particles
-    CVarSetColor(cosmeticOptions["CMC.Junk"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.Junk"].changedCvar, 1);
-    cosmeticOptions["CMC.Junk"].currentColor = { 255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.Junk"));
-
-    // Lesser Particles
-    CVarSetColor(cosmeticOptions["CMC.Lesser"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.Lesser"].changedCvar, 1);
-    cosmeticOptions["CMC.Lesser"].currentColor = { 170 / 255.0f, 50 / 255.0f, 0 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.Lesser"));
-
-    // Major Particles
-    CVarSetColor(cosmeticOptions["CMC.Major"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.Major"].changedCvar, 1);
-    cosmeticOptions["CMC.Major"].currentColor = { 250 / 255.0f, 185 / 255.0f, 40 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.Major"));
-
-    // Small Key Particles
-    CVarSetColor(cosmeticOptions["CMC.SmallKey"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.SmallKey"].changedCvar, 1);
-    cosmeticOptions["CMC.SmallKey"].currentColor = { 85 / 255.0f, 220 / 255.0f, 255 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.SmallKey"));
-
-    // Boss Key Particles
-    CVarSetColor(cosmeticOptions["CMC.BossKey"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.BossKey"].changedCvar, 1);
-    cosmeticOptions["CMC.BossKey"].currentColor = { 255 / 255.0f, 255 / 255.0f, 0 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.BossKey"));
-
-    // Health Particles
-    CVarSetColor(cosmeticOptions["CMC.Health"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.Health"].changedCvar, 1);
-    cosmeticOptions["CMC.Health"].currentColor = { 250 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.Health"));
-
-    // Silver Rupee Particles
-    CVarSetColor(cosmeticOptions["CMC.SilverRupee"].valuesCvar, { 155, 0, 255, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.SilverRupee"].changedCvar, 1);
-    cosmeticOptions["CMC.SilverRupee"].currentColor = { 155 / 255.0f, 0 / 255.0f, 255 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.SilverRupee"));
-
-    // Gold Skulltula Particles
-    CVarSetColor(cosmeticOptions["CMC.Skulltula"].valuesCvar, { 109, 73, 143, 255 });
-    CVarSetInteger(cosmeticOptions["CMC.Skulltula"].changedCvar, 1);
-    cosmeticOptions["CMC.Skulltula"].currentColor = { 0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
-    ResetColor(cosmeticOptions.at("CMC.Skulltula"));
-}
-
 void CosmeticsEditorWindow::DrawElement() {
     UIWidgets::CVarCombobox("Color Scheme", CVAR_COSMETIC("DefaultColorScheme"), colorSchemes,
                             UIWidgets::ComboboxOptions()
@@ -2868,6 +2787,7 @@ void CosmeticsEditorWindow::DrawElement() {
 
             DrawCosmeticGroup(COSMETICS_GROUP_CMC_PARTICLES);
             DrawCosmeticGroup(COSMETICS_GROUP_CMC_TEXTURES);
+            DrawCosmeticGroup(COSMETICS_GROUP_SILVER_RUPEES);
             ImGui::EndTabItem();
         }
 
