@@ -877,6 +877,17 @@ void SohMenu::AddMenuEnhancements() {
             "Allows Strength to be toggled on and off by pressing A on the Strength Upgrade "
             "in the Equipment Subscreen of the Pause Menu. This allows performing some glitches "
             "that require the player to not have Strength."));
+    AddWidget(path, "Allow Scale Equipment to be Toggled", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("ToggleSwim"))
+        .Callback([](WidgetInfo& info) {
+            if (!CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)) {
+                CVarSetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0);
+            }
+        })
+        .Options(CheckboxOptions().Tooltip(
+            "Allows Scale to be toggled on and off by pressing A on the Scale Upgrade "
+            "in the Equipment Subscreen of the Pause Menu. This allows you to void out "
+            "when you try to swim."));
     AddWidget(path, "Unsheathe Sword Without Slashing", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("UnsheatheWithoutSlashing"))
         .Options(CheckboxOptions().Tooltip("Allows Link to unsheathe sword without slashing automatically."));

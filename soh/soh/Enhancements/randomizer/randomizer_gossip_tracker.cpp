@@ -447,14 +447,14 @@ static void DrawHintColorSegments(const std::vector<HintColorSegment>& segments,
 static void DrawAltarIconSegments(const std::vector<AltarIconSegment>& segments, float fullLineWidth) {
     // Render icons inline with text. Icons appear immediately before the following text segment.
     auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
-    constexpr float kIconSize = 24.0f;
+    float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_HINTS("IconSize"), 24));
 
     for (const auto& segment : segments) {
         // If this segment is an icon, draw it inline and keep same line for following text.
         if (!segment.icon.empty()) {
             void* tex = gui->GetTextureByName(segment.icon.c_str());
             if (tex) {
-                ImGui::Image(tex, ImVec2(kIconSize, kIconSize));
+                ImGui::Image(tex, ImVec2(iconSize, iconSize));
                 ImGui::SameLine(0.0f, 4.0f);
             }
             continue;
@@ -471,14 +471,14 @@ static void DrawAltarIconSegments(const std::vector<AltarIconSegment>& segments,
 static void DrawHintIcons(const std::vector<AltarIconSegment>& segments, float fullLineWidth) {
     // Render icons inline with text. Icons appear immediately before the following text segment.
     auto gui = std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui());
-    constexpr float kIconSize = 24.0f;
+    float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_HINTS("IconSize"), 24));
 
     for (const auto& segment : segments) {
         // If this segment is an icon, draw it inline and keep same line for following text.
         if (!segment.icon.empty()) {
             void* tex = gui->GetTextureByName(segment.icon.c_str());
             if (tex) {
-                ImGui::Image(tex, ImVec2(kIconSize, kIconSize));
+                ImGui::Image(tex, ImVec2(iconSize, iconSize));
                 ImGui::SameLine(0.0f, 4.0f);
             }
             continue;
@@ -529,6 +529,19 @@ void HintTrackerSettingsWindow::DrawElement() {
         ImGui::TableSetupColumn("column 1", ImGuiTableColumnFlags_WidthStretch, 150.0f);
         ImGui::TableNextColumn();
 
+        CVarSliderFloat("Font Size", CVAR_TRACKER_HINTS("FontSize"),
+                     FloatSliderOptions()
+                         .Tooltip("Sets the font size used in the hint tracker.")
+                         .Format("%.1f")
+                         .Step(0.1f)
+                         .Min(0.3f)
+                         .Max(2.0f)
+                         .Color(THEME_COLOR)
+                         .DefaultValue(1.0f));
+        
+        CVarSliderInt("Icon size : %dpx", CVAR_TRACKER_HINTS("IconSize"),
+                      IntSliderOptions().Min(6).Max(128).DefaultValue(24).Color(THEME_COLOR));
+
         ImGui::Text("List Items");
         CVarCheckbox("Auto scroll", CVAR_TRACKER_HINTS("AutoScroll"),
                      CheckboxOptions()
@@ -562,6 +575,7 @@ void HintTrackerWindow::Draw() {
 void HintTrackerWindow::DrawElement() {
     Color_Background = CVarGetColor(CVAR_TRACKER_HINTS("BgColor.Value"), Color_Bg_Default);
     auto ctx = Rando::Context::GetInstance();
+    float iconSize = static_cast<float>(CVarGetInteger(CVAR_TRACKER_HINTS("IconSize"), 24));
 
     if (Trackers::BeginFloatWindows(
             "Hint Tracker", mIsVisible, Color_Background,
@@ -592,6 +606,7 @@ void HintTrackerWindow::DrawElement() {
 
         ImGui::Separator();
 
+        ImGui::SetWindowFontScale(CVarGetFloat(CVAR_TRACKER_HINTS("FontSize"), 1.0f));
         ImGui::BeginChild("HintList", ImVec2(0, -8));
 
         const int8_t groupByArea = CVarGetInteger(CVAR_TRACKER_HINTS("GroupBy"), 0);
@@ -673,7 +688,7 @@ void HintTrackerWindow::DrawElement() {
                             ImGui::TextWrapped("%s\u00A0-> \"???\"", s.name.c_str());
                         } else {
                             if (texFaded) {
-                                ImGui::Image(texFaded, ImVec2(24.0f, 24.0f));
+                                ImGui::Image(texFaded, ImVec2(iconSize, iconSize));
                                 ImGui::SameLine();
                                 ImGui::TextWrapped(" -> \"???\"");
                             } else {
@@ -694,7 +709,7 @@ void HintTrackerWindow::DrawElement() {
                         ImGui::TextWrapped("%s\u00A0-> ", s.name.c_str());
                     } else {
                         if (tex) {
-                            ImGui::Image(tex, ImVec2(24.0f, 24.0f));
+                            ImGui::Image(tex, ImVec2(iconSize, iconSize));
                             ImGui::SameLine(0.0f, 4.0f);
                             ImGui::TextWrapped("-> ");
                         } else {

@@ -26,6 +26,13 @@ static Vtx sStrengthAButtonVtx[] = {
     VTX(9, -6, 0, 24 << 5, 16 << 5, 0xFF, 0xFF, 0xFF, 0xFF),
 };
 
+static Vtx sSwimAButtonVtx[] = {
+    VTX(-9, 6, 0, 0 << 5, 0 << 5, 0xFF, 0xFF, 0xFF, 0xFF),
+    VTX(9, 6, 0, 24 << 5, 0 << 5, 0xFF, 0xFF, 0xFF, 0xFF),
+    VTX(-9, -6, 0, 0 << 5, 16 << 5, 0xFF, 0xFF, 0xFF, 0xFF),
+    VTX(9, -6, 0, 24 << 5, 16 << 5, 0xFF, 0xFF, 0xFF, 0xFF),
+};
+
 static s16 sEquipTimer = 0;
 
 extern int gPauseLinkFrameBuffer;
@@ -184,6 +191,14 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
     s16 cursorX;
     s16 cursorY;
     s16 oldCursorPoint;
+    static bool hasBronzeScale = false;
+
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSwim"), 0) &&
+        CUR_UPG_VALUE(UPG_SCALE) == 0 && Flags_GetRandomizerInf(RAND_INF_CAN_SWIM)) {
+        hasBronzeScale = true;
+    } else if (CUR_UPG_VALUE(UPG_SCALE) != 0) {
+        hasBronzeScale = false;
+    }
 
     OPEN_DISPS(play->state.gfxCtx);
 
@@ -236,6 +251,8 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                             } else {
                                 if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
                                     cursorMoveResult = 1;
+                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                                    cursorMoveResult = 1;
                                 }
                             }
                         } else if ((gBitFlags[pauseCtx->cursorPoint[PAUSE_EQUIP] - 1] &
@@ -272,6 +289,8 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
 
                         if (pauseCtx->cursorX[PAUSE_EQUIP] == 0) {
                             if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
+                                cursorMoveResult = 1;
+                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
                                 cursorMoveResult = 1;
                             }
                         } else if ((gBitFlags[pauseCtx->cursorPoint[PAUSE_EQUIP] - 1] &
@@ -322,6 +341,8 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                             if (pauseCtx->cursorY[PAUSE_EQUIP] == 0) {
                                 if (CUR_UPG_VALUE(UPG_BULLET_BAG) != 0) {
                                     cursorMoveResult = 1;
+                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                                    cursorMoveResult = 1;
                                 }
                             } else if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
                                 cursorMoveResult = 1;
@@ -343,6 +364,8 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
 
                         if (pauseCtx->cursorX[PAUSE_EQUIP] == 0) {
                             if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
+                                cursorMoveResult = 1;
+                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
                                 cursorMoveResult = 1;
                             }
                         } else if ((gBitFlags[pauseCtx->cursorPoint[PAUSE_EQUIP] - 1] &
@@ -372,6 +395,11 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                     if (cursorX == 0) {
                         if (cursorY == 0) {
                             if (CUR_UPG_VALUE(UPG_BULLET_BAG) != 0) {
+                                pauseCtx->cursorPoint[PAUSE_EQUIP] = cursorPoint;
+                                pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
+                                pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
+                                break;
+                            } else if (cursorY == UPG_SCALE && hasBronzeScale) {
                                 pauseCtx->cursorPoint[PAUSE_EQUIP] = cursorPoint;
                                 pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
                                 pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
@@ -418,7 +446,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 cursorY = 0;
                 while (true) {
                     if (cursorX == 0) {
-                        if (CUR_UPG_VALUE(cursorY) != 0) {
+                        if ((CUR_UPG_VALUE(cursorY) != 0) || (cursorY == UPG_SCALE && hasBronzeScale)) {
                             pauseCtx->cursorPoint[PAUSE_EQUIP] = cursorPoint;
                             pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
                             pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
@@ -457,16 +485,24 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 if ((pauseCtx->cursorY[PAUSE_EQUIP] == 0) && (CUR_UPG_VALUE(UPG_BULLET_BAG) != 0)) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
-                    cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
-                                 CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
+                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && hasBronzeScale) {
+                        cursorItem = ITEM_SCALE_SILVER;
+                    } else {
+                        cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
+                                     CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
+                    }
                     osSyncPrintf("H_arrowcase_1 + non_equip_item_table = %d\n", cursorItem);
                 }
             } else {
                 if ((pauseCtx->cursorY[PAUSE_EQUIP] == 0) && (CUR_UPG_VALUE(UPG_QUIVER) == 0)) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
-                    cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
-                                 CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
+                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && hasBronzeScale) {
+                        cursorItem = ITEM_SCALE_SILVER;
+                    } else {
+                        cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
+                                     CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
+                    }
                     osSyncPrintf("大人 H_arrowcase_1 + non_equip_item_table = %d\n", cursorItem);
                 }
             }
@@ -526,6 +562,25 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
             (pauseCtx->cursorY[PAUSE_EQUIP] == 2) && CVarGetInteger(CVAR_ENHANCEMENT("ToggleStrength"), 0)) {
             CVarSetInteger(CVAR_ENHANCEMENT("StrengthDisabled"),
                            !CVarGetInteger(CVAR_ENHANCEMENT("StrengthDisabled"), 0));
+            // Equip success sound
+            Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
+                                   &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
+            // Wait 10 frames before accepting input again
+            pauseCtx->unk_1E4 = 7;
+            sEquipTimer = 10;
+        }
+
+        // Scale Toggling
+        if ((pauseCtx->cursorSpecialPos == 0) && (pauseCtx->state == 6) && (pauseCtx->unk_1E4 == 0) &&
+            CHECK_BTN_ALL(input->press.button, BTN_A) && (pauseCtx->cursorX[PAUSE_EQUIP] == 0) &&
+            (pauseCtx->cursorY[PAUSE_EQUIP] == 3) && CVarGetInteger(CVAR_ENHANCEMENT("EquipmentCanBeRemoved"), 0)) {
+            CVarSetInteger(CVAR_ENHANCEMENT("SwimDisabled"),
+                           !CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0));
+            if (CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0)) {
+                Flags_UnsetRandomizerInf(RAND_INF_CAN_SWIM);
+            } else {
+                Flags_SetRandomizerInf(RAND_INF_CAN_SWIM);
+            }
             // Equip success sound
             Audio_PlaySoundGeneral(NA_SE_SY_DECIDE, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                    &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
@@ -729,6 +784,16 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
         }
     }
 
+    // Grey Out Scale Upgrade Name when Disabled
+    if ((pauseCtx->pageIndex == PAUSE_EQUIP) && (pauseCtx->cursorX[PAUSE_EQUIP] == 0) &&
+        (pauseCtx->cursorY[PAUSE_EQUIP] == 3) && CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)) {
+        if (CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0)) {
+            pauseCtx->nameColorSet = 1;
+        } else {
+            pauseCtx->nameColorSet = 0;
+        }
+    }
+
     for (rowStart = 0, i = 0, point = 4; i < 4; i++, rowStart += 4, point += 16) {
 
         for (k = 0, temp = rowStart + 1, bit = rowStart, j = point; k < 3; k++, bit++, j += 4, temp++) {
@@ -766,6 +831,22 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
             pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[1] - 4;
     }
 
+    // Add zoom effect to scale item if cursor is hovering over it when toggle option is on
+    if ((pauseCtx->cursorX[PAUSE_EQUIP] == 0) && (pauseCtx->cursorY[PAUSE_EQUIP] == 3) &&
+        CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) && pauseCtx->cursorSpecialPos == 0) {
+        u8 row = 3;
+        u8 column = 0;
+        u8 equipVtxIndex = 16 * row + 4 * column;
+        pauseCtx->equipVtx[equipVtxIndex].v.ob[0] = pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[0] =
+            pauseCtx->equipVtx[equipVtxIndex].v.ob[0] - 2;
+        pauseCtx->equipVtx[equipVtxIndex + 1].v.ob[0] = pauseCtx->equipVtx[equipVtxIndex + 3].v.ob[0] =
+            pauseCtx->equipVtx[equipVtxIndex + 1].v.ob[0] + 4;
+        pauseCtx->equipVtx[equipVtxIndex].v.ob[1] = pauseCtx->equipVtx[equipVtxIndex + 1].v.ob[1] =
+            pauseCtx->equipVtx[equipVtxIndex].v.ob[1] + 2;
+        pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[1] = pauseCtx->equipVtx[equipVtxIndex + 3].v.ob[1] =
+            pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[1] - 4;
+    }
+
     Gfx_SetupDL_42Opa(play->state.gfxCtx);
 
     gDPSetCombineMode(POLY_OPA_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
@@ -784,6 +865,16 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                       (sChildUpgradeItemBases[i] + CUR_UPG_VALUE(sChildUpgrades[i]) - 1) == ITEM_GAUNTLETS_GOLD)) ||
                     (CVarGetInteger(CVAR_ENHANCEMENT("ToggleStrength"), 0) &&
                      CVarGetInteger(CVAR_ENHANCEMENT("StrengthDisabled"), 0) && sChildUpgrades[i] == UPG_STRENGTH)) {
+                    gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
+                    gSPGrayscale(POLY_OPA_DISP++, true);
+                }
+
+                // Grey Out Scale Upgrades when Disabled and the Toggle Swim Option is on
+                if ((drawGreyItems &&
+                     ((sChildUpgradeItemBases[i] + CUR_UPG_VALUE(sChildUpgrades[i]) - 1) == ITEM_SCALE_SILVER ||
+                      (sChildUpgradeItemBases[i] + CUR_UPG_VALUE(sChildUpgrades[i]) - 1) == ITEM_SCALE_GOLDEN)) ||
+                    (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
+                     CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sChildUpgrades[i] == UPG_SCALE)) {
                     gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
                     gSPGrayscale(POLY_OPA_DISP++, true);
                 }
@@ -814,12 +905,35 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                     gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
                     gSPGrayscale(POLY_OPA_DISP++, true);
                 }
+
+                // Grey Out Scale Upgrades when Disabled and the Toggle Swim Option is on
+                if ((drawGreyItems &&
+                     (((sAdultUpgradeItemBases[i] + CUR_UPG_VALUE(sAdultUpgrades[i]) - 1) == ITEM_SCALE_GOLDEN &&
+                       !(IS_RANDO) && !CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)))) ||
+                    (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
+                     CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sAdultUpgrades[i] == UPG_SCALE)) {
+                    gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
+                    gSPGrayscale(POLY_OPA_DISP++, true);
+                }
                 KaleidoScope_DrawQuadTextureRGBA32(
                     play->state.gfxCtx, gItemIcons[sAdultUpgradeItemBases[i] + CUR_UPG_VALUE(sAdultUpgrades[i]) - 1],
                     32, 32, 0);
                 gSPGrayscale(POLY_OPA_DISP++, false);
             }
         }
+
+        // Draw "Bronze" Scale if player can swim
+        if ((sAdultUpgrades[i] == UPG_SCALE || sChildUpgrades[i] == UPG_SCALE) && CUR_UPG_VALUE(UPG_SCALE) == 0 && hasBronzeScale) {
+            gDPSetGrayscaleColor(POLY_OPA_DISP++, 255, 123, 0, 255);
+            gSPGrayscale(POLY_OPA_DISP++, true);
+            if ((CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
+                 CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sChildUpgrades[i] == UPG_SCALE)) {
+                gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
+            }
+            KaleidoScope_DrawQuadTextureRGBA32(play->state.gfxCtx, gItemIcons[ITEM_SCALE_GOLDEN], 32, 32, 0);
+            gSPGrayscale(POLY_OPA_DISP++, false);
+        }
+
         // Draw inventory screen icons
         for (k = 0, bit = rowStart, point = 4; k < 3; k++, point += 4, temp++, bit++) {
 
@@ -853,6 +967,21 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
         // Add 4 since the icon will be zoomed in on
         s16 translateY = pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[1] + 4;
         KaleidoScope_DrawAButton(play, sStrengthAButtonVtx, translateX, translateY);
+    }
+
+    // Render A button indicator when hovered over scale
+    if ((pauseCtx->cursorX[PAUSE_EQUIP] == 0) && (pauseCtx->cursorY[PAUSE_EQUIP] == 3) &&
+        CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) && pauseCtx->cursorSpecialPos == 0 &&
+        pauseCtx->unk_1E4 == 0 && pauseCtx->state == 6) {
+        u8 row = 3;
+        u8 column = 0;
+        u8 equipVtxIndex = 16 * row + 4 * column;
+        // Get Bottom Bisector of the Quad
+        s16 translateX =
+            (pauseCtx->equipVtx[equipVtxIndex].v.ob[0] + pauseCtx->equipVtx[equipVtxIndex + 1].v.ob[0]) / 2;
+        // Add 4 since the icon will be zoomed in on
+        s16 translateY = pauseCtx->equipVtx[equipVtxIndex + 2].v.ob[1] + 4;
+        KaleidoScope_DrawAButton(play, sSwimAButtonVtx, translateX, translateY);
     }
 
     KaleidoScope_DrawPlayerWork(play);
