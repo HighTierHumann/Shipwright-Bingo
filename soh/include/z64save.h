@@ -234,6 +234,7 @@ typedef struct ShipRandomizerSaveContextData {
     s8 silverRupees[14];
     bool loseCon;
     u8 bombchuUpgradeLevel;
+    bool obtainedBronzeScale;
 } ShipRandomizerSaveContextData;
 
 typedef struct ShipBossRushSaveContextData {

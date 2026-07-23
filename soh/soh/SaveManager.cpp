@@ -233,6 +233,7 @@ void SaveManager::LoadRandomizer() {
                                     gSaveContext.ship.quest.data.randomizer.triforcePowerPiecesCollected);
     SaveManager::Instance->LoadData("loseCon", gSaveContext.ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->LoadData("bombchuUpgradeLevel", gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel);
+    SaveManager::Instance->LoadData("obtainedBronzeScale", gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale);
 
     SaveManager::Instance->LoadData("pendingIceTrapCount", gSaveContext.ship.pendingIceTrapCount);
 
@@ -411,6 +412,7 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
                                     saveContext->ship.quest.data.randomizer.triforcePowerPiecesCollected);
     SaveManager::Instance->SaveData("loseCon", saveContext->ship.quest.data.randomizer.loseCon);
     SaveManager::Instance->SaveData("bombchuUpgradeLevel", saveContext->ship.quest.data.randomizer.bombchuUpgradeLevel);
+    SaveManager::Instance->SaveData("obtainedBronzeScale", saveContext->ship.quest.data.randomizer.obtainedBronzeScale);
 
     SaveManager::Instance->SaveData("pendingIceTrapCount", saveContext->ship.pendingIceTrapCount);
 

@@ -880,8 +880,12 @@ void SohMenu::AddMenuEnhancements() {
     AddWidget(path, "Allow Scale Equipment to be Toggled", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("ToggleSwim"))
         .Callback([](WidgetInfo& info) {
+            // Player has previously obtained Bronze Scale. Set Can Swim flag once ToggleSwim is disabled.
             if (!CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)) {
                 CVarSetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0);
+                if (gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale) {
+                    Flags_SetRandomizerInf(RAND_INF_CAN_SWIM);
+                }
             }
         })
         .Options(CheckboxOptions().Tooltip(

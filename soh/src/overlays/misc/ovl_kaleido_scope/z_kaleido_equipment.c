@@ -191,13 +191,17 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
     s16 cursorX;
     s16 cursorY;
     s16 oldCursorPoint;
-    static bool hasBronzeScale = false;
+    bool drawBronzeScale = false;
+    bool obtainedBronzeScale = gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale;
 
-    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleSwim"), 0) &&
-        CUR_UPG_VALUE(UPG_SCALE) == 0 && Flags_GetRandomizerInf(RAND_INF_CAN_SWIM)) {
-        hasBronzeScale = true;
+    if (Flags_GetRandomizerInf(RAND_INF_CAN_SWIM)) {
+        gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale = true;
+    }
+
+    if (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) && CUR_UPG_VALUE(UPG_SCALE) == 0) {
+        drawBronzeScale = true;
     } else if (CUR_UPG_VALUE(UPG_SCALE) != 0) {
-        hasBronzeScale = false;
+        drawBronzeScale = false;
     }
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -251,7 +255,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                             } else {
                                 if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
                                     cursorMoveResult = 1;
-                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && obtainedBronzeScale && drawBronzeScale) {
                                     cursorMoveResult = 1;
                                 }
                             }
@@ -290,7 +294,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                         if (pauseCtx->cursorX[PAUSE_EQUIP] == 0) {
                             if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
                                 cursorMoveResult = 1;
-                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && obtainedBronzeScale && drawBronzeScale) {
                                 cursorMoveResult = 1;
                             }
                         } else if ((gBitFlags[pauseCtx->cursorPoint[PAUSE_EQUIP] - 1] &
@@ -341,7 +345,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                             if (pauseCtx->cursorY[PAUSE_EQUIP] == 0) {
                                 if (CUR_UPG_VALUE(UPG_BULLET_BAG) != 0) {
                                     cursorMoveResult = 1;
-                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                                } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && obtainedBronzeScale && drawBronzeScale) {
                                     cursorMoveResult = 1;
                                 }
                             } else if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
@@ -365,7 +369,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                         if (pauseCtx->cursorX[PAUSE_EQUIP] == 0) {
                             if (CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) != 0) {
                                 cursorMoveResult = 1;
-                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && hasBronzeScale) {
+                            } else if (pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE && obtainedBronzeScale && drawBronzeScale) {
                                 cursorMoveResult = 1;
                             }
                         } else if ((gBitFlags[pauseCtx->cursorPoint[PAUSE_EQUIP] - 1] &
@@ -399,7 +403,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                                 pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
                                 pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
                                 break;
-                            } else if (cursorY == UPG_SCALE && hasBronzeScale) {
+                            } else if (cursorY == UPG_SCALE && obtainedBronzeScale && drawBronzeScale) {
                                 pauseCtx->cursorPoint[PAUSE_EQUIP] = cursorPoint;
                                 pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
                                 pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
@@ -446,7 +450,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 cursorY = 0;
                 while (true) {
                     if (cursorX == 0) {
-                        if ((CUR_UPG_VALUE(cursorY) != 0) || (cursorY == UPG_SCALE && hasBronzeScale)) {
+                        if ((CUR_UPG_VALUE(cursorY) != 0) || (cursorY == UPG_SCALE && obtainedBronzeScale && drawBronzeScale)) {
                             pauseCtx->cursorPoint[PAUSE_EQUIP] = cursorPoint;
                             pauseCtx->cursorX[PAUSE_EQUIP] = cursorX;
                             pauseCtx->cursorY[PAUSE_EQUIP] = cursorY;
@@ -485,7 +489,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 if ((pauseCtx->cursorY[PAUSE_EQUIP] == 0) && (CUR_UPG_VALUE(UPG_BULLET_BAG) != 0)) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
-                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && hasBronzeScale) {
+                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && obtainedBronzeScale && drawBronzeScale) {
                         cursorItem = ITEM_SCALE_SILVER;
                     } else {
                         cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
@@ -497,7 +501,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 if ((pauseCtx->cursorY[PAUSE_EQUIP] == 0) && (CUR_UPG_VALUE(UPG_QUIVER) == 0)) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
-                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && hasBronzeScale) {
+                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && obtainedBronzeScale) {
                         cursorItem = ITEM_SCALE_SILVER;
                     } else {
                         cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
@@ -573,7 +577,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
         // Scale Toggling
         if ((pauseCtx->cursorSpecialPos == 0) && (pauseCtx->state == 6) && (pauseCtx->unk_1E4 == 0) &&
             CHECK_BTN_ALL(input->press.button, BTN_A) && (pauseCtx->cursorX[PAUSE_EQUIP] == 0) &&
-            (pauseCtx->cursorY[PAUSE_EQUIP] == 3) && CVarGetInteger(CVAR_ENHANCEMENT("EquipmentCanBeRemoved"), 0)) {
+            (pauseCtx->cursorY[PAUSE_EQUIP] == 3) && CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)) {
             CVarSetInteger(CVAR_ENHANCEMENT("SwimDisabled"),
                            !CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0));
             if (CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0)) {
@@ -870,10 +874,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 }
 
                 // Grey Out Scale Upgrades when Disabled and the Toggle Swim Option is on
-                if ((drawGreyItems &&
-                     ((sChildUpgradeItemBases[i] + CUR_UPG_VALUE(sChildUpgrades[i]) - 1) == ITEM_SCALE_SILVER ||
-                      (sChildUpgradeItemBases[i] + CUR_UPG_VALUE(sChildUpgrades[i]) - 1) == ITEM_SCALE_GOLDEN)) ||
-                    (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
+                if ((CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
                      CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sChildUpgrades[i] == UPG_SCALE)) {
                     gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
                     gSPGrayscale(POLY_OPA_DISP++, true);
@@ -907,10 +908,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 }
 
                 // Grey Out Scale Upgrades when Disabled and the Toggle Swim Option is on
-                if ((drawGreyItems &&
-                     (((sAdultUpgradeItemBases[i] + CUR_UPG_VALUE(sAdultUpgrades[i]) - 1) == ITEM_SCALE_GOLDEN &&
-                       !(IS_RANDO) && !CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0)))) ||
-                    (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
+                if ((CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
                      CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sAdultUpgrades[i] == UPG_SCALE)) {
                     gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
                     gSPGrayscale(POLY_OPA_DISP++, true);
@@ -922,12 +920,12 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
             }
         }
 
-        // Draw "Bronze" Scale if player can swim
-        if ((sAdultUpgrades[i] == UPG_SCALE || sChildUpgrades[i] == UPG_SCALE) && CUR_UPG_VALUE(UPG_SCALE) == 0 && hasBronzeScale) {
+        // Draw "Bronze" Scale if player has previously obtained it and ToggleSwim is enabled
+        if ((sAdultUpgrades[i] == UPG_SCALE || sChildUpgrades[i] == UPG_SCALE) &&
+            obtainedBronzeScale && drawBronzeScale) {
             gDPSetGrayscaleColor(POLY_OPA_DISP++, 255, 123, 0, 255);
             gSPGrayscale(POLY_OPA_DISP++, true);
-            if ((CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) &&
-                 CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sChildUpgrades[i] == UPG_SCALE)) {
+            if ((CVarGetInteger(CVAR_ENHANCEMENT("SwimDisabled"), 0) && sChildUpgrades[i] == UPG_SCALE)) {
                 gDPSetGrayscaleColor(POLY_OPA_DISP++, 109, 109, 109, 255);
             }
             KaleidoScope_DrawQuadTextureRGBA32(play->state.gfxCtx, gItemIcons[ITEM_SCALE_GOLDEN], 32, 32, 0);
