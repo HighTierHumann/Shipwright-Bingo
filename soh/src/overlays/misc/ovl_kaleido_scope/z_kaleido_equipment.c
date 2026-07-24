@@ -490,7 +490,7 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
                     if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && obtainedBronzeScale && drawBronzeScale) {
-                        cursorItem = ITEM_SCALE_SILVER;
+                        cursorItem = PAUSE_ITEM_NONE; // Don't render an item name
                     } else {
                         cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
                                      CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
@@ -501,8 +501,8 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
                 if ((pauseCtx->cursorY[PAUSE_EQUIP] == 0) && (CUR_UPG_VALUE(UPG_QUIVER) == 0)) {
                     cursorItem = ITEM_BULLET_BAG_30 + CUR_UPG_VALUE(UPG_BULLET_BAG) - 1;
                 } else {
-                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && obtainedBronzeScale) {
-                        cursorItem = ITEM_SCALE_SILVER;
+                    if ((pauseCtx->cursorY[PAUSE_EQUIP] == UPG_SCALE) && obtainedBronzeScale && drawBronzeScale) {
+                        cursorItem = PAUSE_ITEM_NONE; // Don't render an item name
                     } else {
                         cursorItem = ITEM_QUIVER_30 + sUpgradeItemOffsets[pauseCtx->cursorY[PAUSE_EQUIP]] +
                                      CUR_UPG_VALUE(pauseCtx->cursorY[PAUSE_EQUIP]) - 1;
