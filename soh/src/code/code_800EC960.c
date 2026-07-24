@@ -4851,13 +4851,8 @@ void Audio_PlaySceneSequence(u16 seqId) {
         } else {
             nv = (sSeqFlags[(seqId & 0xFF) & 0xFF] & 0x40) ? 1 : 0xFF;
             Audio_PlaySequenceWithSeqPlayerIO(SEQ_PLAYER_BGM_MAIN, seqId, 0, 7, nv);
-<<<<<<< HEAD
-            if (!(sSeqFlags[seqId] & 0x20)) {
-                D_8013062C = 0xC0;
-=======
             if (!(Audio_GetSeqFlags(seqId) & 0x20)) {
                 sSeqResumePoint = 0xC0;
->>>>>>> c4e92a70f49ab904c9c7ec92ae0f4d4d5b340e81
             }
         }
         sPrevSceneSeqId = seqId & 0xFF;
