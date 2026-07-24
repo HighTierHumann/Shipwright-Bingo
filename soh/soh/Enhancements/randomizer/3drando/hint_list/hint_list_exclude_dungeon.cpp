@@ -1386,6 +1386,9 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near some Keese# holds #[[1]]#.",
                                                         /*german*/ TODO_TRANSLATE,
                                                         /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
+    hintTextTable[RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES] = HintText(CustomMessage("They say that a #silver rupee near a Sun Block# holds #[[1]]#.",
+                                                        /*german*/ TODO_TRANSLATE,
+                                                        /*french*/ TODO_TRANSLATE, {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      SHADOW TEMPLE       |
