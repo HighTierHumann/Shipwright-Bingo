@@ -231,7 +231,7 @@ typedef struct {
 typedef struct ShipRandomizerSaveContextData {
     u8 triforcePiecesCollected;
     u8 triforcePowerPiecesCollected;
-    s8 silverRupees[14];
+    s8 silverRupees[16];
     bool loseCon;
     u8 bombchuUpgradeLevel;
     bool obtainedBronzeScale;

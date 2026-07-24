@@ -299,7 +299,13 @@ void RegionTable_Init_SpiritTemple() {
         ENTRANCE(RR_SPIRIT_TEMPLE_SUN_BLOCK_ROOM,    true),
     });
 
-    areaTable[RR_SPIRIT_TEMPLE_SUN_BLOCK_ROOM] = Region("Spirit Temple Sun Block Room", SCENE_SPIRIT_TEMPLE, {}, {}, {
+    areaTable[RR_SPIRIT_TEMPLE_SUN_BLOCK_ROOM] = Region("Spirit Temple Sun Block Room", SCENE_SPIRIT_TEMPLE, {}, {
+        LOCATION(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_1, true),
+        LOCATION(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_2, true),
+        LOCATION(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_3, true),
+        LOCATION(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_4, true),
+        LOCATION(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_5, true),
+    }, {
         //Exits
         ENTRANCE(RR_SPIRIT_TEMPLE_EMPTY_STAIRS,          logic->HasItem(RG_POWER_BRACELET) || logic->SunlightArrows()),
         //The blocks can be used to get onto this ledge itemless

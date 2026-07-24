@@ -149,6 +149,7 @@ std::vector<ItemTrackerItem> triforcePowerPieces = {
 std::vector<ItemTrackerItem> silverRupeeItems = {
     ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_BOULDERS, DrawSilverRupee),
     ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD, DrawSilverRupee),
+    ITEM_TRACKER_ITEM(RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_SUN_BLOCK, DrawSilverRupee),
     ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE, DrawSilverRupee),
     ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_BEAMOS, DrawSilverRupee),
     ITEM_TRACKER_ITEM(RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_REDEAD, DrawSilverRupee),
@@ -376,6 +377,7 @@ std::map<uint16_t, std::string> itemTrackerOverworldKeyShortNames = {
 std::map<uint16_t, std::string> itemTrackerSilverRupeeShortNames = {
     { RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE, "SPRT-B" },
     { RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE, "SPRT-C" },
+    { RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE, "SPRT-S" },
     { RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE, "SHDW-S" },
     { RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE, "SHDW-B" },
     { RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE, "SHDW-R" },
@@ -672,6 +674,7 @@ ItemTrackerNumbers GetItemCurrentAndMax(ItemTrackerItem item) {
             break;
         case RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE:
         case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
+        case RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE:
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
         case RG_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE:
         case RG_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE:
@@ -1513,6 +1516,9 @@ void DrawSilverRupee(ItemTrackerItem item) {
             break;
         case RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE:
             item.name = "Spirit Temple Child Torches Room";
+            break;
+        case RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE:
+            item.name = "Spirit Temple Sun Block Room";
             break;
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
             item.name = "Shadow Temple Scythe Room";

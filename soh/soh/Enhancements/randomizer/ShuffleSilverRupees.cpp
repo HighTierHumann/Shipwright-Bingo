@@ -65,6 +65,10 @@ SilverRupeeAreas::SilverRupeeAreas() {
         SilverRupeeAreaInfo("Spirit Temple Child Torches Room", RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES,
                             RSK_SILVERS_SPIRIT_TEMPLE_CHILD, RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE,
                             RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG);
+    mAreas[SRA_SPIRIT_TEMPLE_SUN_BLOCK] =
+        SilverRupeeAreaInfo("Spirit Temple Sun Block Room", RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,
+                            RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK, RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE,
+                            RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_BAG);
     mAreas[SRA_SHADOW_TEMPLE_SCYTHE] =
         SilverRupeeAreaInfo("Shadow Temple Scythe Room", RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEES,
                             RSK_SILVERS_SHADOW_TEMPLE_SCYTHE, RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE,
@@ -168,6 +172,13 @@ void SetSilverRupeeFlag() {
         gSaveContext.sceneFlags[SCENE_SPIRIT_TEMPLE].swch |= (1 << 0x05);
         if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE) {
             Flags_SetSwitch(gPlayState, 0x05);
+        }
+    }
+
+    if (Flags_GetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVERS)) {
+        gSaveContext.sceneFlags[SCENE_SPIRIT_TEMPLE].swch |= (1 << 0x0A);
+        if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE) {
+            Flags_SetSwitch(gPlayState, 0x0A);
         }
     }
 
@@ -341,6 +352,11 @@ void Rando::StaticData::RegisterSilverRupeeLocations() {
     locationTable[RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_3] =                    Location::SilverRupee(RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_3,                RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-511, -1075),       "Child Torches Silver Rupee 3",          RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES,             SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_3));
     locationTable[RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_4] =                    Location::SilverRupee(RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_4,                RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-672, -1075),       "Child Torches Silver Rupee 4",          RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES,             SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_4));
     locationTable[RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_5] =                    Location::SilverRupee(RC_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_5,                RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-766, -1075),       "Child Torches Silver Rupee 5",          RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEES,             SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_5));
+    locationTable[RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_1] =                Location::SilverRupee(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_1,            RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-984, -450),        "Sun Block Silver Rupee 1",              RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,         SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_1));
+    locationTable[RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_2] =                Location::SilverRupee(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_2,            RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-1123, 428),       "Sun Block Silver Rupee 2",              RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,         SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_2));
+    locationTable[RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_3] =                Location::SilverRupee(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_3,            RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-1275, -247),       "Sun Block Silver Rupee 3",              RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,         SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_3));
+    locationTable[RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_4] =                Location::SilverRupee(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_4,            RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-1433, -283),       "Sun Block Silver Rupee 4",              RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,         SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_4));
+    locationTable[RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_5] =                Location::SilverRupee(RC_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_5,            RCQUEST_VANILLA, RCAREA_SPIRIT_TEMPLE,                 SCENE_SPIRIT_TEMPLE,              TWO_ACTOR_PARAMS(-1836, -446),       "Sun Block Silver Rupee 5",              RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEES,         SpoilerCollectionCheck::RandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_5));
 
     locationTable[RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1] =                   Location::SilverRupee(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1,               RCQUEST_VANILLA, RCAREA_SHADOW_TEMPLE,                 SCENE_SHADOW_TEMPLE,              TWO_ACTOR_PARAMS(3399, -838),        "Scythe Room Silver Rupee 1",            RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEES,            SpoilerCollectionCheck::RandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1));
     locationTable[RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_2] =                   Location::SilverRupee(RC_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_2,               RCQUEST_VANILLA, RCAREA_SHADOW_TEMPLE,                 SCENE_SHADOW_TEMPLE,              TWO_ACTOR_PARAMS(2869, -948),        "Scythe Room Silver Rupee 2",            RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEES,            SpoilerCollectionCheck::RandomizerInf(RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_2));

@@ -1523,6 +1523,14 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
                 Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
             }
             break;
+        case RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE:
+            Rupees_ChangeBy(5);
+            PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_SUN_BLOCK]);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_SUN_BLOCK]++;
+            if (gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_SUN_BLOCK] >= 5) {
+                Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVERS);
+            }
+            break;
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE:
             Rupees_ChangeBy(5);
             PlaySilverRupeeSound(gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SHADOW_TEMPLE_SCYTHE]);
@@ -1636,6 +1644,11 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
             Rupees_ChangeBy(25);
             gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_CHILD] = 5;
             Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_CHILD_SILVERS);
+            break;
+        case RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_BAG:
+            Rupees_ChangeBy(25);
+            gSaveContext.ship.quest.data.randomizer.silverRupees[Rando::SilverRupeeAreaKey::SRA_SPIRIT_TEMPLE_SUN_BLOCK] = 5;
+            Flags_SetRandomizerInf(RAND_INF_SPIRIT_TEMPLE_SUN_BLOCK_SILVERS);
             break;
         case RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG:
             Rupees_ChangeBy(25);

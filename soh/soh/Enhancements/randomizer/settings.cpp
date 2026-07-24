@@ -1360,6 +1360,7 @@ void Settings::CreateOptions() {
                 mOptions[RSK_SILVERS_RANDOM_COUNT].Unhide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Hide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Hide();
@@ -1379,6 +1380,7 @@ void Settings::CreateOptions() {
                 mOptions[RSK_SILVERS_RANDOM_COUNT].Hide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Unhide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Unhide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK].Unhide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Unhide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Unhide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Unhide();
@@ -1397,6 +1399,7 @@ void Settings::CreateOptions() {
                 mOptions[RSK_SILVERS_RANDOM_COUNT].Hide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS].Hide();
                 mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD].Hide();
+                mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS].Hide();
                 mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD].Hide();
@@ -1413,9 +1416,10 @@ void Settings::CreateOptions() {
                 break;
         }
     });
-    OPT_U8(RSK_SILVERS_RANDOM_COUNT, "Silver Rupee sets or bags to randomize:", {NumOpts(0, 15)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversRandomCount"), "", WIDGET_CVAR_SLIDER_INT, 8);
+    OPT_U8(RSK_SILVERS_RANDOM_COUNT, "Silver Rupee sets or bags to randomize:", {NumOpts(0, 16)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversRandomCount"), "", WIDGET_CVAR_SLIDER_INT, 8);
     OPT_U8(RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS, "Spirit Temple Boulder Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTempleBoulders"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_SILVERS_SPIRIT_TEMPLE_CHILD, "Spirit Temple Child Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTempleChild"), "", WIDGET_CVAR_COMBOBOX, 0);
+    OPT_U8(RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK, "Spirit Temple Sun Block Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversSpiritTempleSunBlock"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_SCYTHE, "Shadow Temple Scythe Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleScythe"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_BEAMOS, "Shadow Temple Beamos Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleBeamos"), "", WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_SILVERS_SHADOW_TEMPLE_REDEAD, "Shadow Temple ReDead Silvers", {"No", "Random Set", "Set Shuffled", "Random Bag", "Bag Shuffled", "True Random"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSilversShadowTempleReDead"), "", WIDGET_CVAR_COMBOBOX, 0);
@@ -2233,13 +2237,13 @@ void Settings::CreateOptions() {
           &mOptions[RSK_KEYRINGS_GANONS_CASTLE], &mOptions[RSK_KEYRINGS_GERUDO_FORTRESS],
           &mOptions[RSK_SILVER_RUPEES],                  &mOptions[RSK_SILVERS_RANDOM_COUNT],
           &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS], &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
-          &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],   &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
-          &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],   &mOptions[RSK_SILVERS_FOREST_TRIAL],
-          &mOptions[RSK_SILVERS_FIRE_TRIAL],             &mOptions[RSK_SILVERS_SPIRIT_TRIAL],
-          &mOptions[RSK_SILVERS_LIGHT_TRIAL],            &mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE],
-          &mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK],  &mOptions[RSK_SILVERS_GTG_BOULDERS],
-          &mOptions[RSK_SILVERS_GTG_LAVA],               &mOptions[RSK_SILVERS_GTG_TOILET],
-          &mOptions[RSK_SILVERS_BOTW],
+          &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK],&mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],
+          &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],   &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],
+          &mOptions[RSK_SILVERS_FOREST_TRIAL],           &mOptions[RSK_SILVERS_FIRE_TRIAL],
+          &mOptions[RSK_SILVERS_SPIRIT_TRIAL],           &mOptions[RSK_SILVERS_LIGHT_TRIAL],
+          &mOptions[RSK_SILVERS_ICE_CAVERN_SCYTHE],      &mOptions[RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK],
+          &mOptions[RSK_SILVERS_GTG_BOULDERS],           &mOptions[RSK_SILVERS_GTG_LAVA],
+          &mOptions[RSK_SILVERS_GTG_TOILET],             &mOptions[RSK_SILVERS_BOTW],
         },
         WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_KEYRINGS] =
@@ -2665,6 +2669,7 @@ void Settings::CreateOptions() {
                                                  &mOptions[RSK_SILVERS_RANDOM_COUNT],
                                                  &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS],
                                                  &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
+                                                 &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK],
                                                  &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],
                                                  &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
                                                  &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],
@@ -3252,6 +3257,7 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
 
     const std::vector<OptionValue*> silverRupeeOptions = {
         &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_BOULDERS], &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_CHILD],
+        &mOptions[RSK_SILVERS_SPIRIT_TEMPLE_SUN_BLOCK],
         &mOptions[RSK_SILVERS_SHADOW_TEMPLE_SCYTHE],   &mOptions[RSK_SILVERS_SHADOW_TEMPLE_BEAMOS],
         &mOptions[RSK_SILVERS_SHADOW_TEMPLE_REDEAD],   &mOptions[RSK_SILVERS_FOREST_TRIAL],
         &mOptions[RSK_SILVERS_FIRE_TRIAL],             &mOptions[RSK_SILVERS_SPIRIT_TRIAL],

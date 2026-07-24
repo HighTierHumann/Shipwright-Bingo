@@ -334,7 +334,7 @@ std::shared_ptr<GetItemEntry> Item::GetGIEntry() const { // NOLINT(*-no-recursio
             }
             break;
         case RG_PROGRESSIVE_SCALE:
-            if (!logic->CheckRandoInf(RAND_INF_CAN_SWIM)) {
+            if (!gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale) {
                 actual = RG_BRONZE_SCALE;
                 break;
             }

@@ -645,7 +645,7 @@ void Settings::CreateOptionDescriptions() {
         "\n"
         "Off - No Silver Rupees will be shuffled and replaced.\n"
         "\n"
-        "Random - A random amount of Silver Rupee sets (0-15) will be replaced with freestanding "
+        "Random - A random amount of Silver Rupee sets (0-16) will be replaced with freestanding "
         "items. Whether the Silver Rupees are shuffled as a set or as a bag is also randomly determined.\n"
         "\n"
         "Count - A specified amount of Silver Rupee sets will be replaced with freestanding items "

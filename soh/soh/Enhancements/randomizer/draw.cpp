@@ -1416,8 +1416,9 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
 
     s16 slot = getItemEntry->drawItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
     
-    Color_RGB8 silverDefaults [11] = {
+    Color_RGB8 silverDefaults [12] = {
         { 255, 85,  0   }, // Spirit Gem
+        { 255, 85,  0   },
         { 255, 85,  0   },
         { 153, 0,   255 }, // Shadow Gem
         { 153, 0,   255 },
@@ -1430,17 +1431,17 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
         { 85,  100, 255 },
     };
 
-    std::string CvarValue[11] = {
-        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.ShadowGem",    "gCosmetics.SilverRupee.ShadowGem",
-        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem", "gCosmetics.SilverRupee.SpiritTrialGem",
-        "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
+    std::string CvarValue[12] = {
+        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.SpiritGem",    "gCosmetics.SilverRupee.ShadowGem",
+        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ShadowGem",      "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem",
+        "gCosmetics.SilverRupee.SpiritTrialGem", "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
     };
 
     Gfx* CustomdLists[] = {
-        (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
-        (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
-        (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gGiGerudoMaskDL,
-        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
+        (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
+        (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
+        (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,
+        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
     };
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -1495,8 +1496,9 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
 
     s16 slot = getItemEntry->drawItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG;
 
-    Color_RGB8 silverDefaults [11] = {
+    Color_RGB8 silverDefaults [12] = {
         { 255, 85,  0   }, // Spirit Gem
+        { 255, 85,  0   },
         { 255, 85,  0   },
         { 153, 0,   255 }, // Shadow Gem
         { 153, 0,   255 },
@@ -1509,17 +1511,17 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
         { 85,  100, 255 },
     };
 
-    std::string CvarValue[11] = {
-        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.ShadowGem",    "gCosmetics.SilverRupee.ShadowGem",
-        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem", "gCosmetics.SilverRupee.SpiritTrialGem",
-        "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
+    std::string CvarValue[12] = {
+        "gCosmetics.SilverRupee.SpiritGem",     "gCosmetics.SilverRupee.SpiritGem",      "gCosmetics.SilverRupee.SpiritGem",    "gCosmetics.SilverRupee.ShadowGem",
+        "gCosmetics.SilverRupee.ShadowGem",     "gCosmetics.SilverRupee.ShadowGem",      "gCosmetics.SilverRupee.ForestTrialGem", "gCosmetics.SilverRupee.FireTrialGem",
+        "gCosmetics.SilverRupee.SpiritTrialGem", "gCosmetics.SilverRupee.LightTrialGem", "gCosmetics.SilverRupee.IceGem",         "gCosmetics.SilverRupee.IceGem",
     };
 
     Gfx* CustomdLists[] = {
-        (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
-        (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
-        (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gGiGerudoMaskDL,
-        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
+        (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconSpiritTempleDL, (Gfx*)gBossKeyIconShadowTempleDL,
+        (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconShadowTempleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL,
+        (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconGanonsCastleDL, (Gfx*)gBossKeyIconWaterTempleDL,  (Gfx*)gBossKeyIconWaterTempleDL,
+        (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiGerudoMaskDL,            (Gfx*)gGiSpookyMaskDL,
     };
 
     OPEN_DISPS(play->state.gfxCtx);

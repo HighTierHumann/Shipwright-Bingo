@@ -7,12 +7,12 @@
 GetItemCategory Randomizer_AdjustItemCategory(GetItemEntry item) {
     GetItemCategory category = item.getItemCategory;
 
-    // Downgrade bombchus to lesser if the player already has bombchus
+    // Downgrade bombchus to junk if the player already has bombchus
     if (INV_CONTENT(ITEM_BOMBCHU) == ITEM_BOMBCHU &&
         ((item.modIndex == MOD_RANDOMIZER && item.getItemId == RG_PROGRESSIVE_BOMBCHU_BAG) ||
          (item.modIndex == MOD_NONE &&
           (item.getItemId == GI_BOMBCHUS_5 || item.getItemId == GI_BOMBCHUS_10 || item.getItemId == GI_BOMBCHUS_20)))) {
-        category = ITEM_CATEGORY_LESSER;
+        category = ITEM_CATEGORY_JUNK;
     }
 
     // Downgrade bottles to lesser if the player already has a bottle
