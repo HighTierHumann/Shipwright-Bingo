@@ -5,8 +5,9 @@
 #include "fill.hpp"
 #include "../static_data.h"
 #include "../SeedContext.h"
-#include "random.hpp"
+#include "../rng.h"
 #include "soh/Enhancements/randomizer/Traps.h"
+#include "soh/Enhancements/randomizer/randomizerTypes.h"
 #include <algorithm>
 #include <spdlog/spdlog.h>
 
@@ -14,10 +15,7 @@ std::vector<RandomizerGet> itemPool = {};
 std::vector<RandomizerGet> lesserPool = {};
 std::vector<RandomizerGet> plentifulPool = {};
 std::vector<RandomizerGet> junkPool = {};
-const std::array<RandomizerGet, 13> JunkPoolItems = {
-    RG_BOMBS_5,  RG_BOMBS_10,  RG_BOMBS_20,  RG_DEKU_NUTS_5, RG_DEKU_STICK_1, RG_DEKU_SEEDS_30, RG_RECOVERY_HEART,
-    RG_ARROWS_5, RG_ARROWS_10, RG_ARROWS_30, RG_BLUE_RUPEE,  RG_RED_RUPEE,    RG_DEKU_NUTS_10,
-};
+std::vector<RandomizerGet> JunkPoolItems = {};
 // RANDOTODO should probably check the same thing as check matches contents at some point
 const std::map<RandomizerGet, std::vector<RandomizerGet>*> poolForItem = {
     { RG_BOMBS_5, &junkPool },         { RG_BOMBS_10, &junkPool },     { RG_BOMBS_20, &junkPool },
@@ -154,6 +152,14 @@ void GenerateItemPool() {
     plentifulPool.clear();
     lesserPool.clear();
     int reservedSlots = 0;
+    JunkPoolItems = { RG_BOMBS_5,       RG_BOMBS_10,       RG_BOMBS_20,    RG_DEKU_NUTS_5, RG_DEKU_STICK_1,
+                      RG_DEKU_SEEDS_30, RG_RECOVERY_HEART, RG_ARROWS_5,    RG_ARROWS_10,   RG_ARROWS_30,
+                      RG_BLUE_RUPEE,    RG_RED_RUPEE,      RG_DEKU_NUTS_10 };
+    if (ctx->GetOption(RSK_ENABLE_BOMBCHU_DROPS).Is(RO_GENERIC_ON) &&
+        ctx->GetOption(RSK_BOMBCHU_BAG).IsNot(RO_BOMBCHU_BAG_NONE)) {
+        JunkPoolItems.emplace_back(RG_BOMBCHU_5);
+        JunkPoolItems.emplace_back(RG_BOMBCHU_10);
+    }
 
     // clang-format off
     // Items the player can start with are removed from the pool so a started copy isn't also shuffled.
@@ -335,7 +341,9 @@ void GenerateItemPool() {
     }
 
     // Fixed item locations
-    ctx->PlaceItemInLocation(RC_HC_ZELDAS_LETTER, RG_ZELDAS_LETTER);
+    if (!ctx->GetOption(RSK_SHUFFLE_ZELDAS_LETTER)) {
+        ctx->PlaceItemInLocation(RC_HC_ZELDAS_LETTER, RG_ZELDAS_LETTER);
+    }
     ctx->PlaceItemInLocation(RC_GANONS_BOSS_KEY, RG_BLUE_RUPEE); // placeholder, filled by setting
     ctx->PlaceItemInLocation(RC_GANON_SOUL, RG_BLUE_RUPEE); // placeholder, filled by setting
     ctx->PlaceItemInLocation(RC_WINCON, RG_BLUE_RUPEE); // placeholder, filled by setting
@@ -368,12 +376,16 @@ void GenerateItemPool() {
         }
     }
 
-    if (ctx->GetOption(RSK_SHUFFLE_WEIRD_EGG)) {
+    if (ctx->GetOption(RSK_SHUFFLE_WEIRD_EGG).Is(RO_WEIRD_EGG_SHUFFLED)) {
         if (!ctx->GetOption(RSK_STARTING_WEIRD_EGG)) {
             AddItemToPool(RG_WEIRD_EGG, 2, 1, 1, 1);
         }
     } else {
         ctx->PlaceItemInLocation(RC_HC_MALON_EGG, RG_WEIRD_EGG, false, true);
+    }
+
+    if (ctx->GetOption(RSK_SHUFFLE_ZELDAS_LETTER) && !ctx->GetOption(RSK_STARTING_ZELDAS_LETTER)) {
+        AddItemToPool(RG_ZELDAS_LETTER, 2, 1, 1, 1);
     }
 
     if (ctx->GetOption(RSK_SHUFFLE_OCARINA)) {
@@ -434,7 +446,9 @@ void GenerateItemPool() {
     if (ctx->GetOption(RSK_SHUFFLE_CRAWL)) {
         AddItemToPool(RG_CRAWL, 2, 1, 1, 1);
     }
-    if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST)) {
+    if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST).Is(RO_OPEN_CHEST_PROGRESSIVE)) {
+        AddItemToPool(RG_OPEN_CHEST, 3, 2, 2, 2);
+    } else if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST)) {
         AddItemToPool(RG_OPEN_CHEST, 2, 1, 1, 1);
     }
 

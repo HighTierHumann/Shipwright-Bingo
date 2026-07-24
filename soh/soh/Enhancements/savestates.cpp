@@ -50,6 +50,7 @@ extern "C" void EnZf_SaveState(SaveStateCtx* ctx);
 extern "C" void EnZl3_SaveState(SaveStateCtx* ctx);
 extern "C" void ObjectKankyo_SaveState(SaveStateCtx* ctx);
 extern "C" void EnHeishi1_SaveState(SaveStateCtx* ctx);
+extern "C" void Player_SaveState(SaveStateCtx* ctx);
 
 extern "C" void Matrix_SaveState(SaveStateCtx* ctx);
 extern "C" void Lights_SaveState(SaveStateCtx* ctx);
@@ -58,7 +59,7 @@ extern "C" void Camera_SaveState(SaveStateCtx* ctx);
 extern "C" void OnePointCutscene_SaveState(SaveStateCtx* ctx);
 extern "C" void Environment_SaveState(SaveStateCtx* ctx);
 extern "C" void MapExp_SaveState(SaveStateCtx* ctx);
-extern "C" void AudioOca_SaveState(SaveStateCtx* ctx);
+extern "C" void AudioOcarina_SaveState(SaveStateCtx* ctx);
 extern "C" void MessagePAL_SaveState(SaveStateCtx* ctx);
 
 static void SaveOverlayState(std::unique_ptr<uint8_t[]>& buf, void (*fn)(SaveStateCtx*)) {
@@ -111,7 +112,7 @@ typedef struct SaveStateInfo {
     std::unique_ptr<uint8_t[]> onePointCutsceneState;
     std::unique_ptr<uint8_t[]> environmentState;
     std::unique_ptr<uint8_t[]> mapExpState;
-    std::unique_ptr<uint8_t[]> audioOcaState;
+    std::unique_ptr<uint8_t[]> audioOcarinaState;
     std::unique_ptr<uint8_t[]> messagePalState;
 
     // Overlay static data
@@ -147,6 +148,7 @@ typedef struct SaveStateInfo {
     std::unique_ptr<uint8_t[]> enZl3State;
     std::unique_ptr<uint8_t[]> objectKankyoState;
     std::unique_ptr<uint8_t[]> enHeishi1State;
+    std::unique_ptr<uint8_t[]> playerState;
 
     u8 transitionActorCount_copy;
     s16 transitionActorIds_copy[256];
@@ -247,7 +249,7 @@ void SaveState::SaveOverlayStaticData(void) {
     SaveOverlayState(info->onePointCutsceneState, OnePointCutscene_SaveState);
     SaveOverlayState(info->environmentState, Environment_SaveState);
     SaveOverlayState(info->mapExpState, MapExp_SaveState);
-    SaveOverlayState(info->audioOcaState, AudioOca_SaveState);
+    SaveOverlayState(info->audioOcarinaState, AudioOcarina_SaveState);
     SaveOverlayState(info->messagePalState, MessagePAL_SaveState);
     SaveOverlayState(info->bgDdanKdState, BgDdanKd_SaveState);
     SaveOverlayState(info->bgDodoagoState, BgDodoago_SaveState);
@@ -281,6 +283,7 @@ void SaveState::SaveOverlayStaticData(void) {
     SaveOverlayState(info->enZl3State, EnZl3_SaveState);
     SaveOverlayState(info->objectKankyoState, ObjectKankyo_SaveState);
     SaveOverlayState(info->enHeishi1State, EnHeishi1_SaveState);
+    SaveOverlayState(info->playerState, Player_SaveState);
 }
 
 void SaveState::LoadOverlayStaticData(void) {
@@ -292,7 +295,7 @@ void SaveState::LoadOverlayStaticData(void) {
     LoadOverlayState(info->onePointCutsceneState, OnePointCutscene_SaveState);
     LoadOverlayState(info->environmentState, Environment_SaveState);
     LoadOverlayState(info->mapExpState, MapExp_SaveState);
-    LoadOverlayState(info->audioOcaState, AudioOca_SaveState);
+    LoadOverlayState(info->audioOcarinaState, AudioOcarina_SaveState);
     LoadOverlayState(info->messagePalState, MessagePAL_SaveState);
     LoadOverlayState(info->bgDdanKdState, BgDdanKd_SaveState);
     LoadOverlayState(info->bgDodoagoState, BgDodoago_SaveState);
@@ -326,6 +329,7 @@ void SaveState::LoadOverlayStaticData(void) {
     LoadOverlayState(info->enZl3State, EnZl3_SaveState);
     LoadOverlayState(info->objectKankyoState, ObjectKankyo_SaveState);
     LoadOverlayState(info->enHeishi1State, EnHeishi1_SaveState);
+    LoadOverlayState(info->playerState, Player_SaveState);
 }
 
 void SaveState::SaveTransitionActors(void) {
