@@ -67,6 +67,27 @@ void BuildRockySignMessage(uint16_t* textId, bool* loadFromMessageTable) {
     *loadFromMessageTable = false;
 }
 
+void BuildDeezyDMCMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    CustomMessage msg;
+    MessageContext* msgCtx = &gPlayState->msgCtx;
+    msgCtx->textDelayTimer = 20;
+    if (*textId == TEXT_QUESTION_MARKS_DMC) {
+        msg = CustomMessage("%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%rAHHHHHH!!!!^%rTIME LOSS AHHHHH!!!!^"
+                            "%wAlso, %cDeezy %wsays hello!",
+                            TODO_TRANSLATE,
+                            TODO_TRANSLATE);
+    }
+    msg.AutoFormat();
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
 void BuildGerudoGuardJailOfferMessage(uint16_t* textId, bool* loadFromMessageTable) {
     Player* player = GET_PLAYER(gPlayState);
 
@@ -91,6 +112,7 @@ void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_MALON_LETS_SING_THIS_SONG, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_GV_ROCKY_SIGN, IS_RANDO, BuildRockySignMessage);
     COND_ID_HOOK(OnOpenText, TEXT_GERUDO_GUARD_FRIENDLY, IS_RANDO, BuildGerudoGuardJailOfferMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_QUESTION_MARKS_DMC, IS_RANDO, BuildDeezyDMCMessage);
 }
 
 static RegisterShipInitFunc initFunc(RegisterMiscellaneousMessages, { "IS_RANDO" });

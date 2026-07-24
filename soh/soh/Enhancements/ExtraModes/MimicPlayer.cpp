@@ -3,6 +3,7 @@
 #include "soh/ObjectExtension/ObjectExtension.h"
 #include "soh/Notification/Notification.h"
 #include <vector>
+#include <spdlog/spdlog.h>
 #include "include/functions.h"
 
 extern "C" {
@@ -189,6 +190,10 @@ void MimicPlayer_Update(Actor* actor, PlayState* play) {
 
     // Do not update while the player is in a cutscene
     if (Play_InCsMode(play)) {
+        return;
+    }
+
+    if (gPlayState->sceneNum == SCENE_SHOOTING_GALLERY && gPlayState->shootingGalleryStatus != 0) {
         return;
     }
 
