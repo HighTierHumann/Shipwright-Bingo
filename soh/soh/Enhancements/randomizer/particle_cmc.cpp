@@ -31,7 +31,7 @@ static Color_RGBA8 flareColors[8] = {
     { 135, 135, 135, 255 }, // Junk
     { 255, 160, 100, 255 }, // Lesser
     { 255, 125, 125, 255 }, // Health
-    { 67, 0, 184, 255 },   // Silver Rupees
+    { 67, 0, 184, 255 },    // Silver Rupees
     { 0, 200, 255, 255 },   // Boss Key
     { 45, 50, 170, 255 },   // Small Key
     { 255, 255, 255, 255 }, // Skulltula Token
@@ -52,11 +52,11 @@ Color_RGBA8 Randomizer_GetParticleCMCColor(GetItemCategory colorIndex, ParticleC
         case ITEM_CATEGORY_LESSER:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.Lesser.Value"), Color_RGBA8{ 170, 50, 0, 255 });
             break;
-        case ITEM_CATEGORY_SILVER_RUPEE:
-            primary = CVarGetColor(CVAR_COSMETIC("CMC.SilverRupee.Value"), Color_RGBA8{ 155, 0, 255, 255 });
-            break;
         case ITEM_CATEGORY_HEALTH:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.Health.Value"), Color_RGBA8{ 250, 0, 0, 255 });
+            break;
+        case ITEM_CATEGORY_SILVER_RUPEE:
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.SilverRupee.Value"), Color_RGBA8{ 155, 0, 255, 255 });
             break;
         case ITEM_CATEGORY_BOSS_KEY:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.BossKey.Value"), Color_RGBA8{ 255, 255, 0, 255 });
