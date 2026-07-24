@@ -1500,7 +1500,7 @@ void SohMenu::AddMenuEnhancements() {
             "Adds a mimic player that will imitate your actions in the game.\n\n"
             "Touching the mimic will instantly kill you, so be careful!"
         ));
-    AddWidget(path, "First Mimic Spawn Delay: %d", WIDGET_CVAR_SLIDER_INT)
+    AddWidget(path, "First Mimic Spawn Delay", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicDelay"))
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
@@ -1513,7 +1513,7 @@ void SohMenu::AddMenuEnhancements() {
             "The number of seconds before the first mimic spawns and imitates your actions.\n\n"
             "Values below 3 seconds may not be beatable."
         ));
-    AddWidget(path, "Mimic Spawn Interval: %d", WIDGET_CVAR_SLIDER_INT)
+    AddWidget(path, "Mimic Spawn Interval", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicSpawnInterval"))
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
@@ -1525,7 +1525,7 @@ void SohMenu::AddMenuEnhancements() {
         .Format("%d seconds").Tooltip(
             "The number of seconds between spawning each mimic after the first one."
         ));
-    AddWidget(path, "Number of Mimics: %d", WIDGET_CVAR_SLIDER_INT)
+    AddWidget(path, "Number of Mimics", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicCount"))
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
@@ -1536,6 +1536,20 @@ void SohMenu::AddMenuEnhancements() {
         .DefaultValue(1)
         .Format("%d mimics").Tooltip(
             "The number of mimics to spawn."
+        ));
+    AddWidget(path, "Mimic Damage", WIDGET_CVAR_SLIDER_FLOAT)
+        .CVar(CVAR_ENHANCEMENT("MimicDamage"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
+        })
+        .Options(FloatSliderOptions()
+        .Step(0.5f)
+        .Min(0.5f)
+        .Max(40.0f)
+        .DefaultValue(40.0f)
+        .Format("%.2f hearts").Tooltip(
+            "The amount of damage each mimic does when touching the player. Set to 40 "
+            "to always kill the player on contact, even with Double Defense."
         ));
     AddWidget(path, "Enable Visual Guard Vision", WIDGET_CVAR_CHECKBOX).CVar(CVAR_ENHANCEMENT("GuardVision"));
     AddWidget(path, "Leever Spawn Rate: %d seconds", WIDGET_CVAR_SLIDER_INT)

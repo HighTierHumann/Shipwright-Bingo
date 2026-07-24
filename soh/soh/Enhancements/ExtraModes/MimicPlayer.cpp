@@ -27,6 +27,9 @@ static constexpr int32_t CVAR_MIMIC_PLAYER_DEFAULT = 0;
 #define CVAR_MIMIC_COUNT_NAME CVAR_ENHANCEMENT("MimicCount")
 #define CVAR_MIMIC_COUNT_VALUE CVarGetInteger(CVAR_MIMIC_COUNT_NAME, 1)
 
+#define CVAR_MIMIC_DAMAGE_NAME CVAR_ENHANCEMENT("MimicDamage")
+#define CVAR_MIMIC_DAMAGE_VALUE CVarGetInteger(CVAR_MIMIC_DAMAGE_NAME, 1)
+
 // Guards against the ShouldActorInit hook hijacking the real player's own ACTOR_PLAYER spawn.
 // Only set to true for the duration of our own deliberate Actor_Spawn call below.
 static bool sSpawningMimicPlayer = false;
@@ -191,11 +194,11 @@ void MimicPlayer_Update(Actor* actor, PlayState* play) {
 
     actor->shape.shadowAlpha = 255;
 
-    // Kill player if they touch mimic
-    if (player->cylinder.base.ocFlags2 & OC2_HIT_PLAYER) {
+    // Damage player if they touch mimic
+    if (player->cylinder.base.ocFlags2 & OC2_HIT_PLAYER && actualPlayer->invincibilityTimer <= 0) {
         player->cylinder.base.ocFlags2 &= ~OC2_HIT_PLAYER;
-        gSaveContext.health = 0;
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("MimicLose"), 0)) {
+        GameInteractor::RawAction::HealOrDamagePlayer(CVAR_MIMIC_DAMAGE_VALUE * -1);
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("MimicLose"), 0) && gSaveContext.health <= 0) {
             Play_PerformSave(play);
             Notification::Emit({
                 .message = "Game autosaved",

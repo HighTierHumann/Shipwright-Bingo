@@ -2138,97 +2138,97 @@ void StaticData::HintTable_Init_Item() {
                                              }, {
                                              CustomMessage("a nickel-plated currency of the damned", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                         {
                                                         CustomMessage("a spiritually rocky shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a nickel-plated currency container of the earth", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Child Torches Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Child Torches Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                         {
                                                         CustomMessage("a spiritually youthful shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a nickel-plated currency container for the young", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Sun Block Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Temple Sun Block Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                         {
                                                         CustomMessage("a spiritually radiant shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a bright nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
                                              
-     hintTextTable[RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                         {
                                                         CustomMessage("a shadowy, blade-like shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a sharp nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
                                              
-     hintTextTable[RHT_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple Beamos Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple Beamos Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a shadowy, beaming shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("an observant nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple ReDead Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Shadow Temple ReDead Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a shadowy, zombie-like shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a nickel-plated currency container of two lost souls", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Forest Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Forest Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a test of the woods shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a floral nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Fire Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Fire Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a test of warmth Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a warm nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Spirit Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a test of the soul shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a soulful nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Light Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Light Trial Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a test of the light shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a bright nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG] = HintText(CustomMessage("an Ice Cavern Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_ICE_CAVERN_SCYTHE_SILVER_RUPEE_BAG] = HintText(CustomMessage("an Ice Cavern Scythe Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("an icy, blade-like shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a nickel-plated currency container of the frozen edge", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG] = HintText(CustomMessage("an Ice Cavern Push Block Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_BAG] = HintText(CustomMessage("an Ice Cavern Push Block Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("an icy, blocky shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a nickel-plated currency container of a cold block", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_BOULDER_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Boulder Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a warrior's shiny Rupee holder of stone", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("an earthy fighter's nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Lava Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_LAVA_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Lava Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a warrior's shiny Rupee holder of heat", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a warm fighter's nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Toilet Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_GERUDO_TRAINING_GROUND_TOILET_SILVER_RUPEE_BAG] = HintText(CustomMessage("a GTG Toilet Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a warrior's shiny Rupee holder of the water", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
                                                         CustomMessage("a damp fighter's nickel-plated currency container", TODO_TRANSLATE, TODO_TRANSLATE)});
 
-     hintTextTable[RHT_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Bottom of the Well Basement Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
+    hintTextTable[RHT_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG] = HintText(CustomMessage("a Bottom of the Well Basement Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE),
                                                          {
                                                         CustomMessage("a tormented prisoner's shiny Rupee holder", TODO_TRANSLATE, TODO_TRANSLATE)
                                                         }, {
