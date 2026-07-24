@@ -322,7 +322,7 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.SkulltulaTex",             "Skulltula Texture Color",      COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(0, 0, 0, 255), false, true, false),
     COSMETIC_OPTION("SilverRupee.SpiritGem",        "Spirit Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 85,  0,   255), false, true, false),
     COSMETIC_OPTION("SilverRupee.ShadowGem",        "Shadow Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(153, 0,   255, 255), false, true, false),
-    COSMETIC_OPTION("SilverRupee.ForestTrialGem",   "Forest Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(0,   255, 255, 255), false, true, false),
+    COSMETIC_OPTION("SilverRupee.ForestTrialGem",   "Forest Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(0,   255, 0,   255), false, true, false),
     COSMETIC_OPTION("SilverRupee.FireTrialGem",     "Fire Trial Gem",           COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 30,  0,   255), false, true, false),
     COSMETIC_OPTION("SilverRupee.SpiritTrialGem",   "Spirit Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 85,  0,   255), false, true, false),
     COSMETIC_OPTION("SilverRupee.LightTrialGem",    "Light Trial Gem",          COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(200, 255, 0,   255), false, true, false),
