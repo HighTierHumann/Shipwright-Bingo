@@ -2905,7 +2905,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), 0))) {
+    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), ICE_DISABLED) != ICE_DISABLED)) {
         switch (gPlayState->sceneNum) {
             case SCENE_ZORAS_FOUNTAIN:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -444, 100, -1735, 0, 0, 0,
@@ -2916,7 +2916,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), 0))) {
+    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), IGC_DISABLED) != IGC_DISABLED)) {
         switch (gPlayState->sceneNum) {
             case SCENE_OUTSIDE_GANONS_CASTLE:
                 if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {
@@ -2930,7 +2930,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), 0))) {
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), DEKU_DISABLED) != DEKU_DISABLED) {
         switch (gPlayState->sceneNum) {
             case SCENE_KOKIRI_FOREST:
                 if (gPlayState->roomCtx.curRoom.num == 1) {
@@ -2943,8 +2943,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
-        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), 0))) {
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), FRST_DISABLED) != FRST_DISABLED) {
         switch (gPlayState->sceneNum) {
             case SCENE_SACRED_FOREST_MEADOW:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -90, 480, -2902, 0, 0, 0,
@@ -2955,8 +2954,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
-        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), 0))) {
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), FIRE_DISABLED) != FIRE_DISABLED) {
         switch (gPlayState->sceneNum) {
             case SCENE_DEATH_MOUNTAIN_CRATER:
                 if (gPlayState->roomCtx.curRoom.num == 1) {
@@ -2969,8 +2967,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
-        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), 0))) {
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), SPRT_DISABLED) != SPRT_DISABLED) {
         switch (gPlayState->sceneNum) {
             case SCENE_DESERT_COLOSSUS:
                 Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_KANBAN, -1461, 48, -118, 0,
@@ -2981,8 +2978,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if ((CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0)) &&
-        (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), 0))) {
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), SHDW_DISABLED) != SHDW_DISABLED) {
         switch (gPlayState->sceneNum) {
             case SCENE_GRAVEYARD:
                 if (gPlayState->roomCtx.curRoom.num == 0) {

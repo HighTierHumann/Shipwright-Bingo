@@ -1,6 +1,7 @@
 #include "soh/Enhancements/randomizer/entrance.h"
 #include "soh/Enhancements/randomizer/randomizer_entrance_tracker.h"
 #include "soh/Enhancements/randomizer/randomizer.h"
+#include "soh/Enhancements/enhancementTypes.h"
 #include <soh/OTRGlobals.h>
 
 extern "C" {
@@ -49,10 +50,10 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_GRAVEYARD_ENTRANCE;
             break;
         case TEXT_KAK_WELL_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedBotWSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("BottomOfTheWellSign"), BOTW_DISABLED) == BOTW_INVERTED) {
                 entrance = ENTR_KAKARIKO_VILLAGE_OUTSIDE_BOTTOM_OF_THE_WELL;
                 break;
-            } else {
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("BottomOfTheWellSign"), BOTW_DISABLED) == BOTW_ENABLED) {
                 entrance = ENTR_BOTTOM_OF_THE_WELL_ENTRANCE;
                 break;
             }
@@ -60,7 +61,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT;
             break;
         case TEXT_GRAVEYARD_SHADOW_TEMPLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedShadowTempleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), SHDW_DISABLED) == SHDW_INVERTED) {
                 entrance = ENTR_GRAVEYARD_OUTSIDE_TEMPLE;
                 break;
             } else {
@@ -71,10 +72,10 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_GROTTOS_13;
             break;
         case TEXT_DMT_DC_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDodongosSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DodongosCavernSign"), DC_DISABLED) == DC_INVERTED) {
                 entrance = ENTR_DEATH_MOUNTAIN_TRAIL_OUTSIDE_DODONGOS_CAVERN;
                 break;
-            } else {
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DodongosCavernSign"), DC_DISABLED) == DC_ENABLED) {
                 entrance = ENTR_DODONGOS_CAVERN_ENTRANCE;
                 break;
             }
@@ -82,7 +83,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_GORON_CITY_UPPER_EXIT;
             break;
         case TEXT_DMC_FIRE_TEMPLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedFireTempleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), FIRE_DISABLED) == FIRE_INVERTED) {
                 entrance = ENTR_DEATH_MOUNTAIN_CRATER_OUTSIDE_TEMPLE;
                 break;
             } else {
@@ -106,10 +107,10 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_ZORAS_RIVER_WEST_EXIT;
             break;
         case TEXT_GF_GTG_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGTGSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GerudoTrainingGroundSign"), GTG_DISABLED) == GTG_INVERTED) {
                 entrance = ENTR_GERUDOS_FORTRESS_OUTSIDE_GERUDO_TRAINING_GROUND;
                 break;
-            } else {
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GerudoTrainingGroundSign"), GTG_DISABLED) == GTG_ENABLED) {
                 entrance = ENTR_GERUDO_TRAINING_GROUND_ENTRANCE;
                 break;
             }
@@ -130,15 +131,15 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
         case TEXT_ZF_JABU_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedJabuJabuSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JabuJabuSign"), JABU_DISABLED) == JABU_INVERTED) {
                 entrance = ENTR_ZORAS_FOUNTAIN_OUTSIDE_JABU_JABU;
                 break;
-            } else {
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JabuJabuSign"), JABU_DISABLED) == JABU_ENABLED) {
                 entrance = ENTR_JABU_JABU_ENTRANCE;
                 break;
             }
         case TEXT_ZF_ICE_CAVERN_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedIceCavernSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), ICE_DISABLED) == ICE_INVERTED) {
                 entrance = ENTR_ZORAS_FOUNTAIN_OUTSIDE_ICE_CAVERN;
                 break;
             } else {
@@ -149,7 +150,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             entrance = ENTR_LOST_WOODS_SOUTH_EXIT;
             break;
         case TEXT_KF_DEKU_TREE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDekuTreeSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), DEKU_DISABLED) == DEKU_INVERTED) {
                 entrance = ENTR_KOKIRI_FOREST_OUTSIDE_DEKU_TREE;
                 break;
             } else {
@@ -157,7 +158,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
                 break;
             }
         case TEXT_SFM_FOREST_TEMPLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedForestTempleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), FRST_DISABLED) == FRST_INVERTED) {
                 entrance = ENTR_SACRED_FOREST_MEADOW_OUTSIDE_TEMPLE;
                 break;
             } else {
@@ -181,7 +182,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
         case TEXT_COLOSSUS_SPIRIT_TEMPLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedSpiritTempleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), SPRT_DISABLED) == SPRT_INVERTED) {
                 entrance = ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE;
                 break;
             } else {
@@ -189,15 +190,15 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
                 break;
             }
         case TEXT_LAKE_HYLIA_WATER_SWITCH_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedWaterTempleSign"), 0) && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), WATR_DISABLED) == WATR_INVERTED) {
                 entrance = ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE;
                 break;
-            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), 0)) {
+            } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), WATR_DISABLED) == WATR_ENABLED) {
                 entrance = ENTR_WATER_TEMPLE_ENTRANCE;
                 break;
             }
         case TEXT_OGC_GANONS_CASTLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGanonsCastleSign"), 0)) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), IGC_DISABLED) == IGC_INVERTED) {
                 entrance = ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT;
                 break;
             } else {

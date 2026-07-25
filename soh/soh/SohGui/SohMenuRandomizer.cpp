@@ -24,6 +24,78 @@ static const std::map<int32_t, const char*> skipGetItemAnimationOptions = {
     { SGIA_ALL, "All Items" },
 };
 
+static const std::map<int32_t, const char*> dekuTreeSignOptions = {
+    { DEKU_DISABLED, "Disabled" },
+    { DEKU_ENABLED, "Enabled" },
+    { DEKU_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> dodongosCavernSignOptions = {
+    { DC_DISABLED, "Disabled" },
+    { DC_ENABLED, "Enabled" },
+    { DC_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> jabuJabusBellySignOptions = {
+    { JABU_DISABLED, "Disabled" },
+    { JABU_ENABLED, "Enabled" },
+    { JABU_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> forestTempleSignOptions = {
+    { FRST_DISABLED, "Disabled" },
+    { FRST_ENABLED, "Enabled" },
+    { FRST_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> fireTempleSignOptions = {
+    { FIRE_DISABLED, "Disabled" },
+    { FIRE_ENABLED, "Enabled" },
+    { FIRE_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> iceCavernSignOptions = {
+    { ICE_DISABLED, "Disabled" },
+    { ICE_ENABLED, "Enabled" },
+    { ICE_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> waterTempleSignOptions = {
+    { WATR_DISABLED, "Disabled" },
+    { WATR_ENABLED, "Enabled" },
+    { WATR_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> gtgSignOptions = {
+    { GTG_DISABLED, "Disabled" },
+    { GTG_ENABLED, "Enabled" },
+    { GTG_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> spiritTempleSignOptions = {
+    { SPRT_DISABLED, "Disabled" },
+    { SPRT_ENABLED, "Enabled" },
+    { SPRT_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> botwSignOptions = {
+    { BOTW_DISABLED, "Disabled" },
+    { BOTW_ENABLED, "Enabled" },
+    { BOTW_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> shadowTempleSignOptions = {
+    { SHDW_DISABLED, "Disabled" },
+    { SHDW_ENABLED, "Enabled" },
+    { SHDW_INVERTED, "Inverted" },
+};
+
+static const std::map<int32_t, const char*> igcSignOptions = {
+    { IGC_DISABLED, "Disabled" },
+    { IGC_ENABLED, "Enabled" },
+    { IGC_INVERTED, "Inverted" },
+};
+
 static bool locationsDirty = true;
 static bool tricksDirty = true;
 static int32_t prevMQDungeonSetting;
@@ -849,313 +921,116 @@ void SohMenu::AddMenuRandomizer() {
     AddWidget(column2, "Signs Hint Entrances", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"))
         .Options(CheckboxOptions().Tooltip("If enabled, signs near loading zones will tell you where they lead to."));
-    AddWidget(column2, "Inverted Sign Entrance Hints", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"))
-        .Options(CheckboxOptions().Tooltip("If enabled, signs near dungeons will tell you the location of the dungeon "
-                                           "they're associated with instead. (e.g. the DMT sign outside of Dodongo's "
-                                           "Cavern will instead reveal the location of Dodongo's Cavern) \n\n'Signs Hint Entrances' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool entrancesOnSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
-            info.options->disabled = !entrancesOnSigns;
-            if (!entrancesOnSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
-            }
-        });
-    AddWidget(column2, "Extra Dungeon Entrance Signs", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"))
-        .Options(CheckboxOptions().Tooltip("Adds signs outside of every dungeon, and changes the Rusty Switch sign in Lake Hylia to hint what dungeon is in Water Temple. \n\n'Signs Hint Entrances' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool entrancesOnSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
-            info.options->disabled = !entrancesOnSigns;
-            if (!entrancesOnSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0); // A little sloppy forcing these to 0, but it prevents crashes when reading the Lake Hylia sign in particular
-            }
-        });
-
-    AddWidget(column2, "Deku Tree Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Deku Tree Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Adds a sign outside of Deku Tree"
-            "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(dekuTreeSignOptions).DefaultIndex(DEKU_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Deku Tree Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDekuTreeSign"))
-        .Options(CheckboxOptions().Tooltip("Inverts the sign outside of Deku Tree"
-                                           "\n\n'Inverted Sign Entrance Hints' AND 'Deku Tree Sign' MUST be Enabled first."))
+    AddWidget(column2, "Dodongo's Cavern Sign", WIDGET_CVAR_COMBOBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("DodongosCavernSign"))
+        .Options(ComboboxOptions().ComboMap(dodongosCavernSignOptions).DefaultIndex(DC_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDekuTreeSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Dodongo's Cavern Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDodongosSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Dodongo's Cavern"
-            "\n\n'Inverted Sign Entrance Hints' MUST be Enabled first."))
+        
+    AddWidget(column2, "Jabu Jabu's Belly Sign", WIDGET_CVAR_COMBOBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("JabuJabusBellySign"))
+        .Options(ComboboxOptions().ComboMap(jabuJabusBellySignOptions).DefaultIndex(JABU_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedDodongosSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Jabu Jabu Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedJabuJabuSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Jabu Jabu"
-            "\n\n'Inverted Sign Entrance Hints' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedJabuJabuSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Forest Temple Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Forest Temple Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Forest Temple"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(forestTempleSignOptions).DefaultIndex(FRST_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Forest Temple Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedForestTempleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Forest Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Forest Temple Sign' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ForestTempleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedForestTempleSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Fire Temple Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Fire Temple Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Fire Temple"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(fireTempleSignOptions).DefaultIndex(FIRE_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Fire Temple Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedFireTempleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Fire Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Fire Temple Sign' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("FireTempleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedFireTempleSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Ice Cavern Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Ice Cavern Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Ice Cavern"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(iceCavernSignOptions).DefaultIndex(ICE_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Ice Cavern Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedIceCavernSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Ice Cavern"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Ice Cavern Sign' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("IceCavernSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedIceCavernSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Water Temple Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Water Temple Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Water Temple"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(waterTempleSignOptions).DefaultIndex(WATR_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Water Temple Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedWaterTempleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Water Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Water Temple Sign' MUST be Enabled first."))
+    AddWidget(column2, "Gerudo Training Ground Sign", WIDGET_CVAR_COMBOBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("GerudoTrainingGroundSign"))
+        .Options(ComboboxOptions().ComboMap(gtgSignOptions).DefaultIndex(GTG_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("WaterTempleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedWaterTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted GTG Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGTGSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of GTG"
-            "\n\n'Inverted Sign Entrance Hints' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGTGSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Spirit Temple Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Spirit Temple Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Spirit Temple"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(spiritTempleSignOptions).DefaultIndex(SPRT_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Spirit Temple Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedSpiritTempleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Spirit Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Spirit Temple Sign' MUST be Enabled first."))
+    AddWidget(column2, "Bottom of the Well Sign", WIDGET_CVAR_COMBOBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("BottomOfTheWellSign"))
+        .Options(ComboboxOptions().ComboMap(botwSignOptions).DefaultIndex(BOTW_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("SpiritTempleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedSpiritTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Bottom of the Well Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedBotWSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Bottom of the Well"
-            "\n\n'Inverted Sign Entrance Hints' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0);
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedBotWSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Shadow Temple Sign", WIDGET_CVAR_CHECKBOX)
+    AddWidget(column2, "Shadow Temple Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Shadow Temple"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
+        .Options(ComboboxOptions().ComboMap(shadowTempleSignOptions).DefaultIndex(SHDW_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Inverted Shadow Temple Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedShadowTempleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Shadow Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Shadow Temple Sign' MUST be Enabled first."))
+    AddWidget(column2, "Inside Ganon's Castle Sign", WIDGET_CVAR_COMBOBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InsideGanonsCastleSign"))
+        .Options(ComboboxOptions().ComboMap(igcSignOptions).DefaultIndex(IGC_DISABLED))
         .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ShadowTempleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedShadowTempleSign"), 0);
-            }
+            info.options->disabled =
+                !CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"), 0);
+            info.options->disabledTooltip =
+                "This option only applies when \"Signs Hint Entrances\" is enabled.";
         });
-
-    AddWidget(column2, "Ganon's Castle Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"))
-        .Options(CheckboxOptions().Tooltip("Adds a sign outside of Ganon's Castle"
-                                           "\n\n'Extra Dungeon Entrance Signs' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool extraSigns = CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("ExtraDungeonSigns"), 0);
-            info.isHidden = !extraSigns;
-            if (!extraSigns) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), 0);
-            }
-        });
-
-    AddWidget(column2, "Inverted Ganon's Castle Sign", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGanonsCastleSign"))
-        .Options(CheckboxOptions().Tooltip(
-            "Inverts the sign outside of Shadow Temple"
-            "\n\n'Inverted Sign Entrance Hints' AND 'Ganons Castle Sign' MUST be Enabled first."))
-        .PreFunc([](WidgetInfo& info) {
-            bool shouldEnable = false;
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), 0) &&
-                CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertEntranceSigns"), 0)) {
-                shouldEnable = true;
-            }
-            info.isHidden = !shouldEnable;
-            if (!shouldEnable) {
-                CVarSetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InvertedGanonsCastleSign"), 0);
-            }
-        });
-
+        
     auto randoSettings = Rando::Settings::GetInstance();
     randoSettings->CreateOptions();
     randoSettings->GetOptionGroup(RSG_MENU_SIDEBAR_LOGIC_ACCESS).AddWidgets(path);
