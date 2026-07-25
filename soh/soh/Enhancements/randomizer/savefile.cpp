@@ -4,6 +4,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/randomizer/logic.h"
 #include "soh/Enhancements/randomizer/3drando/pool_functions.hpp"
+#include "soh/Enhancements/randomizer/settings.h"
 
 #include <random>
 #include <algorithm>
@@ -691,14 +692,20 @@ extern "C" void Randomizer_InitSaveFile() {
     gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = 0;
 
     // Set flags for excluded locations
-    std::vector<RandomizerCheck> excludedLocations =
-        FilterFromPool(ctx->allLocations, [ctx](const auto loc) { return ctx->GetItemLocation(loc)->IsExcluded(); });
+    for (size_t i = 0; i < Rando::Settings::GetInstance()->GetExcludeLocationsOptions().size() - 1; i++) {
+        for (const auto& location : Rando::Settings::GetInstance()->GetExcludeLocationsOptions()[i]) {
+            if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_INCLUDE) {
+                continue;
+            }
 
-    for (RandomizerCheck loc : excludedLocations) {
-        RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(loc);
-        if (randInf != RAND_INF_MAX) { // Shops use RAND_INF_MAX to check if an item is "Sold Out". If we don't add this check, then shop items will be Sold Out when ANY check is excluded.
-            Flags_SetRandomizerInf(randInf);
-        }
+            if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_EXCLUDE) {
+                RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(
+                    static_cast<RandomizerCheck>(location->GetKey()));
+
+                if (randInf != RAND_INF_MAX) {        // Shops use RAND_INF_MAX to check if an item is "Sold Out".
+                    Flags_SetRandomizerInf(randInf);  // If we don't add this check, then shop items will be Sold Out
+                }                                     // when ANY check is excluded.
+        }   }
     }
 
     SetStartingItems();
