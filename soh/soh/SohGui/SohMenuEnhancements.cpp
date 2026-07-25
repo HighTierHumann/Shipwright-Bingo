@@ -1549,17 +1549,16 @@ void SohMenu::AddMenuEnhancements() {
         .Format("%d mimics").Tooltip(
             "The number of mimics to spawn."
         ));
-    AddWidget(path, "Mimic Damage", WIDGET_CVAR_SLIDER_FLOAT)
+    AddWidget(path, "Mimic Damage", WIDGET_CVAR_SLIDER_INT)
         .CVar(CVAR_ENHANCEMENT("MimicDamage"))
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !CVarGetInteger(CVAR_ENHANCEMENT("MimicMode"), 0);
         })
-        .Options(FloatSliderOptions()
-        .Step(0.5f)
-        .Min(0.5f)
-        .Max(40.0f)
-        .DefaultValue(40.0f)
-        .Format("%.2f hearts").Tooltip(
+        .Options(IntSliderOptions()
+        .Min(1)
+        .Max(40)
+        .DefaultValue(40)
+        .Format("%d hearts").Tooltip(
             "The amount of damage each mimic does when touching the player. Set to 40 "
             "to always kill the player on contact, even with Double Defense."
         ));

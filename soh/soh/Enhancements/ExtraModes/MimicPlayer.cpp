@@ -29,7 +29,7 @@ static constexpr int32_t CVAR_MIMIC_PLAYER_DEFAULT = 0;
 #define CVAR_MIMIC_COUNT_VALUE CVarGetInteger(CVAR_MIMIC_COUNT_NAME, 1)
 
 #define CVAR_MIMIC_DAMAGE_NAME CVAR_ENHANCEMENT("MimicDamage")
-#define CVAR_MIMIC_DAMAGE_VALUE CVarGetInteger(CVAR_MIMIC_DAMAGE_NAME, 1)
+#define CVAR_MIMIC_DAMAGE_VALUE CVarGetInteger(CVAR_MIMIC_DAMAGE_NAME, 40)
 
 // Guards against the ShouldActorInit hook hijacking the real player's own ACTOR_PLAYER spawn.
 // Only set to true for the duration of our own deliberate Actor_Spawn call below.
