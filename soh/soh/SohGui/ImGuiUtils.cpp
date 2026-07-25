@@ -276,9 +276,9 @@ void RegisterImGuiItemIcons() {
 
     for (const auto& entry : triforcePowerMapping) {
         std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-            ->LoadGuiTexture(entry.second.name, entry.second.texturePath, ImVec4(0.33f, 0.33f, 0.33f, 1));
+            ->LoadGuiTexture(entry.second.name, entry.second.texturePath, "", ImVec4(0.33f, 0.33f, 0.33f, 1));
         std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-            ->LoadGuiTexture(entry.second.nameFaded, entry.second.texturePath, ImVec4(0.33f, 0.33f, 0.33f, 0.3f));
+            ->LoadGuiTexture(entry.second.nameFaded, entry.second.texturePath, "", ImVec4(0.33f, 0.33f, 0.33f, 0.3f));
     }
 
     for (const auto& entry : customItemsMapping) {
