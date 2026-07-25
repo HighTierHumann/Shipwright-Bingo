@@ -1410,7 +1410,7 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
         { 153, 0,   255 }, // Shadow Gem
         { 153, 0,   255 },
         { 153, 0,   255 },
-        { 0,   255, 255 }, // Forest Trial Gem
+        { 0,   255, 0   }, // Forest Trial Gem
         { 255, 30,  0   }, // Fire Trial Gem
         { 255, 85,  0   }, // Spirit Trial Gem
         { 200, 255, 0   }, // Light Trial Gem
