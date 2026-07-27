@@ -225,11 +225,14 @@ void SetSilverRupeeFlag() {
     }
 
     if (Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVERS)) {
+        ActorContext* act = &gPlayState->actorCtx;
+
         gSaveContext.sceneFlags[SCENE_INSIDE_GANONS_CASTLE].swch |= (1 << 0x12);
-        gSaveContext.sceneFlags[SCENE_INSIDE_GANONS_CASTLE].swch |= (1 << 0x1D);
+        gSaveContext.sceneFlags[SCENE_INSIDE_GANONS_CASTLE].clear |= (1 << 0x08); // Remove room timer
         if (gPlayState->sceneNum == SCENE_INSIDE_GANONS_CASTLE) {
             Flags_SetSwitch(gPlayState, 0x12);
-            Flags_SetSwitch(gPlayState, 0x1D);
+            Flags_SetClear(gPlayState, 0x08); // Remove room timer
+            Flags_SetTempClear(gPlayState, 0x3f); // Remove room timer
         }
     }
 
