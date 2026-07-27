@@ -7,10 +7,12 @@
 #define CVAR_SETTING(var) CVAR_PREFIX_SETTING "." var
 #define CVAR_WINDOW(var) CVAR_PREFIX_WINDOW "." var
 #define CVAR_TRACKER(var) CVAR_PREFIX_TRACKER "." var
+#define CVAR_BINGO(var) CVAR_PREFIX_BINGO "." var
 #define CVAR_TRACKER_ITEM(var) CVAR_TRACKER("ItemTracker." var)
 #define CVAR_TRACKER_CHECK(var) CVAR_TRACKER("CheckTracker." var)
 #define CVAR_TRACKER_ENTRANCE(var) CVAR_TRACKER("EntranceTracker." var)
 #define CVAR_TRACKER_HINTS(var) CVAR_TRACKER("HintTracker." var)
+#define CVAR_BINGO_BOARD(var) CVAR_BINGO("Board." var)
 #define CVAR_DEVELOPER_TOOLS(var) CVAR_PREFIX_DEVELOPER_TOOLS "." var
 #define CVAR_GENERAL(var) CVAR_PREFIX_GENERAL "." var
 #define CVAR_REMOTE(var) CVAR_PREFIX_REMOTE "." var

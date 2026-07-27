@@ -87,6 +87,7 @@ void SohMenu::AddMenuElements() {
     AddMenuSettings();
     AddMenuEnhancements();
     AddMenuRandomizer();
+    AddMenuBingo();
     AddMenuNetwork();
     AddMenuDevTools();
 

@@ -28,6 +28,7 @@
 #include "soh/Enhancements/randomizer/randomizer_item_tracker.h"
 #include "soh/Enhancements/timesplits/TimeSplits.h"
 #include "soh/Enhancements/randomizer/Plandomizer.h"
+#include "soh/Bingo/BingoBoardWindow.h"
 #include "SohModals.h"
 
 namespace SohGui {
