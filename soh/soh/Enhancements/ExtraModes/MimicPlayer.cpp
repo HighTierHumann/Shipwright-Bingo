@@ -308,12 +308,9 @@ static void MimicPlayer_Spawn(PlayState* play, int32_t spawnIndex) {
     }
 
     static constexpr f32 MIMIC_SPAWN_DISTANCE = -9999;
-    f32 spawnDistance = MIMIC_SPAWN_DISTANCE * (spawnIndex + 1);
-    f32 spawnX = realPlayer->actor.world.pos.x - (Math_SinS(realPlayer->actor.shape.rot.y) * spawnDistance);
-    f32 spawnZ = realPlayer->actor.world.pos.z - (Math_CosS(realPlayer->actor.shape.rot.y) * spawnDistance);
 
     sSpawningMimicPlayer = true;
-    Actor_Spawn(&play->actorCtx, play, ACTOR_PLAYER, spawnX, realPlayer->actor.world.pos.y, spawnZ,
+    Actor_Spawn(&play->actorCtx, play, ACTOR_PLAYER, MIMIC_SPAWN_DISTANCE, MIMIC_SPAWN_DISTANCE, MIMIC_SPAWN_DISTANCE,
                 realPlayer->actor.shape.rot.x, realPlayer->actor.shape.rot.y, realPlayer->actor.shape.rot.z, 0);
     sSpawningMimicPlayer = false;
     sMimicsSpawnedThisScene++;

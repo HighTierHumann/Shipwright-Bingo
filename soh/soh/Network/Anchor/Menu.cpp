@@ -142,6 +142,7 @@ void AnchorMainMenu(WidgetInfo& info) {
     ImGui::Spacing();
 
     bool hideLocations = Anchor::Instance->roomState.showLocationsMode == 0;
+    bool isGlobalRoom = anchorRoomId == "soh-global";
     ImGui::BeginDisabled(hideLocations);
     UIWidgets::CVarCheckbox(
         "Show Other Players on Minimap", CVAR_REMOTE_ANCHOR("ShowOtherPlayersOnMinimap"),
@@ -152,6 +153,33 @@ void AnchorMainMenu(WidgetInfo& info) {
                          ? "Other players will appear on the minimap in areas where you have the compass. "
                            "Visibility is restricted according to the Show Locations mode for the room."
                          : "Cannot show other players because the room's Show Locations mode is set to None."));
+    ImGui::EndDisabled();
+
+    ImGui::Spacing();
+
+    ImGui::BeginDisabled(!isGlobalRoom);
+    UIWidgets::CVarCheckbox(
+        "Show Name Tags in Global Room", CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"),
+        UIWidgets::CheckboxOptions()
+            .Color(THEME_COLOR)
+            .DefaultValue(true)
+            .Tooltip(isGlobalRoom
+                         ? "Other players' name tags will be visible in the global room. There is no censorship, "
+                           "so enable at your own risk! We are not responsible for any inappropriate names you may encounter."
+                         : "Option disabled because name tags are shown by default in non-global rooms."));
+    ImGui::EndDisabled();
+
+    ImGui::Spacing();
+
+    ImGui::BeginDisabled(!CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0));
+    UIWidgets::CVarCheckbox(
+        "Show Global Room Player Locations", CVAR_REMOTE_ANCHOR("ShowGlobalLocations"),
+        UIWidgets::CheckboxOptions()
+            .Color(THEME_COLOR)
+            .DefaultValue(true)
+            .Tooltip(CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0)
+                         ? "Other players' locations will be visible in the global room."
+                         : "Option disabled because Global Room nametags are disabled."));
     ImGui::EndDisabled();
 
     ImGui::Spacing();

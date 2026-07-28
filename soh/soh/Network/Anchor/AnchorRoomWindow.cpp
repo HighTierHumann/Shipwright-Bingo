@@ -39,7 +39,7 @@ void AnchorRoomWindow::Draw() {
 void AnchorRoomWindow::DrawElement() {
     bool isGlobalRoom = (std::string("soh-global") == CVarGetString(CVAR_REMOTE_ANCHOR("RoomId"), ""));
 
-    if (isGlobalRoom) {
+    if (isGlobalRoom && !CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0)) {
         u32 activeClients = 0;
         for (auto& [clientId, client] : Anchor::Instance->clients) {
             if (client.online) {
@@ -47,6 +47,35 @@ void AnchorRoomWindow::DrawElement() {
             }
         }
         ImGui::Text("Players Online: %d", activeClients);
+        return;
+    } else if (isGlobalRoom && CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0)) {
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(40, 205, 255, 255));
+        ImGui::PushStyleColor(ImGuiCol_Separator, IM_COL32(40, 80, 155, 255));
+        ImGui::SeparatorText("Global Room Players");
+        ImGui::PopStyleColor(2);
+        for (auto& [clientId, client] : Anchor::Instance->clients) {
+            // Skip rendering offline clients (except self) so their IDs aren't shown
+            if (!client.online) {
+                continue;
+            }
+            ImGui::PushID(clientId);
+
+            if (client.self) {
+                ImGui::TextColored(ImVec4(0.8f, 1.0f, 0.8f, 1.0f), "%s", CVarGetString(CVAR_REMOTE_ANCHOR("Name"), ""));
+            } else {
+                ImGui::Text("%s", client.name.c_str());
+            }
+
+            if (CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowGlobalLocations"), 0)) {
+                if ((client.self ? Anchor::Instance->IsSaveLoaded() : client.isSaveLoaded)) {
+                    ImGui::SameLine();
+                    ImGui::TextColored(
+                        ImVec4(1, 1, 1, 0.5f), "- %s",
+                        SohUtils::GetSceneName(client.self ? gPlayState->sceneNum : client.sceneNum).c_str());
+                }
+            }
+            ImGui::PopID();
+        }
         return;
     }
 

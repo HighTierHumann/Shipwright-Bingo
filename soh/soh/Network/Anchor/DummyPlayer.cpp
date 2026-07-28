@@ -90,6 +90,8 @@ void DummyPlayer_Init(Actor* actor, PlayState* play) {
 
     if (!isGlobalRoom) {
         NameTag_RegisterForActorWithOptions(actor, client.name.c_str(), {});
+    } else if (CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0)) {
+        NameTag_RegisterForActorWithOptions(actor, client.name.c_str(), {});
     }
 }
 
