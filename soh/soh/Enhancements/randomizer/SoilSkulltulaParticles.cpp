@@ -86,7 +86,7 @@ void SoilSkulltula_RandomizerDrawSetup(void* refActor) {
 
     if (!CVarGetInteger(CVAR_ENHANCEMENT("CMCSoilGSParticles"), 0)) {
         return;
-    } else if (beanActor->dyna.actor.xzDistToPlayer > 1000.0f) {
+    } else if (beanActor->dyna.actor.xzDistToPlayer > (1000.0f * CVarGetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 0))) {
         return;
     }
 

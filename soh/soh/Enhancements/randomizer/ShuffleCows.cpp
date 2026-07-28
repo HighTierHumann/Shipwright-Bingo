@@ -122,7 +122,7 @@ void ShuffledCow_RandomizerDrawSetup(void* refActor) {
     if (!ShuffledCow_RandomizerHoldsItem(enCow, gPlayState) ||
         !CVarGetInteger(CVAR_ENHANCEMENT("CMCCowParticles"), 0)) {
         return;
-    } else if (enCow->actor.xzDistToPlayer > 1000.0f) {
+    } else if (enCow->actor.xzDistToPlayer > (1000.0f * CVarGetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 0))) {
         return;
     }
 

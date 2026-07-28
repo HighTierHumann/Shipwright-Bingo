@@ -191,8 +191,31 @@ static void EnWonderItem_RandomizerDraw(EnWonderItem* wonderActor, Color_RGBA8* 
         pos.x = Rand_CenteredFloat(1.0f) + wonderActor->actor.world.pos.x + offset.x;
         pos.y = (Rand_ZeroOne() * 25.0f) + wonderActor->actor.world.pos.y + 10 + offset.y;
         pos.z = Rand_CenteredFloat(1.0f) + wonderActor->actor.world.pos.z + offset.z;
-        EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 2000, 100);
-        EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 2000, 100);
+
+        switch (gPlayState->sceneNum) {
+            case SCENE_MARKET_DAY:
+            case SCENE_MARKET_NIGHT:
+            case SCENE_IMPAS_HOUSE:
+                pos.y += 30.0f;
+                break;
+            case SCENE_THIEVES_HIDEOUT:
+                if (gPlayState->roomCtx.curRoom.num == 3 && wonderIdentity->randomizerCheck == RC_TH_WONDER_KITCHEN_SOUP) {
+                    pos.y += 30.0f;
+                }
+                break;
+            case SCENE_DESERT_COLOSSUS:
+                pos.x = Rand_CenteredFloat(25.0f) + wonderActor->actor.world.pos.x + offset.x;
+                pos.z = Rand_CenteredFloat(25.0f) + wonderActor->actor.world.pos.z + offset.z;
+                break;
+        }
+
+        if (gPlayState->sceneNum == SCENE_DESERT_COLOSSUS) {
+            EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 4000, 200);
+            EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 4000, 200);
+        } else {
+            EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, secColor, envColor, 2000, 100);
+            EffectSsKiraKira_SpawnFocused(gPlayState, &pos, &velocity, &accel, primColor, envColor, 2000, 100);
+        }
     }
 }
 
@@ -206,7 +229,7 @@ void EnWonderItem_RandomizerDrawSetup(void* refActor) {
             Actor_Kill(&wonderActor->actor);
         }
         return;
-    } else if (wonderActor->actor.xzDistToPlayer > 1000.0f) {
+    } else if (wonderActor->actor.xzDistToPlayer > (1000.0f * CVarGetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 0))) {
         return;
     }
 

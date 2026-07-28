@@ -128,7 +128,7 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
     if (!SuperFairy_RandomizerHoldsItem(superFairySpawner, gPlayState) ||
         !CVarGetInteger(CVAR_ENHANCEMENT("CMCSongFairyParticles"), 0)) {
         return;
-    } else if (superFairySpawner->actor.xzDistToPlayer > 1000.0f) {
+    } else if (superFairySpawner->actor.xzDistToPlayer > (1000.0f * CVarGetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 0))) {
         return;
     }
 

@@ -1468,6 +1468,8 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
     OPEN_DISPS(play->state.gfxCtx);
 
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
+    Matrix_Translate(0.0f, -10.0f, 0.0f, MTXMODE_APPLY);
+    Matrix_Scale(0.8f, 0.8f, 0.8f, MTXMODE_APPLY);
     gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0x80, 85, 85, 85, 255);
     gDPSetEnvColor(POLY_OPA_DISP++, 125, 125, 125, 255);
@@ -1490,7 +1492,7 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
         { 153, 0,   255 }, // Shadow Gem
         { 153, 0,   255 },
         { 153, 0,   255 },
-        { 0,   255, 255 }, // Forest Trial Gem
+        { 0,   255, 0   }, // Forest Trial Gem
         { 255, 30,  0   }, // Fire Trial Gem
         { 255, 85,  0   }, // Spirit Trial Gem
         { 200, 255, 0   }, // Light Trial Gem
