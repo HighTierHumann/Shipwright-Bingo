@@ -153,6 +153,27 @@ std::array<SilverRupeeAreaInfo*, SRA_MAX> SilverRupeeAreas::GetAreaList() {
 size_t SilverRupeeAreas::GetAreaListSize() const {
     return mAreas.size();
 }
+
+void SilverRupeeAreas::ParseJson(const nlohmann::json& spoilerFileJson) {
+    nlohmann::json silverAreasShuffledJson = spoilerFileJson.value("shuffledSilverRupeeAreas", nlohmann::json::array());
+
+    for (auto& dungeonRoom : mAreas) {
+        dungeonRoom.ClearShuffled();
+
+        for (const auto& areaJson : silverAreasShuffledJson) {
+            if (areaJson.is_object() && areaJson.value("name", "") == dungeonRoom.GetName()) {
+                bool bag = areaJson.value("bag", false);
+                
+                if (bag) {
+                    dungeonRoom.SetShuffled(true);
+                } else {
+                    dungeonRoom.SetShuffled(); 
+                }
+                break;
+            }
+        }
+    }
+}
 } // namespace Rando
 
 

@@ -5,6 +5,7 @@
 #include "../settings.h"
 #include "../entrance.h"
 #include "../trial.h"
+#include "../ShuffleSilverRupees.h"
 #include "pool_functions.hpp"
 #include "soh/Enhancements/randomizer/randomizer_entrance_tracker.h"
 #include <nlohmann/json.hpp>
@@ -211,6 +212,22 @@ static void WriteMasterQuestDungeons() {
     }
 }
 
+// Writes the Silver Rupees shuffled to the spoiler log, if there are any.
+static void WriteShuffledSilverRupees() {
+    auto ctx = Rando::Context::GetInstance();
+    for (const auto* dungeonRoom : ctx->GetSilverRupeeAreas()->GetAreaList()) {
+        if (!(dungeonRoom->IsShuffled() || dungeonRoom->IsBag())) {
+            continue;
+        }
+
+        json areaJson = json::object();
+        areaJson["name"] = dungeonRoom->GetName();
+        areaJson["bag"] = dungeonRoom->IsBag();
+
+        jsonData["shuffledSilverRupeeAreas"].push_back(areaJson);
+    }
+}
+
 // Writes the required trials to the spoiler log, if there are any.
 static void WriteChosenOptions() {
     auto ctx = Rando::Context::GetInstance();
@@ -358,6 +375,7 @@ void SpoilerLog_Write() {
     WriteStartingInventory();
     WriteEnabledTricks();
     WriteMasterQuestDungeons();
+    WriteShuffledSilverRupees();
     WriteChosenOptions();
     WritePlaythrough();
 

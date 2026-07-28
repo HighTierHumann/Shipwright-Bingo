@@ -71,6 +71,7 @@ class SilverRupeeAreas {
     void ClearAllShuffled();
     std::array<SilverRupeeAreaInfo*, SRA_MAX> GetAreaList();
     size_t GetAreaListSize() const;
+    void ParseJson(const nlohmann::json& spoilerFileJson);
 
   private:
     std::array<SilverRupeeAreaInfo, SRA_MAX> mAreas;

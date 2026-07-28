@@ -3283,8 +3283,8 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
         // Each Silver Rupee area's setting (either resolved above from Random/Count, or set
         // directly by the player in Selection mode) determines whether that area's Silver
         // Rupees get shuffled into the item pool as freestanding items. "Random" per-area
-        // resolves to a 50% chance, either as 5 individual items ("Random") or as a single
-        // Silver Rupee Bag item ("Random Bag").
+        // resolves to a 50% chance, either as 5 individual items (6 in Plentiful) ("Random")
+        // or as a single Silver Rupee Bag item ("Random Bag").
         for (auto* area : silverRupeeAreas->GetAreaList()) {
             const OptionValue& areaOption = mOptions[area->GetSettingKey()];
             if (areaOption.Is(RO_SILVERS_FOR_DUNGEON_ROOM_ON) ||
