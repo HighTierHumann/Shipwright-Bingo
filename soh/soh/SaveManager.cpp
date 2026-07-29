@@ -638,7 +638,10 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
         nlohmann::json& randoSettings = randoBlock["randoSettings"];
         fileMetaInfo[fileNum].maxTriforcePieces = randoSettings[RSK_TRIFORCE_HUNT_PIECES_TOTAL].get<uint8_t>();
         fileMetaInfo[fileNum].triforcePowerPieces = randoBlock.value("triforcePowerPiecesCollected", 0);
-        fileMetaInfo[fileNum].maxTriforcePowerPieces = randoSettings[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].get<uint8_t>();
+        if (randoSettings[RSK_TRIFORCE_POWER_HUNT].get<uint8_t>() != 0) {
+            fileMetaInfo[fileNum].maxTriforcePowerPieces =
+                randoSettings[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].get<uint8_t>() + 1;
+        }
         fileMetaInfo[fileNum].hasFishingRod = (int16_t)baseBlock["randomizerInf"][RAND_INF_FISHING_POLE_FOUND >> 4] &
                                               (1 << (RAND_INF_FISHING_POLE_FOUND & 0xF));
         fileMetaInfo[fileNum].fishingPoleShuffled = randoSettings[RSK_SHUFFLE_FISHING_POLE].get<uint8_t>() != 0;

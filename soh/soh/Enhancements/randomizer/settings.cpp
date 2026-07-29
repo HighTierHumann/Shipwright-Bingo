@@ -455,7 +455,7 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, "Triforce of Power Hunt Total Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL], WIDGET_CVAR_SLIDER_INT, 29, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, {
         // Update power triforce of power pieces required to be capped at the current value for pieces total.
-        const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 30);
+        const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 29);
         if (mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].GetOptionCount() != powerTriforceTotal + 1) {
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, powerTriforceTotal + 1));
         }

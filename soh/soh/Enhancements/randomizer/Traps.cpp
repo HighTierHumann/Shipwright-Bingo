@@ -1259,8 +1259,14 @@ static void InitTrickNames() {
     trickNameTable[RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE] = {
         // TODO_TRANSLATE
         Text{ "Spirit Temple Keese Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
-        Text{ "Spirit Temple Torch Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Torch Room Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
         Text{ "Sprite Temple Torch Room Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Light Cube Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Sun Block Gold Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Sun Block Silver Rupee", TODO_TRANSLATE, TODO_TRANSLATE },
     };
     trickNameTable[RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE] = {
         // TODO_TRANSLATE
@@ -1349,8 +1355,14 @@ static void InitTrickNames() {
     trickNameTable[RG_SPIRIT_TEMPLE_CHILD_SILVER_RUPEE_BAG] = {
         // TODO_TRANSLATE
         Text{ "Spirit Temple Keese Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
-        Text{ "Spirit Temple Torch Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Torch Room Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
         Text{ "Sprite Temple Torch Room Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
+    trickNameTable[RG_SPIRIT_TEMPLE_SUN_BLOCK_SILVER_RUPEE_BAG] = {
+        // TODO_TRANSLATE
+        Text{ "Spirit Temple Light Cube Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spirit Temple Sun Block Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Sprite Temple Sun Block Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
     };
     trickNameTable[RG_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_BAG] = {
         // TODO_TRANSLATE
