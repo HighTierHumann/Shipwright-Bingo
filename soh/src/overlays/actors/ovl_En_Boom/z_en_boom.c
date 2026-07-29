@@ -91,7 +91,10 @@ void EnBoom_Init(Actor* thisx, PlayState* play) {
     blure.calcMode = 0;
     blure.trailType = TRAIL_TYPE_BOOMERANG;
 
-    Effect_Add(play, &this->effectIndex, EFFECT_BLURE1, 0, 0, &blure);
+    this->effectIndex = TOTAL_EFFECT_COUNT;
+    if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+        Effect_Add(play, &this->effectIndex, EFFECT_BLURE1, 0, 0, &blure);
+    }
 
     Collider_InitQuad(play, &this->collider);
     Collider_SetQuad(play, &this->collider, &this->actor, &sQuadInit);

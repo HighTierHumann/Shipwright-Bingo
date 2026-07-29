@@ -86,6 +86,8 @@ void EnArrow_Init(Actor* thisx, PlayState* play) {
     };
     EnArrow* this = (EnArrow*)thisx;
 
+    this->effectIndex = TOTAL_EFFECT_COUNT;
+
     if (CVarGetInteger(CVAR_COSMETIC("Arrows.NormalPrimary.Changed"), 0)) {
         blureNormal.altEnvColor =
             CVarGetColor(CVAR_COSMETIC("Arrows.NormalPrimary.Value"), (Color_RGBA8){ 0, 150, 0, 0 });
@@ -150,26 +152,33 @@ void EnArrow_Init(Actor* thisx, PlayState* play) {
             SkelAnime_Init(play, &this->skelAnime, &gArrowSkel, &gArrow2Anim, NULL, NULL, 0);
         }
 
-        if (this->actor.params <= ARROW_NORMAL) {
+            if (this->actor.params <= ARROW_NORMAL) {
             if (this->actor.params == ARROW_NORMAL_HORSE) {
                 blureNormal.elemDuration = 4;
             } else {
                 blureNormal.elemDuration = 16;
             }
 
-            Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureNormal);
+                if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+                    Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureNormal);
+                }
 
         } else if (this->actor.params == ARROW_FIRE) {
 
-            Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureFire);
+            if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+                Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureFire);
+            }
 
         } else if (this->actor.params == ARROW_ICE) {
 
-            Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureIce);
+            if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+                Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureIce);
+            }
 
         } else if (this->actor.params == ARROW_LIGHT) {
-
-            Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureLight);
+            if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+                Effect_Add(play, &this->effectIndex, EFFECT_BLURE2, 0, 0, &blureLight);
+            }
         }
 
         Collider_InitQuad(play, &this->collider);

@@ -663,6 +663,10 @@ void SohMenu::AddMenuEnhancements() {
         .RaceDisable(false)
         .Options(CheckboxOptions().Tooltip("Disables the sword trail effect when swinging Link's sword. Useful when "
                                            "using mods that replace Link's sword model."));
+    AddWidget(path, "Disable Weapon Trail Effects", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"))
+        .RaceDisable(false)
+        .Options(CheckboxOptions().Tooltip("Disables weapon trail effects (like the arrow trails)."));
     AddWidget(path, "Disable 2D Pre-Rendered Scenes", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("3DSceneRender"))
         .RaceDisable(false)

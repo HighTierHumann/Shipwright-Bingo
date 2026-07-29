@@ -87,8 +87,12 @@ void EnBomChu_Init(Actor* thisx, PlayState* play) {
     blureInit.calcMode = 0;
     blureInit.trailType = TRAIL_TYPE_BOMBCHU;
 
-    Effect_Add(play, &this->blure1Index, EFFECT_BLURE1, 0, 0, &blureInit);
-    Effect_Add(play, &this->blure2Index, EFFECT_BLURE1, 0, 0, &blureInit);
+    this->blure1Index = TOTAL_EFFECT_COUNT;
+    this->blure2Index = TOTAL_EFFECT_COUNT;
+    if (!CVarGetInteger(CVAR_ENHANCEMENT("DisableWeaponTrailEffects"), 0)) {
+        Effect_Add(play, &this->blure1Index, EFFECT_BLURE1, 0, 0, &blureInit);
+        Effect_Add(play, &this->blure2Index, EFFECT_BLURE1, 0, 0, &blureInit);
+    }
 
     this->actor.room = -1;
     this->timer = 120;
