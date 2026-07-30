@@ -920,7 +920,10 @@ void SohMenu::AddMenuRandomizer() {
     AddWidget(column2, "Sign Settings", WIDGET_SEPARATOR_TEXT);
     AddWidget(column2, "Signs Hint Entrances", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("EntrancesOnSigns"))
-        .Options(CheckboxOptions().Tooltip("If enabled, signs near loading zones will tell you where they lead to."));
+        .Options(CheckboxOptions().Tooltip(
+            "If enabled, signs near loading zones will tell you where they lead to.\n\n"
+            "For dungeon specific signs, note that the INVERTED setting is NOT compatible "
+            "with \"Decoupled Entrances\" and will not give you accurate hints."));
     AddWidget(column2, "Deku Tree Sign", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("DekuTreeSign"))
         .Options(ComboboxOptions().ComboMap(dekuTreeSignOptions).DefaultIndex(DEKU_DISABLED))
