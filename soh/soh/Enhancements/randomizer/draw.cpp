@@ -1436,7 +1436,7 @@ extern "C" void Randomizer_DrawSilverRupee(PlayState* play, GetItemEntry* getIte
     const float gemScale = 1.0f;
     const float maskScale = 0.2f;
 
-    if (slot < 11) {
+    if (slot <= 11) {
         Gfx_SetupDL_25Xlu(play->state.gfxCtx);
 
         Matrix_Translate(0.0f, 30.0f, 0.0f, MTXMODE_APPLY);
@@ -1518,7 +1518,7 @@ extern "C" void Randomizer_DrawSilverRupeeBag(PlayState* play, GetItemEntry* get
     const float gemScale = 1.0f;
     const float maskScale = 0.2f;
 
-    if (slot < 11) {
+    if (slot <= 11) {
         Gfx_SetupDL_25Xlu(play->state.gfxCtx);
 
         Matrix_Translate(0.0f, 30.0f, 0.0f, MTXMODE_APPLY);
