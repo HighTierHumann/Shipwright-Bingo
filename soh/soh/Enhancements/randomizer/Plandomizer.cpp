@@ -3,6 +3,9 @@
 #include "soh/SohGui/UIWidgets.hpp"
 #include "soh/util.h"
 #include <vector>
+#include <algorithm>
+#include <numeric>
+#include <unordered_set>
 #include "soh/Notification/Notification.h"
 #include <soh_assets.h>
 #include "soh/Enhancements/randomizer/3drando/hints.hpp"
@@ -16,6 +19,7 @@
 #include "soh/Enhancements/randomizer/rando_hash.h"
 #include "soh/Enhancements/randomizer/Traps.h"
 #include "soh/Enhancements/randomizer/3drando/shops.hpp"
+#include "soh/Enhancements/randomizer/entrance.h"
 
 #include <fast/Fast3dGui.h>
 
@@ -39,6 +43,7 @@ std::string logTemp = "";
 std::string lastLoadedSpoiler = "";
 int32_t temporaryItemIndex = -1;
 RandomizerCheckArea selectedArea = RCAREA_INVALID;
+std::string entranceSearchText = "";
 
 ImVec4 itemColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 ImTextureID textureID;
@@ -62,6 +67,16 @@ std::vector<std::pair<Rando::Item, int32_t>> drawnItemsList;
 
 std::vector<SpoilerHintObject> spoilerHintData;
 std::vector<SpoilerHintObject> plandoHintData;
+
+std::vector<SpoilerEntranceObject> spoilerEntranceData;
+std::vector<SpoilerEntranceObject> plandoEntranceData;
+
+// Pool of {entranceIndex, targetName} pairs that are not currently assigned as any
+// entrance's override destination. targetName is the "where you'd arrive" half of that
+// index's name (see PlandomizerGetEntranceTargetName), not its source-side row label.
+// An entry only ends up here once the player sets some entrance's destination to "None" -
+// see PlandomizerRebuildAvailableEntranceDestinations().
+std::vector<std::pair<int16_t, std::string>> availableEntranceDestinations;
 
 extern std::map<RandomizerCheckArea, std::string> rcAreaNames;
 
@@ -523,7 +538,147 @@ void PlandomizerAddToItemList(Rando::Item randoItem) {
     PlandomizerSortDrawnItems();
 }
 
+// Rando::Entrance::GetName() returns a fixed "Source Region -> Target Region" identity string.
+// The Entrance column only wants the source half (it's the immutable label for this transition);
+// the Destination column only wants the target half (it's what actually gets arrived at). Both
+// halves are needed since the same helper resolves names for both an entrance's own identity and
+// for whatever entrance is currently occupying its override slot.
+std::string PlandomizerGetEntranceTargetName(const std::string& fullName) {
+    size_t arrowPos = fullName.find(" -> ");
+    return arrowPos != std::string::npos ? fullName.substr(arrowPos + 4) : fullName;
+}
+
+std::string PlandomizerGetEntranceTypeName(Rando::EntranceType type) {
+    static const std::unordered_map<Rando::EntranceType, std::string> entranceTypeNames = {
+        { Rando::EntranceType::None, "None" },
+        { Rando::EntranceType::OwlDrop, "Owl Drop" },
+        { Rando::EntranceType::Spawn, "Spawn" },
+        { Rando::EntranceType::WarpSong, "Warp Song" },
+        { Rando::EntranceType::BlueWarp, "Blue Warp" },
+        { Rando::EntranceType::Dungeon, "Dungeon" },
+        { Rando::EntranceType::GanonDungeon, "Ganon's Dungeon" },
+        { Rando::EntranceType::DungeonReverse, "Dungeon (Reverse)" },
+        { Rando::EntranceType::Boss, "Boss" },
+        { Rando::EntranceType::BossReverse, "Boss (Reverse)" },
+        { Rando::EntranceType::ChildBoss, "Child Boss" },
+        { Rando::EntranceType::ChildBossReverse, "Child Boss (Reverse)" },
+        { Rando::EntranceType::AdultBoss, "Adult Boss" },
+        { Rando::EntranceType::AdultBossReverse, "Adult Boss (Reverse)" },
+        { Rando::EntranceType::GanonTower, "Ganon's Tower" },
+        { Rando::EntranceType::Interior, "Interior" },
+        { Rando::EntranceType::InteriorReverse, "Interior (Reverse)" },
+        { Rando::EntranceType::SpecialInterior, "Special Interior" },
+        { Rando::EntranceType::ThievesHideout, "Thieves' Hideout" },
+        { Rando::EntranceType::ThievesHideoutReverse, "Thieves' Hideout (Reverse)" },
+        { Rando::EntranceType::GrottoGrave, "Grotto/Grave" },
+        { Rando::EntranceType::GrottoGraveReverse, "Grotto/Grave (Reverse)" },
+        { Rando::EntranceType::Overworld, "Overworld" },
+        { Rando::EntranceType::Extra, "Extra" },
+        { Rando::EntranceType::Mixed, "Mixed" },
+        { Rando::EntranceType::All, "All" },
+    };
+    auto it = entranceTypeNames.find(type);
+    return it != entranceTypeNames.end() ? it->second : "Unknown";
+}
+
+// Resolves an entrance index (as stored in the spoiler log's "entrances" array) to the
+// human readable name Rando::Entrance carries via GetName(). -1 is treated as "None".
+std::string PlandomizerGetEntranceName(int16_t entranceIndex) {
+    if (entranceIndex < 0) {
+        return "None";
+    }
+    const Rando::Entrance* entrance = Rando::EntranceShuffler::GetEntranceByIndex(entranceIndex);
+    return entrance != nullptr ? entrance->GetName() : "Unknown Entrance";
+}
+
+// Groups entrances by the area their parent region belongs to, for the Entrances tab's
+// area subdividers/search. Falls back to RA_MAX ("Other") for anything unresolvable.
+RandomizerArea PlandomizerGetEntranceArea(int16_t entranceIndex) {
+    const Rando::Entrance* entrance = Rando::EntranceShuffler::GetEntranceByIndex(entranceIndex);
+    if (entrance == nullptr) {
+        return RA_MAX;
+    } else if (entrance->GetType() == Rando::EntranceType::OwlDrop) {
+        return RA_LINKS_POCKET;
+    }
+    return RegionTable(entrance->GetParentRegionKey())->GetFirstArea();
+}
+
+// Multiple distinct entrance indices can lead to a destination with the same display name
+// (e.g. several vanilla connections into the same region) - only the first is kept so the
+// same-looking destination can't appear twice and outlive being picked in one of its rows.
+void PlandomizerAddAvailableEntranceDestination(int16_t entranceIndex, const std::string& entranceName) {
+    if (entranceIndex < 0) {
+        return;
+    }
+    for (auto& available : availableEntranceDestinations) {
+        if (available.first == entranceIndex || available.second == entranceName) {
+            return;
+        }
+    }
+    availableEntranceDestinations.push_back({ entranceIndex, entranceName });
+}
+
+// Recomputes availableEntranceDestinations from scratch based on which entranceIndex values
+// are not currently claimed by any row's entranceOverrideIndex. Called after loading a spoiler
+// log so that a freshly loaded (fully assigned) plando starts with an empty pool, matching the
+// "only option is None until something is cleared" behavior.
+void PlandomizerRebuildAvailableEntranceDestinations() {
+    availableEntranceDestinations.clear();
+    for (auto& entranceData : plandoEntranceData) {
+        bool isClaimed = false;
+        for (auto& other : plandoEntranceData) {
+            if (other.entranceOverrideIndex == entranceData.entranceIndex) {
+                isClaimed = true;
+                break;
+            }
+        }
+        if (!isClaimed) {
+            PlandomizerAddAvailableEntranceDestination(entranceData.entranceIndex, entranceData.entranceDestination);
+        }
+    }
+}
+
+void PlandomizerRemoveAvailableEntranceDestination(int16_t entranceIndex) {
+    for (auto it = availableEntranceDestinations.begin(); it != availableEntranceDestinations.end(); ++it) {
+        if (it->first == entranceIndex) {
+            availableEntranceDestinations.erase(it);
+            return;
+        }
+    }
+}
+
+bool PlandomizerHasUnassignedEntranceDestinations() {
+    for (auto& entranceData : plandoEntranceData) {
+        if (entranceData.entranceOverrideIndex < 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Sets every entrance's destination back to "None" and returns them all to the available pool,
+// letting the user freely reassign destinations without manually clearing each row first.
+// Only touches rows that were actually shuffled in the loaded spoiler log - leaving the
+// (much larger) list of vanilla-connected entrances untouched so this doesn't force the user
+// to manually rebuild the entire world's connectivity from scratch.
+void PlandomizerClearAllEntranceDestinations() {
+    for (auto& entranceData : plandoEntranceData) {
+        if (entranceData.wasInSpoilerLog && entranceData.entranceOverrideIndex >= 0) {
+            PlandomizerAddAvailableEntranceDestination(entranceData.entranceOverrideIndex,
+                                                        entranceData.entranceOverrideDestination);
+            entranceData.entranceOverrideIndex = -1;
+            entranceData.entranceOverrideDestination = "None";
+        }
+    }
+}
+
 void PlandomizerSaveSpoilerLog() {
+    if (PlandomizerHasUnassignedEntranceDestinations()) {
+        Notification::Emit(
+            { .message = "Every entrance needs a destination assigned before saving.", .remainingTime = 10.0f });
+        return;
+    }
+
     nlohmann::json spoilerSave;
     std::string filename = lastLoadedSpoiler;
 
@@ -556,6 +711,24 @@ void PlandomizerSaveSpoilerLog() {
         }
     }
 
+    if (!plandoEntranceData.empty()) {
+        spoilerSave["entrances"] = nlohmann::json::array();
+        for (auto& import : plandoEntranceData) {
+            // Skip rows that were only synthesized to list a non-shuffled entrance and were
+            // never actually edited by the user - don't pollute the spoiler log with them.
+            if (!import.wasInSpoilerLog && import.entranceOverrideIndex == import.entranceIndex) {
+                continue;
+            }
+            spoilerSave["entrances"].push_back({
+                { "type", import.entranceTypeRaw },
+                { "index", import.entranceIndex },
+                { "destination", import.entranceDestinationIndex },
+                { "override", import.entranceOverrideIndex },
+                { "overrideDestination", import.entranceOverrideDestinationIndex },
+            });
+        }
+    }
+
     std::ofstream outputFile(filename);
     if (outputFile.is_open()) {
         outputFile << spoilerSave.dump(4);
@@ -571,6 +744,9 @@ void PlandomizerLoadSpoilerLog(std::string logFile) {
     spoilerHintData.clear();
     plandoHintData.clear();
     drawnItemsList.clear();
+    spoilerEntranceData.clear();
+    plandoEntranceData.clear();
+    availableEntranceDestinations.clear();
 
     nlohmann::json spoilerLogInput;
     auto spoilerPath = Ship::Context::GetPathRelativeToAppDirectory("Randomizer");
@@ -643,6 +819,81 @@ void PlandomizerLoadSpoilerLog(std::string logFile) {
                     plandoLogData.push_back(checkObject);
                     PlandomizerAddToItemList(plandomizerRandoRetrieveItem(RG_SOLD_OUT));
                 }
+            }
+
+            std::unordered_set<int16_t> loadedEntranceIndices;
+            if (spoilerLogInput.contains("entrances")) {
+                // "entrances" is an array of override records keyed by numeric entrance indices,
+                // e.g. { "type": 5, "index": 678, "destination": 152, "override": 521, "overrideDestination": 0 }.
+                // The indices are resolved to human-readable names via entrance.cpp's
+                // Rando::EntranceShuffler::GetEntranceByIndex(), not read directly out of the JSON.
+                auto entrances = spoilerLogInput["entrances"];
+                for (auto& value : entrances) {
+                    SpoilerEntranceObject entranceObject;
+                    entranceObject.entranceTypeRaw = value.value("type", 0);
+                    entranceObject.entranceIndex = value.value("index", (int16_t)-1);
+                    entranceObject.entranceDestinationIndex = value.value("destination", (int16_t)-1);
+                    entranceObject.entranceOverrideIndex = value.value("override", (int16_t)-1);
+                    entranceObject.entranceOverrideDestinationIndex = value.value("overrideDestination", (int16_t)-1);
+                    entranceObject.wasInSpoilerLog = true;
+
+                    std::string entranceFullName = PlandomizerGetEntranceName(entranceObject.entranceIndex);
+                    std::string overrideFullName = PlandomizerGetEntranceName(entranceObject.entranceOverrideIndex);
+
+                    entranceObject.entranceType =
+                        PlandomizerGetEntranceTypeName((Rando::EntranceType)entranceObject.entranceTypeRaw);
+                    // Entrance column: source half only (this row's immutable identity).
+                    entranceObject.entranceName = entranceFullName;
+                    // This entrance's own target half - i.e. what it's called when it's free and
+                    // offered up as a destination option to some other row. Feeds the pool.
+                    entranceObject.entranceDestination = PlandomizerGetEntranceTargetName(entranceFullName);
+                    entranceObject.entranceOverride = overrideFullName;
+                    // Destination column: target half of whatever is currently occupying this slot.
+                    entranceObject.entranceOverrideDestination = PlandomizerGetEntranceTargetName(overrideFullName);
+                    RandomizerArea area = PlandomizerGetEntranceArea(entranceObject.entranceIndex);
+                    entranceObject.entranceAreaOrder = (int32_t)area;
+
+                    spoilerEntranceData.push_back(entranceObject);
+                    plandoEntranceData.push_back(entranceObject);
+                    loadedEntranceIndices.insert(entranceObject.entranceIndex);
+                }
+            }
+
+            // List every remaining entrance the game knows about (whether it's shuffled or not)
+            // so it can be edited too. Its override defaults to itself, i.e. "leads to its
+            // original vanilla destination" - only written back into the spoiler log's
+            // "entrances" array on save if the user actually reassigns it (see
+            // PlandomizerSaveSpoilerLog).
+            for (const Rando::Entrance* entrance : Rando::EntranceShuffler::GetAllEntrances()) {
+                int16_t entranceIndex = entrance->GetIndex();
+                if (loadedEntranceIndices.contains(entranceIndex)) {
+                    continue;
+                }
+
+                SpoilerEntranceObject entranceObject;
+                entranceObject.entranceTypeRaw = (uint8_t)entrance->GetType();
+                entranceObject.entranceIndex = entranceIndex;
+                entranceObject.entranceDestinationIndex =
+                    entrance->GetReverse() != nullptr ? entrance->GetReverse()->GetIndex() : (int16_t)-1;
+                entranceObject.entranceOverrideIndex = entranceIndex;
+                entranceObject.entranceOverrideDestinationIndex = entranceObject.entranceDestinationIndex;
+                entranceObject.wasInSpoilerLog = false;
+
+                std::string entranceFullName = PlandomizerGetEntranceName(entranceIndex);
+                entranceObject.entranceType = PlandomizerGetEntranceTypeName(entrance->GetType());
+                entranceObject.entranceName = entranceFullName;
+                entranceObject.entranceDestination = PlandomizerGetEntranceTargetName(entranceFullName);
+                entranceObject.entranceOverride = entranceFullName;
+                entranceObject.entranceOverrideDestination = PlandomizerGetEntranceTargetName(entranceFullName);
+                RandomizerArea area = PlandomizerGetEntranceArea(entranceIndex);
+                entranceObject.entranceAreaOrder = (int32_t)area;
+
+                spoilerEntranceData.push_back(entranceObject);
+                plandoEntranceData.push_back(entranceObject);
+            }
+
+            if (!plandoEntranceData.empty()) {
+                PlandomizerRebuildAvailableEntranceDestinations();
             }
         } catch (nlohmann::json::parse_error&) {
             Notification::Emit({ .message = "Invalid Spoiler Log Format", .remainingTime = 10.0f });
@@ -1066,6 +1317,25 @@ void PlandomizerDrawOptions() {
             }
         }
     }
+    if (getTabID == TAB_ENTRANCES) {
+        if (plandoEntranceData.size() > 0) {
+            ImGui::Text("Search:");
+            ImGui::SameLine();
+            UIWidgets::InputString("##EntranceSearch", &entranceSearchText,
+                                   UIWidgets::InputOptions()
+                                       .Color(THEME_COLOR)
+                                       .LabelPosition(UIWidgets::LabelPositions::None)
+                                       .Size(ImVec2(200.0f, 0.0f))
+                                       .Tooltip("Filter entrances/destinations/areas by name"));
+            ImGui::SameLine();
+            if (UIWidgets::Button("Clear All Destinations", UIWidgets::ButtonOptions()
+                                                                .Color(THEME_COLOR)
+                                                                .Size(UIWidgets::Sizes::Inline)
+                                                                .Padding(ImVec2(10.f, 6.f)))) {
+                PlandomizerClearAllEntranceDestinations();
+            }
+        }
+    }
 }
 
 void PlandomizerDrawHintsWindow() {
@@ -1160,6 +1430,134 @@ void PlandomizerDrawLocationsWindow(RandomizerCheckArea rcArea) {
     ImGui::EndChild();
 }
 
+// Draws the editable destination combobox for a single entrance row. The option list is built
+// fresh every frame from: "None", whatever is currently sitting in availableEntranceDestinations
+// (i.e. destinations freed up by other rows being set to "None"), and this row's own current
+// destination (so it stays visible/selected even though it isn't "available" to other rows).
+// Indices are tracked in parallel with the display strings so a selection never has to be
+// resolved by matching on name (avoids ambiguity if two entrances ever share a display name).
+void PlandomizerDrawEntranceDestinationCombo(uint32_t index) {
+    ImGui::PushID(index);
+    auto& entranceData = plandoEntranceData[index];
+
+    std::vector<std::string> options = { "None" };
+    std::vector<int16_t> optionIndices = { -1 };
+    for (auto& available : availableEntranceDestinations) {
+        options.push_back(available.second);
+        optionIndices.push_back(available.first);
+    }
+
+    size_t selected = 0;
+    if (entranceData.entranceOverrideIndex >= 0) {
+        options.push_back(entranceData.entranceOverrideDestination);
+        optionIndices.push_back(entranceData.entranceOverrideIndex);
+        selected = options.size() - 1;
+    }
+
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+    if (UIWidgets::Combobox("##EntranceDestination", &selected, options,
+                            UIWidgets::ComboboxOptions().Color(THEME_COLOR).LabelPosition(UIWidgets::LabelPositions::None))) {
+        int16_t newIndex = optionIndices[selected];
+        std::string newName = options[selected];
+        int16_t oldIndex = entranceData.entranceOverrideIndex;
+        std::string oldName = entranceData.entranceOverrideDestination;
+
+        if (newIndex != oldIndex) {
+            // Give up whatever this row previously held so another row can pick it up...
+            if (oldIndex >= 0) {
+                PlandomizerAddAvailableEntranceDestination(oldIndex, oldName);
+            }
+            // ...and claim the newly selected destination so nobody else can also pick it.
+            if (newIndex >= 0) {
+                PlandomizerRemoveAvailableEntranceDestination(newIndex);
+            }
+            entranceData.entranceOverrideIndex = newIndex;
+            entranceData.entranceOverrideDestination = newIndex >= 0 ? newName : "None";
+        }
+    }
+    ImGui::PopID();
+}
+
+// Case-insensitive substring match used by the Entrances tab's search box, checked against
+// the entrance's name, its current destination, and its area label.
+bool PlandomizerEntranceMatchesSearch(const SpoilerEntranceObject& entranceData, const std::string& needleLower) {
+    if (needleLower.empty()) {
+        return true;
+    }
+    auto containsNeedle = [&needleLower](const std::string& haystack) {
+        std::string haystackLower = haystack;
+        std::transform(haystackLower.begin(), haystackLower.end(), haystackLower.begin(),
+                       [](unsigned char c) { return std::tolower(c); });
+        return haystackLower.find(needleLower) != std::string::npos;
+    };
+    return containsNeedle(entranceData.entranceName) || containsNeedle(entranceData.entranceOverrideDestination);
+}
+
+void PlandomizerDrawEntrancesWindow() {
+    ImGui::BeginChild("Entrances");
+
+    std::string needleLower = entranceSearchText;
+    std::transform(needleLower.begin(), needleLower.end(), needleLower.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    if (ImGui::BeginTable("Entrances Window", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_ScrollY)) {
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 140.0f);
+        ImGui::TableSetupColumn("Entrance", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Destination", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableHeadersRow();
+
+        // Filter by the search box, then group by area (subdividers) and sort by type/name
+        // within each area, while keeping original indices so plandoEntranceData indexes
+        // remain valid for editing.
+        std::vector<size_t> sortedIndices;
+        sortedIndices.reserve(spoilerEntranceData.size());
+        for (size_t i = 0; i < spoilerEntranceData.size(); i++) {
+            if (PlandomizerEntranceMatchesSearch(spoilerEntranceData[i], needleLower)) {
+                sortedIndices.push_back(i);
+            }
+        }
+        // Group primarily by entrance type (so the Entrances tab shows type blocks),
+        // then secondarily by area and name.
+        std::stable_sort(sortedIndices.begin(), sortedIndices.end(), [&](size_t a, size_t b) {
+            const auto& A = spoilerEntranceData[a];
+            const auto& B = spoilerEntranceData[b];
+            if (A.entranceTypeRaw != B.entranceTypeRaw) {
+                return A.entranceTypeRaw < B.entranceTypeRaw;
+            }
+            if (A.entranceAreaOrder != B.entranceAreaOrder) {
+                return A.entranceAreaOrder < B.entranceAreaOrder;
+            }
+            return A.entranceName < B.entranceName;
+        });
+
+        int32_t lastGroupKey = INT32_MIN;
+        for (auto idx : sortedIndices) {
+            // Use the entrance type as the grouping key so entries are separated by type.
+            int32_t groupKey = (int32_t)spoilerEntranceData[idx].entranceTypeRaw;
+            if (groupKey != lastGroupKey) {
+                lastGroupKey = groupKey;
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+            }
+
+            ImGui::TableNextRow();
+            ImGui::PushID((int)idx);
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextWrapped("%s", spoilerEntranceData[idx].entranceType.c_str());
+            ImGui::TableSetColumnIndex(1);
+            // Entrance identity is immutable - shown as plain, unmodifiable text.
+            ImGui::TextWrapped("%s", spoilerEntranceData[idx].entranceName.c_str());
+            ImGui::TableSetColumnIndex(2);
+            // Pass the original data index so the combobox edits the correct plando entry.
+            PlandomizerDrawEntranceDestinationCombo((uint32_t)idx);
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    ImGui::EndChild();
+}
+
 void PlandomizerDrawSpoilerTable() {
     ImGui::BeginChild("Main");
     UIWidgets::PushStyleTabs(THEME_COLOR);
@@ -1172,6 +1570,11 @@ void PlandomizerDrawSpoilerTable() {
         if (ImGui::BeginTabItem("Locations")) {
             getTabID = TAB_LOCATIONS;
             PlandomizerDrawLocationsWindow(selectedArea);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Entrances")) {
+            getTabID = TAB_ENTRANCES;
+            PlandomizerDrawEntrancesWindow();
             ImGui::EndTabItem();
         }
     }

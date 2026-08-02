@@ -1712,10 +1712,10 @@ void EntranceShuffler::ApplyEntranceOverrides() {
     for (size_t i = 0; i < entranceOverrides.size(); i++) {
         EntranceOverride entranceOverride = entranceOverrides[i];
 
-        if (entranceOverride.index == 0 && entranceOverride.destination == 0 && entranceOverride.override == 0 &&
-            entranceOverride.overrideDestination == 0) {
-            continue;
-        }
+        // if (entranceOverride.index == 0 && entranceOverride.destination == 0 && entranceOverride.override == 0 &&
+        //     entranceOverride.overrideDestination == 0) {
+        //     continue;
+        // }
 
         Entrance* entrance = entranceMap[entranceOverride.index];
         Entrance* overrideEntrance = entranceMap[entranceOverride.override];
@@ -1729,6 +1729,15 @@ void EntranceShuffler::ApplyEntranceOverrides() {
 const Entrance* EntranceShuffler::GetEntranceByIndex(int16_t index) {
     auto iter = entranceMap.find(index);
     return iter != entranceMap.end() ? iter->second : nullptr;
+}
+
+std::vector<const Entrance*> EntranceShuffler::GetAllEntrances() {
+    std::vector<const Entrance*> allEntrances;
+    allEntrances.reserve(entranceMap.size());
+    for (const auto& [mapIndex, entrance] : entranceMap) {
+        allEntrances.push_back(entrance);
+    }
+    return allEntrances;
 }
 } // namespace Rando
 

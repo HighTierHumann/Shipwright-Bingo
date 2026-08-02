@@ -140,6 +140,9 @@ class EntranceShuffler {
     void ApplyEntranceOverrides();
 
     static const Entrance* GetEntranceByIndex(int16_t index);
+    // Every entrance known to the game, shuffled or not (requires SetAllEntrancesData() to have
+    // already populated entranceMap, same precondition as GetEntranceByIndex).
+    static std::vector<const Entrance*> GetAllEntrances();
 
   private:
     std::vector<Entrance*> AssumeEntrancePool(std::vector<Entrance*>& entrancePool);
