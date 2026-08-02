@@ -180,7 +180,9 @@ void GenerateItemPool() {
     if (!ctx->GetOption(RSK_STARTING_FARORES_WIND))  AddItemToPool(RG_FARORES_WIND, 2, 1, 1, 0);
     if (!ctx->GetOption(RSK_STARTING_NAYRUS_LOVE))   AddItemToPool(RG_NAYRUS_LOVE, 2, 1, 1, 0);
     AddItemToPool(RG_GREG_RUPEE, 1, 1, 1, 1);
-    AddFixedItemToPool(RG_PROGRESSIVE_HOOKSHOT, 3 - ctx->GetOption(RSK_STARTING_HOOKSHOT).Get());
+
+    int8_t hookshotCount = 2 - ctx->GetOption(RSK_STARTING_HOOKSHOT).Get();
+    AddItemToPool(RG_PROGRESSIVE_HOOKSHOT, hookshotCount + 1, hookshotCount, hookshotCount, hookshotCount);
     if (!ctx->GetOption(RSK_STARTING_HYLIAN_SHIELD)) AddItemToPool(RG_HYLIAN_SHIELD, 1, 1, 1, 1);
     AddItemToPool(RG_DOUBLE_DEFENSE, 2, 1, 0, 0);
     if (ctx->GetOption(RSK_STARTING_BIGGORON_SWORD).IsNot(RO_STARTING_BGS_BIGGORON_SWORD)) {
