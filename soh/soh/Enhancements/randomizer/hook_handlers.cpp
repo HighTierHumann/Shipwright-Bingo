@@ -3001,6 +3001,12 @@ void RandomizerOnSceneSpawnActorsHandler() {
                                 static_cast<int16_t>(0x4000), 0, static_cast<int16_t>(0x0700));
                 }
                 break;
+            case SCENE_BOTTOM_OF_THE_WELL:
+                if (gPlayState->roomCtx.curRoom.num == 0) {
+                    Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_ANI, -62, 240, 1162, 0,
+                                static_cast<int16_t>(0x8000), 0, 0);
+                }
+                break;
             default:
                 break;
         }

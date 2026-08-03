@@ -128,7 +128,9 @@ void func_809B0558(EnAni* this, PlayState* play) {
         } else {
             EnAni_SetupAction(this, func_809B0524);
         }
-        Flags_SetItemGetInf(ITEMGETINF_15);
+        if (gPlayState->sceneNum != SCENE_BOTTOM_OF_THE_WELL) {
+            Flags_SetItemGetInf(ITEMGETINF_15);
+        }
     } else {
         if (GameInteractor_Should(VB_GIVE_ITEM_FROM_MAN_ON_ROOF, true)) {
             Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 10000.0f, 200.0f);

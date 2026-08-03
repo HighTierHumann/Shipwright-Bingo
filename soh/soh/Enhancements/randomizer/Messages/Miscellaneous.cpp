@@ -68,6 +68,18 @@ void BuildRockySignMessage(uint16_t* textId, bool* loadFromMessageTable) {
     *loadFromMessageTable = false;
 }
 
+void BuildSkwimbleMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    CustomMessage msg;
+    if (gPlayState->sceneNum == SCENE_BOTTOM_OF_THE_WELL) {
+        msg = CustomMessage("Greetings! My name is %rSkwimble%w.^It appears you have performed %rmy clip%w, well done!",
+                            TODO_TRANSLATE,
+                            TODO_TRANSLATE);
+    }
+    msg.AutoFormat();
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
 void BuildDeezyDMCMessage(uint16_t* textId, bool* loadFromMessageTable) {
     CustomMessage msg;
     MessageContext* msgCtx = &gPlayState->msgCtx;
@@ -112,6 +124,8 @@ void RegisterMiscellaneousMessages() {
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_IS_AFRAID, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_MALON_LETS_SING_THIS_SONG, IS_RANDO, BuildFixedMallonAtCastleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_GV_ROCKY_SIGN, IS_RANDO, BuildRockySignMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_MAN_ON_ROOF_DIALOGUE, IS_RANDO, BuildSkwimbleMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_TO_GET_A_GOOD_VIEW, IS_RANDO, BuildSkwimbleMessage);
     COND_ID_HOOK(OnOpenText, TEXT_GERUDO_GUARD_FRIENDLY, IS_RANDO, BuildGerudoGuardJailOfferMessage);
     COND_ID_HOOK(OnOpenText, TEXT_QUESTION_MARKS_DMC, IS_RANDO, BuildDeezyDMCMessage);
 }

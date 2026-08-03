@@ -1721,6 +1721,8 @@ bool IsCheckShuffled(RandomizerCheck rc) {
                 (showDungeonWonderItems && RandomizerCheckObjects::AreaIsDungeon(loc->GetArea()))) &&
                (loc->GetRCType() != RCTYPE_ICICLE || showIcicles) &&
                (loc->GetRCType() != RCTYPE_RED_ICE || showRedIce) &&
+               (loc->GetRCType() != RCTYPE_SILVER_RUPEE ||
+                Rando::Context::GetInstance()->IsSilverRupeeAreaShuffled(loc->GetHintKey())) &&
                (loc->GetRCType() != RCTYPE_FISH ||
                 OTRGlobals::Instance->gRandoContext->GetFishsanity()->GetFishLocationIncluded(loc)) &&
                (loc->GetRCType() != RCTYPE_FREESTANDING ||
