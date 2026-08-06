@@ -85,6 +85,7 @@ int Playthrough_Init(uint32_t seed, std::set<RandomizerCheck> excludedLocations,
 
     return 1;
 }
+    //Zara was Here
 
 // used for generating a lot of seeds at once
 int Playthrough_Repeat(std::set<RandomizerCheck> excludedLocations, std::set<RandomizerTrick> enabledTricks,
