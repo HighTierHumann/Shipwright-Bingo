@@ -143,6 +143,7 @@ void Entrance_ResetEntranceTable(void) {
 
 void Entrance_Init(void) {
     EntranceOverride* entranceOverrides = Randomizer_GetEntranceOverrides();
+    s32 index;
 
     Entrance_CopyOriginalEntranceTable();
 
@@ -155,7 +156,7 @@ void Entrance_Init(void) {
     }
 
     // Delete the title card and add a fade in for Hyrule Field from Ocarina of Time cutscene
-    for (s32 index = ENTR_HYRULE_FIELD_16; index <= ENTR_HYRULE_FIELD_16_3; ++index) {
+    for (index = ENTR_HYRULE_FIELD_16; index <= ENTR_HYRULE_FIELD_16_3; ++index) {
         gEntranceTable[index].field = ENTRANCE_INFO_FIELD(false, false, TRANS_TYPE_FADE_BLACK, TRANS_TYPE_INSTANT);
     }
 
@@ -198,7 +199,7 @@ void Entrance_Init(void) {
                 bossScene = dungeons[j].bossScene;
             }
 
-            if (originalIndex == dungeons[j].bossDoor) {
+            if (index == dungeons[j].bossDoor) {
                 saveWarpEntrance = dungeons[j].entryway;
             }
         }
