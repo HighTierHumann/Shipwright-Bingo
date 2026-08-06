@@ -1674,20 +1674,6 @@ extern "C" void Graph_StartFrame() {
     OTRGlobals::Instance->context->GetWindow()->SetLastScancode(-1);
 
     switch (dwScancode) {
-        case KbScancode::LUS_KB_F1: {
-            std::shared_ptr<SohModalWindow> modal = static_pointer_cast<SohModalWindow>(
-                std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())
-                    ->GetGuiWindow("Modal Window"));
-            if (modal->IsPopupOpen("Menu Moved")) {
-                modal->DismissPopup();
-            } else {
-                modal->RegisterPopup("Menu Moved",
-                                     "The menubar, accessed by hitting F1, no longer exists.\nThe new menu can be "
-                                     "accessed by hitting the Esc button instead.",
-                                     "OK");
-            }
-            break;
-        }
         case KbScancode::LUS_KB_F5: {
             if (CVarGetInteger(CVAR_CHEAT("SaveStatesEnabled"), 0) == 0) {
                 std::dynamic_pointer_cast<Fast::Fast3dGui>(Ship::Context::GetRawInstance()->GetWindow()->GetGui())

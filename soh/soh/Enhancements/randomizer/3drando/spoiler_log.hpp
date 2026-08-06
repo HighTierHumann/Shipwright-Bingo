@@ -18,6 +18,7 @@ typedef enum {
     SPOILER_CHK_RANDOMIZER_INF,
 } SpoilerCollectionCheckType;
 
-void GenerateHash();
+// void GenerateHash();
+void GenerateLocationBasedHash();
 
 void SpoilerLog_Write();

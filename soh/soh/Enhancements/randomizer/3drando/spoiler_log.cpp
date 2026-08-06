@@ -30,6 +30,12 @@
 using json = nlohmann::ordered_json;
 using namespace Rando;
 
+
+constexpr std::uint64_t Polynomial = 0x0004820009ULL;
+constexpr std::uint64_t Mask       = 0xFFFFFFFFFFULL;
+constexpr std::uint64_t XorOut     = 0xFFFFFFFFFFULL;
+constexpr std::uint64_t TopBit     = 0x8000000000ULL;
+
 json jsonData;
 std::map<RandomizerHintTextKey, Rando::ItemLocation*> hintedLocations;
 
@@ -40,17 +46,81 @@ namespace {
 std::string placementtxt;
 } // namespace
 
-void GenerateHash() {
-    auto ctx = Rando::Context::GetInstance();
-    std::string hash = ctx->GetHash();
-    // adds leading 0s to the hash string if it has less than 10 digits.
-    while (hash.length() < 10) {
-        hash = "0" + hash;
+// void GenerateHash() {
+//     auto ctx = Rando::Context::GetInstance();
+//     std::string hash = ctx->GetHash();
+//     // adds leading 0s to the hash string if it has less than 10 digits.
+//     while (hash.length() < 10) {
+//         hash = "0" + hash;
+//     }
+//     for (size_t i = 0, j = 0; i < ctx->hashIconIndexes.size(); i++, j += 2) {
+//         int number = std::stoi(hash.substr(j, 2));
+//         ctx->hashIconIndexes[i] = number;
+//     }
+// }
+
+
+inline std::uint64_t updateByte(
+        std::uint64_t crc,
+        std::uint8_t value)
+{
+
+
+    crc ^= static_cast<std::uint64_t>(value) << 32;
+
+    for (int bit = 0; bit < 8; ++bit)
+    {
+        if ((crc & TopBit) != 0)
+        {
+            crc = ((crc << 1) ^ Polynomial) & Mask;
+        }
+        else
+        {
+            crc = (crc << 1) & Mask;
+        }
     }
-    for (size_t i = 0, j = 0; i < ctx->hashIconIndexes.size(); i++, j += 2) {
-        int number = std::stoi(hash.substr(j, 2));
-        ctx->hashIconIndexes[i] = number;
+
+    return crc;
+}
+
+std::array<std::uint8_t, 5> crc40ToBytes(std::uint64_t crc)
+{
+    crc &= 0xFFFFFFFFFFULL;
+
+    return
+    {
+        static_cast<std::uint8_t>((crc >> 32)%100 & 0xFF),
+        static_cast<std::uint8_t>((crc >> 24)%100 & 0xFF),
+        static_cast<std::uint8_t>((crc >> 16)%100 & 0xFF),
+        static_cast<std::uint8_t>((crc >> 8)%100  & 0xFF),
+        static_cast<std::uint8_t>( crc %100       & 0xFF)
+    };
+}
+
+void GenerateLocationBasedHash() {
+
+    std::uint64_t crc = 0;
+    for (size_t i = 0; i < RC_MAX; i++) {
+        auto item = ctx->GetItemLocation(i)->GetPlacedItem().GetItemID();
+
+
+        crc = updateByte(
+            crc,
+            static_cast<std::uint8_t>(item & 0xFF));
+
+        crc = updateByte(
+            crc,
+            static_cast<std::uint8_t>((item >> 8) & 0xFF));
+
     }
+
+    auto crcArray = crc40ToBytes(crc);
+    for (size_t i = 0, j = 0; i < ctx->hashIconIndexes.size(); i++, j++) {
+        SPDLOG_DEBUG("Hash value: {0}-{1}", i, crcArray[i]);
+        ctx->hashIconIndexes[i] = crcArray[i];
+    }
+
+
 }
 
 static auto GetGeneralPath() {

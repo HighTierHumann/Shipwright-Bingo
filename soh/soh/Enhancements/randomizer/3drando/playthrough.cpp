@@ -69,7 +69,8 @@ int Playthrough_Init(uint32_t seed, std::set<RandomizerCheck> excludedLocations,
         return ret;
     }
 
-    GenerateHash();
+    // GenerateHash();
+    GenerateLocationBasedHash();
 
     if (true) {
         // TODO: Handle different types of file output (Spoiler Log, Plando Template, Patch Files, Race Files, etc.)

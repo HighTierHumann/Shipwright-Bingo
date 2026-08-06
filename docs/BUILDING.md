@@ -211,7 +211,7 @@ cd build-cmake
 # Generate
 cpack -G DEB
 cpack -G ZIP
-cpack -G External (creates appimage)
+cpack -G External -D CPACK_SYSTEM_NAME="x86_64"(creates appimage)
 ```
 
 ### Additional CMake Targets
