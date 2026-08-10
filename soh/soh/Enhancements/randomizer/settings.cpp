@@ -446,27 +446,22 @@ void Settings::CreateOptions() {
         // Remove the pieces required/total sliders and add a separator after Triforce Hunt if Triforce Hunt is off
         const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 0);
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHunt"), RO_GENERIC_OFF)) {
-            // Not in love with this, but it does stop Power Hunt appearing on File Select when disabled
-            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, powerTriforceTotal + 1));
-            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].ChangeOptions(NumOpts(1, 100));
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].Unhide();
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].Unhide();
         } else {
-            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(0, 0));
-            mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].ChangeOptions(NumOpts(0, 0));
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].Hide();
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL].Hide();
         }
     });
-    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, "Triforce of Power Hunt Total Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL], WIDGET_CVAR_SLIDER_INT, 0, false, nullptr, IMFLAG_NONE);
+    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, "Triforce of Power Hunt Total Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL], WIDGET_CVAR_SLIDER_INT, 1, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_TRIFORCE_POWER_HUNT_PIECES_TOTAL, {
         // Update power triforce of power pieces required to be capped at the current value for pieces total.
-        const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 0);
+        const uint8_t powerTriforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforcePowerHuntTotalPieces"), 1);
         if (mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].GetOptionCount() != powerTriforceTotal + 1) {
             mOptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, powerTriforceTotal + 1));
         }
     });
-    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED, "Triforce of Power Hunt Required Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntRequiredPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED], WIDGET_CVAR_SLIDER_INT, 0);
+    OPT_U8(RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED, "Triforce of Power Hunt Required Pieces", {NumOpts(1, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("TriforcePowerHuntRequiredPieces"), mOptionDescriptions[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED], WIDGET_CVAR_SLIDER_INT, 1);
     OPT_BOOL(RSK_MIMIC_LOSE, "Lose to Mimic", CVAR_RANDOMIZER_SETTING("MimicLose"), mOptionDescriptions[RSK_MIMIC_LOSE]);
     OPT_U8(RSK_MQ_DUNGEON_RANDOM, "MQ Dungeon Setting", {"None", "Set Number", "Random", "Selection Only"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("MQDungeons"), mOptionDescriptions[RSK_MQ_DUNGEON_RANDOM], WIDGET_CVAR_COMBOBOX, RO_MQ_DUNGEONS_NONE, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_MQ_DUNGEON_RANDOM, {
