@@ -319,6 +319,5 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/CMake/Packaging-2.cmake)
-set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}-x86_64")
 include(CMake/Packaging.cmake)
 
