@@ -26,7 +26,14 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "YOUR NAME")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-set(CPACK_SYSTEM_NAME ${LSB_RELEASE_CODENAME_SHORT})
+    # Rolling-release distros (openSUSE Tumbleweed, Arch, Fedora) have no LSB codename
+    # and lsb_release reports "n/a"; the slash would be read as a path separator in
+    # CPACK_PACKAGE_FILE_NAME and CPACK_TOPLEVEL_TAG, breaking mksquashfs.
+    if (LSB_RELEASE_CODENAME_SHORT AND NOT LSB_RELEASE_CODENAME_SHORT MATCHES "[^A-Za-z0-9._-]")
+        set(CPACK_SYSTEM_NAME ${LSB_RELEASE_CODENAME_SHORT})
+    else()
+        set(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_PROCESSOR})
+    endif()
 # package name for deb
 # if set, then instead of some-application-0.9.2-Linux.deb
 # you'll get some-application_0.9.2_amd64.deb (note the underscores too)
