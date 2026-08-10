@@ -638,6 +638,7 @@ void SaveManager::StartupCheckAndInitMeta(int fileNum) {
         nlohmann::json& randoSettings = randoBlock["randoSettings"];
         fileMetaInfo[fileNum].maxTriforcePieces = randoSettings[RSK_TRIFORCE_HUNT_PIECES_TOTAL].get<uint8_t>();
         fileMetaInfo[fileNum].triforcePowerPieces = randoBlock.value("triforcePowerPiecesCollected", 0);
+        // We don't need to display count if the user only needs 1 piece
         if (randoSettings[RSK_TRIFORCE_POWER_HUNT].get<uint8_t>() != 0) {
             fileMetaInfo[fileNum].maxTriforcePowerPieces =
                 randoSettings[RSK_TRIFORCE_POWER_HUNT_PIECES_REQUIRED].get<uint8_t>() + 1;
