@@ -153,10 +153,9 @@ void BuildTriforcePowerPieceMessage(CustomMessage& msg) {
     msg.AutoFormat(ITEM_CUSTOM);
 }
 
-void BuildSilverRupeeMessage(Player* player, CustomMessage& msg) {
+void BuildSilverRupeeMessage(int16_t getItemId, CustomMessage& msg) {
     uint8_t remaining = 5;
-    int16_t rgid = player->getItemEntry.getItemId;
-    int16_t slot = rgid - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
+    int16_t slot = getItemId - RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE;
 
     if (slot <= 15) {
         remaining = 5 - (gSaveContext.ship.quest.data.randomizer.silverRupees[slot] + 1);
@@ -175,10 +174,10 @@ void BuildSilverRupeeMessage(Player* player, CustomMessage& msg) {
     }
     msg.Replace("[[remaining]]", std::to_string(remaining));
     CustomMessage article = CustomMessage(
-        Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(rgid)).GetArticle(), TEXTBOX_TYPE_BLUE);
+        Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(getItemId)).GetArticle(), TEXTBOX_TYPE_BLUE);
     msg.Replace("[[article]]", article);
     CustomMessage name =
-        CustomMessage(Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(rgid)).GetName(), TEXTBOX_TYPE_BLUE);
+        CustomMessage(Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(getItemId)).GetName(), TEXTBOX_TYPE_BLUE);
     msg.Replace("[[name]]", name);
     msg.AutoFormat(ITEM_CUSTOM);
 }
@@ -280,9 +279,9 @@ void BuildItemMessage(u16* textId, bool* loadFromMessageTable) {
         BuildTriforcePieceMessage(msg);
     } else if (player->getItemEntry.getItemId == RG_TRIFORCE_POWER_PIECE) {
         BuildTriforcePowerPieceMessage(msg);
-    } else if (player->getItemEntry.objectId == OBJECT_GI_RUPY && player->getItemEntry.textId ==
-        TEXT_RANDOMIZER_CUSTOM_ITEM && (player->getItemEntry.getItemId != RG_GREG_RUPEE || player->getItemEntry.getItemId != RG_ICE_TRAP)) {
-        BuildSilverRupeeMessage(player, msg);
+    } else if (player->getItemEntry.getItemId >= RG_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE &&
+               player->getItemEntry.getItemId <= RG_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_BAG) {
+        BuildSilverRupeeMessage(player->getItemEntry.getItemId, msg);
     } else {
         BuildCustomItemMessage(player, msg);
     }

@@ -859,6 +859,7 @@ extern "C" void Randomizer_InitSaveFile() {
         Flags_SetRandomizerInf(RAND_INF_WEIRD_EGG);
         Flags_SetEventChkInf(EVENTCHKINF_TALON_WOKEN_IN_CASTLE);
         Flags_SetEventChkInf(EVENTCHKINF_TALON_RETURNED_FROM_CASTLE);
+        gSaveContext.sceneFlags[SCENE_HYRULE_CASTLE].swch |= (1 << 0x04); // Push boxes already
     }
 
     // Starting with an unshuffled letter skips child Zelda.

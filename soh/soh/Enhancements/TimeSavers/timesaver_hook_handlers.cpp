@@ -1223,6 +1223,12 @@ void TimeSaverOnSceneInitHandler(int16_t sceneNum) {
                 Flags_SetEventChkInf(EVENTCHKINF_INVITED_TO_SING_WITH_CHILD_MALON);
             }
             break;
+        case SCENE_GERUDOS_FORTRESS:
+            if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipMiscInteractions"), IS_RANDO) &&
+                CHECK_QUEST_ITEM(QUEST_GERUDO_CARD)) {
+                gSaveContext.sceneFlags[SCENE_GERUDOS_FORTRESS].swch |= (1 << 0x03);
+            }
+            break;
         case SCENE_DEKU_TREE_BOSS:
             if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.BossIntro"), IS_RANDO)) {
                 if (!Flags_GetEventChkInf(EVENTCHKINF_BEGAN_GOHMA_BATTLE)) {
