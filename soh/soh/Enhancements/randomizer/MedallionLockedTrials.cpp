@@ -1,6 +1,7 @@
 #include "soh/OTRGlobals.h"
 #include "soh/ShipInit.hpp"
 #include "soh/Enhancements/randomizer/SeedContext.h"
+#include <spdlog/spdlog.h>
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -9,29 +10,43 @@ void DoorShutter_SetupAction(DoorShutter*, DoorShutterActionFunc);
 void DoorShutter_SetupType(DoorShutter*, PlayState*);
 }
 
+int8_t CountMedallionsObtained() {
+    int8_t medallionsHeld = 0;
+    for (int i = 0; i < 6; i++) {
+        if (CHECK_QUEST_ITEM(i)) medallionsHeld++;
+    }
+    return medallionsHeld;
+}
+
 static void OnDoorInit(void* actorRef) {
+    const auto ctx = Rando::Context::GetInstance();
     if (gPlayState->sceneNum == SCENE_INSIDE_GANONS_CASTLE) {
         DoorShutter* door = static_cast<DoorShutter*>(actorRef);
         bool barred = false;
-        switch (door->dyna.actor.params) {
-            case 8255:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_FOREST);
-                break;
-            case 9279:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_WATER);
-                break;
-            case 10303:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_LIGHT);
-                break;
-            case 11327:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_FIRE);
-                break;
-            case 12351:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_SHADOW);
-                break;
-            case 16447:
-                barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_SPIRIT);
-                break;
+
+        if (CountMedallionsObtained() >= ctx->GetOption(RSK_MEDALLION_LOCKED_TRIALS_THRESHOLD).Get() + 1) {
+            return;
+        } else {
+            switch (door->dyna.actor.params) {
+                case 8255:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_FOREST);
+                    break;
+                case 9279:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_WATER);
+                    break;
+                case 10303:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_LIGHT);
+                    break;
+                case 11327:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_FIRE);
+                    break;
+                case 12351:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_SHADOW);
+                    break;
+                case 16447:
+                    barred = !CHECK_QUEST_ITEM(QUEST_MEDALLION_SPIRIT);
+                    break;
+            }
         }
         if (barred) {
             door->doorType = SHUTTER_FRONT_SWITCH_BACK_CLEAR;
