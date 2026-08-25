@@ -52,6 +52,9 @@ extern "C" void ObjTsubo_RandomizerDraw(Actor* thisx, PlayState* play) {
                 case ITEM_CATEGORY_SKULLTULA_TOKEN:
                     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotTokenDL);
                     break;
+                case ITEM_CATEGORY_BEAN:
+                    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotBeanDL);
+                    break;
                 case ITEM_CATEGORY_MAJOR:
                     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gPotMajorDL);
                     break;

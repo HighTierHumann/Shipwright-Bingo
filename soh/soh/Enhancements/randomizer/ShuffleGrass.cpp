@@ -65,6 +65,9 @@ extern "C" void EnKusa_RandomizerDraw(Actor* thisx, PlayState* play) {
                 case ITEM_CATEGORY_SKULLTULA_TOKEN:
                     DrawTypeOfGrass(grassActor, (Gfx*)gRandoBushTokenDL, (Gfx*)gRandoCuttableGrassTokenDL, play);
                     break;
+                case ITEM_CATEGORY_BEAN:
+                    DrawTypeOfGrass(grassActor, (Gfx*)gRandoBushBeanDL, (Gfx*)gRandoCuttableGrassBeanDL, play);
+                    break;
                 case ITEM_CATEGORY_MAJOR:
                     DrawTypeOfGrass(grassActor, (Gfx*)gRandoBushMajorDL, (Gfx*)gRandoCuttableGrassMajorDL, play);
                     break;

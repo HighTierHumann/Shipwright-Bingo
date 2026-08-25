@@ -79,6 +79,10 @@ extern "C" void EnWood02_RandomizerDraw(Actor* thisx, PlayState* play) {
             Matrix_Scale(0.1f, 0.05f, 0.1f, MTXMODE_APPLY);
             Gfx_DrawDListOpa(play, (Gfx*)gSmallTokenCrateDL);
             break;
+        case ITEM_CATEGORY_BEAN:
+            Matrix_Scale(0.1f, 0.05f, 0.1f, MTXMODE_APPLY);
+            Gfx_DrawDListOpa(play, (Gfx*)gSmallBeanCrateDL);
+            break;
         case ITEM_CATEGORY_SMALL_KEY:
             Matrix_Scale(0.1f, 0.05f, 0.1f, MTXMODE_APPLY);
             Gfx_DrawDListOpa(play, (Gfx*)gSmallSmallKeyCrateDL);
