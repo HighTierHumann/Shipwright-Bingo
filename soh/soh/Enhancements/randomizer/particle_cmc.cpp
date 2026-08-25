@@ -3,7 +3,7 @@
 #include "soh/cvar_prefixes.h"
 
 // Color of the circle for the particles
-static Color_RGBA8 mainColors[8] = {
+static Color_RGBA8 mainColors[9] = {
     { 255, 255, 255, 255 }, // Junk
     { 170, 50, 0, 255 },    // Lesser
     { 250, 0, 0, 255 },     // Health
@@ -12,10 +12,11 @@ static Color_RGBA8 mainColors[8] = {
     { 0, 0, 0, 255 },       // Skulltula Token
     { 250, 185, 40, 255 },  // Major
     { 155, 0, 255, 255 },   // Silver Rupees
+    { 5, 160, 0, 255 },     // Bean
 };
 
 // Secondary color of the circle for the particles
-static Color_RGBA8 secColors[8] = {
+static Color_RGBA8 secColors[9] = {
     { 255, 255, 255, 255 }, // Junk
     { 250, 75, 0, 255 },    // Lesser
     { 0, 0, 255, 255 },     // Health
@@ -24,10 +25,11 @@ static Color_RGBA8 secColors[8] = {
     { 255, 250, 190, 255 }, // Skulltula Token
     { 255, 220, 135, 255 }, // Major
     { 101, 0, 217, 255 },   // Silver Rupees
+    { 0, 100, 0, 255 },     // Bean
 };
 
 // Color of the faded flares stretching off the particles
-static Color_RGBA8 flareColors[8] = {
+static Color_RGBA8 flareColors[9] = {
     { 135, 135, 135, 255 }, // Junk
     { 255, 160, 100, 255 }, // Lesser
     { 255, 125, 125, 255 }, // Health
@@ -36,6 +38,7 @@ static Color_RGBA8 flareColors[8] = {
     { 255, 255, 255, 255 }, // Skulltula Token
     { 250, 220, 180, 255 }, // Major
     { 67, 0, 184, 255 },    // Silver Rupees
+    { 0, 70, 0, 255 },      // Bean
 };
 
 static bool ColorEquals(const Color_RGBA8& a, const Color_RGBA8& b) {
@@ -69,6 +72,9 @@ Color_RGBA8 Randomizer_GetParticleCMCColor(GetItemCategory colorIndex, ParticleC
             break;
         case ITEM_CATEGORY_SILVER_RUPEE:
             primary = CVarGetColor(CVAR_COSMETIC("CMC.SilverRupee.Value"), Color_RGBA8{ 155, 0, 255, 255 });
+            break;
+        case ITEM_CATEGORY_BEAN:
+            primary = CVarGetColor(CVAR_COSMETIC("CMC.Bean.Value"), Color_RGBA8{ 5, 160, 0, 255 });
             break;
         default:
             primary = { 255, 255, 255, 255 };

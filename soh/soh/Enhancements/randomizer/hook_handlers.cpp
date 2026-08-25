@@ -2916,7 +2916,7 @@ void RandomizerOnSceneSpawnActorsHandler() {
         }
     }
 
-    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), IGC_DISABLED) != IGC_DISABLED)) {
+    if (LINK_IS_ADULT && (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InsideGanonsCastleSign"), IGC_DISABLED) != IGC_DISABLED)) {
         switch (gPlayState->sceneNum) {
             case SCENE_OUTSIDE_GANONS_CASTLE:
                 if (ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES).Is(RO_DUNGEON_ENTRANCE_SHUFFLE_ON_PLUS_GANON)) {

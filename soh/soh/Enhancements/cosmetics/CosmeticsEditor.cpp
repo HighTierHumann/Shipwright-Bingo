@@ -312,6 +312,7 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.Health",                   "Health Particles",         COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(250, 0, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.SilverRupee",              "Silver Rupee Particles",   COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(155, 0, 255, 255), false, true, false),
     COSMETIC_OPTION("CMC.Skulltula",                "Skulltula Particles",      COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(0, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.Bean",                     "Bean Particles",           COSMETICS_GROUP_CMC_PARTICLES, ColorRGBA8(5, 160, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.JunkTex",                  "Junk Texture Color",           COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(255, 255, 255, 255), false, true, false),
     COSMETIC_OPTION("CMC.LesserTex",                "Lesser Texture Color",         COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(170, 50, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.MajorTex",                 "Major Texture Color",          COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(250, 185, 40, 255), false, true, false),
@@ -320,6 +321,7 @@ std::map<std::string, CosmeticOption> cosmeticOptions = {
     COSMETIC_OPTION("CMC.HealthTex",                "Health Texture Color",         COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(250, 0, 0, 255), false, true, false),
     COSMETIC_OPTION("CMC.SilverRupeeTex",           "Silver Rupee Texture Color",   COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(155, 0, 255, 255), false, true, false),
     COSMETIC_OPTION("CMC.SkulltulaTex",             "Skulltula Texture Color",      COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(0, 0, 0, 255), false, true, false),
+    COSMETIC_OPTION("CMC.BeanTex",                  "Bean Texture Color",           COSMETICS_GROUP_CMC_TEXTURES, ColorRGBA8(5, 160, 0, 255), false, true, false),
     COSMETIC_OPTION("SilverRupee.SpiritGem",        "Spirit Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(255, 85,  0,   255), false, true, false),
     COSMETIC_OPTION("SilverRupee.ShadowGem",        "Shadow Temple Gem",        COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(153, 0,   255, 255), false, true, false),
     COSMETIC_OPTION("SilverRupee.ForestTrialGem",   "Forest Trial Gem",         COSMETICS_GROUP_SILVER_RUPEES,    ColorRGBA8(0,   255, 0,   255), false, true, false),
@@ -1709,6 +1711,35 @@ void ApplyOrResetCustomGfxPatches(bool manualChange) {
         PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potface_token", "Token_Pot_Face", skulltulaTexture.changedCvar, 17,
                          gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
         PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotTokenDL_f3dlite_potrim_token", "Token_Pot_Rim", skulltulaTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+    }
+
+    static CosmeticOption& beanTexture = cosmeticOptions.at("CMC.BeanTex");
+    if (manualChange || CVarGetInteger(beanTexture.rainbowCvar, 0)) {
+        Color_RGBA8 color = CVarGetColor(beanTexture.valuesCvar, beanTexture.defaultColor);
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_keep/mat_gRandoCuttableGrassBeanDL_f3dlite_flower_bean", "Bean_Flower", beanTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/gameplay_field_keep/mat_gFieldBushBeanDL_f3dlite_flower_bean", "Bean_Field_Flower", beanTexture.changedCvar, 6,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyBeanDL_BeanFront_layerOpaque", "Bean_Chest_Front", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestBodyBeanDL_BeanSides_layerOpaque", "Bean_Chest_Sides", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_box/mat_gChestLidBeanDL_BeanSides_layerOpaque", "Bean_Chest_Lid_Sides", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako/mat_gSmallBeanCrateDL_f3dlite_smallcrate_bean", "Bean_Small_Crate", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeBeanCrateDL_f3dlite_crate_side_bean", "Bean_Large_Crate_Side", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_kibako2/mat_gLargeBeanCrateDL_f3dlite_crate_top_bean", "Bean_Large_Crate_Top", beanTexture.changedCvar, 16,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBeanDL_f3dlite_potbase_bean", "Bean_Pot_Base", beanTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBeanDL_f3dlite_potbottom", "Bean_Pot_Bottom", beanTexture.changedCvar, 7,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBeanDL_f3dlite_potface_bean", "Bean_Pot_Face", beanTexture.changedCvar, 17,
+                         gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
+        PATCH_CUSTOM_GFX("__OTR__objects/object_tsubo/mat_gPotBeanDL_f3dlite_potrim_bean", "Bean_Pot_Rim", beanTexture.changedCvar, 17,
                          gsDPSetPrimColor(0, 0, color.r, color.g, color.b, 255));
     }
 
