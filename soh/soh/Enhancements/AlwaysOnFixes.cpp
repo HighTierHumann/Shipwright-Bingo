@@ -109,7 +109,8 @@ void RegisterAlwaysOnFixes() {
         s8* heldItemAction = va_arg(args, s8*);
         s32* camMode = va_arg(args, s32*);
 
-        if (*heldItemAction == PLAYER_IA_BOW) {
+        if (*heldItemAction == PLAYER_IA_BOW || *heldItemAction == PLAYER_IA_BOW_FIRE ||
+            *heldItemAction == PLAYER_IA_BOW_ICE || *heldItemAction == PLAYER_IA_BOW_LIGHT) {
             if (CVarGetInteger(CVAR_ENHANCEMENT("BowSlingshotAmmoFix"), false) ||
                 CVarGetInteger(CVAR_ENHANCEMENT("EquipmentAlwaysVisible"), false)) {
                 *camMode = CAM_MODE_AIM_ADULT;
