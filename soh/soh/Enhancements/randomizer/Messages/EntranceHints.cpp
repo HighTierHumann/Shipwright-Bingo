@@ -187,7 +187,7 @@ void BuildEntranceHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
         case TEXT_OGC_GANONS_CASTLE_SIGN:
-            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("GanonsCastleSign"), IGC_DISABLED) == IGC_INVERTED) {
+            if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("InsideGanonsCastleSign"), IGC_DISABLED) == IGC_INVERTED) {
                 entrance = ENTR_CASTLE_GROUNDS_RAINBOW_BRIDGE_EXIT;
             } else {
                 entrance = ENTR_INSIDE_GANONS_CASTLE_ENTRANCE;
