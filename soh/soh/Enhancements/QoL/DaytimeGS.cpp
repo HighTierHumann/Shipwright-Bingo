@@ -39,7 +39,7 @@ static void OnSpawnNighttimeGoldSkulltula() {
           true,
           { { ACTOR_EN_SW, { -465, 377, -888 }, { 0, 28217, 0 }, -20222 },
             { ACTOR_EN_SW, { 5, 686, -171 }, { 0, -32768, 0 }, -20220 },
-            { ACTOR_EN_SW, { 324, 270, 905 }, { 16384, 0, 0 }, -20216 },
+            { ACTOR_EN_SW, { 324, 252, 900 }, { 16384, 0, 0 }, -20216 },
             { ACTOR_EN_SW, { -602, 120, 1120 }, { 16384, 0, 0 }, -20208 } } },
         // LLR
         { SCENE_LON_LON_RANCH,
