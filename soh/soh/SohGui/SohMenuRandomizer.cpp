@@ -903,6 +903,12 @@ void SohMenu::AddMenuRandomizer() {
         .Options(CheckboxOptions().Tooltip(
             "When shuffling boss souls, they'll appear as a simpler model instead of showing the boss' models."
             "This might make boss souls more distinguishable from a distance, and can help with performance."));
+    AddWidget(path, "Set junked checks as \"Collected\" on save creation.", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_RANDOMIZER_ENHANCEMENT("CollectJunkChecks"))
+        .RaceDisable(false)
+        .Options(CheckboxOptions().Tooltip(
+            "When creating a save, all junked checks will be automatically collected.\n\n"
+            "All junked checks will render as unshuffled, and particles will not be drawn for them."));
     AddWidget(path, "Skip Get Item Animations", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("TimeSavers.SkipGetItemAnimation"))
         .Options(ComboboxOptions().ComboMap(skipGetItemAnimationOptions).DefaultIndex(SGIA_JUNK));

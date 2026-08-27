@@ -692,20 +692,22 @@ extern "C" void Randomizer_InitSaveFile() {
     gSaveContext.ship.quest.data.randomizer.bombchuUpgradeLevel = 0;
 
     // Set flags for excluded locations
-    for (size_t i = 0; i < Rando::Settings::GetInstance()->GetExcludeLocationsOptions().size() - 1; i++) {
-        for (const auto& location : Rando::Settings::GetInstance()->GetExcludeLocationsOptions()[i]) {
-            if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_INCLUDE) {
-                continue;
-            }
+    if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("CollectJunkChecks"), 0)) {
+        for (size_t i = 0; i < Rando::Settings::GetInstance()->GetExcludeLocationsOptions().size() - 1; i++) {
+            for (const auto& location : Rando::Settings::GetInstance()->GetExcludeLocationsOptions()[i]) {
+                if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_INCLUDE) {
+                    continue;
+                }
 
-            if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_EXCLUDE) {
-                RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(
-                    static_cast<RandomizerCheck>(location->GetKey()));
+                if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_EXCLUDE) {
+                    RandomizerInf randInf = OTRGlobals::Instance->gRandomizer->GetRandomizerInfFromCheck(
+                        static_cast<RandomizerCheck>(location->GetKey()));
 
-                if (randInf != RAND_INF_MAX) {        // Shops use RAND_INF_MAX to check if an item is "Sold Out".
-                    Flags_SetRandomizerInf(randInf);  // If we don't add this check, then shop items will be Sold Out
-                }                                     // when ANY check is excluded.
-        }   }
+                    if (randInf != RAND_INF_MAX) {        // Shops use RAND_INF_MAX to check if an item is "Sold Out".
+                        Flags_SetRandomizerInf(randInf);  // If we don't add this check, then shop items will be Sold Out
+                    }                                     // when ANY check is excluded.
+            }   }
+        }
     }
 
     SetStartingItems();
