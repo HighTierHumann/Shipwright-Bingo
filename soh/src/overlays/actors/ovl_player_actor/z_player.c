@@ -5862,12 +5862,11 @@ s32 func_8083AD4C(PlayState* play, Player* this) {
         } else {
             camMode = CAM_MODE_AIM_BOOMERANG;
         }
+        // Check if aiming camera mode should be overridden due to player settings
+        GameInteractor_Should(VB_CHANGE_AIMING_CAMERA, true, &this->heldItemAction, &camMode);
     } else {
         camMode = CAM_MODE_FIRST_PERSON;
     }
-
-    // Check if aiming camera mode should be overridden due to player settings
-    GameInteractor_Should(VB_CHANGE_AIMING_CAMERA, true, &this->heldItemAction, &camMode);
 
     return Camera_ChangeMode(Play_GetCamera(play, CAM_ID_MAIN), camMode);
 }
