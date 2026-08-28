@@ -222,6 +222,7 @@
                 "WidescreenActorCulling": 0
             },
             "gRandoEnhancements": {
+                "CollectJunkChecks": 1,
                 "BottomOfTheWellSign": 28,
                 "DodongosCavernSign": 5,
                 "EntrancesOnSigns": 1,
