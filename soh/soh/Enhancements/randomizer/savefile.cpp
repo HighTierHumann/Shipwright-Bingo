@@ -693,7 +693,7 @@ extern "C" void Randomizer_InitSaveFile() {
 
     // Set flags for excluded locations
     if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("CollectJunkChecks"), 0)) {
-        for (size_t i = 0; i < Rando::Settings::GetInstance()->GetExcludeLocationsOptions().size() - 1; i++) {
+        for (size_t i = 0; i < Rando::Settings::GetInstance()->GetExcludeLocationsOptions().size(); i++) {
             for (const auto& location : Rando::Settings::GetInstance()->GetExcludeLocationsOptions()[i]) {
                 if (ctx->GetLocationOption(static_cast<RandomizerCheck>(location->GetKey())).Get() == RO_LOCATION_INCLUDE) {
                     continue;
