@@ -528,6 +528,8 @@ void SaveManager::Init() {
     }
     saveBlock = nlohmann::json::object();
     OTRGlobals::Instance->gRandoContext->ClearItemLocations();
+    OTRGlobals::Instance->gRandoContext->SetSeedGenerated(false);
+    OTRGlobals::Instance->gRandoContext->SetSpoilerLoaded(false);
 }
 
 void SaveManager::StartupCheckAndInitMeta(int fileNum) {
