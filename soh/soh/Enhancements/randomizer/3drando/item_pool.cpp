@@ -229,13 +229,13 @@ void GenerateItemPool() {
                                             std::max(0, 2 + infiniteProgressive - startBombBag),
                                             std::max(0, 1 + infiniteProgressive - startBombBag));
     int stickShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_STICK_BAG) ? 1 : 0;
-    int startSticks = ctx->GetOption(RSK_STARTING_STICKS).Get();
+    int startSticks = std::max(0, ctx->GetOption(RSK_STARTING_STICKS).Get() - 1);
     AddItemToPool(RG_PROGRESSIVE_STICK_UPGRADE, std::max(0, 3 + infiniteProgressive + stickShuffle - startSticks),
                                                 std::max(0, 2 + infiniteProgressive + stickShuffle - startSticks),
                                                 std::max(0, 1 + infiniteProgressive + stickShuffle - startSticks),
                                                 std::max(0, 1 + infiniteProgressive + stickShuffle - startSticks));
     int nutShuffle = ctx->GetOption(RSK_SHUFFLE_DEKU_NUT_BAG) ? 1 : 0;
-    int startNuts = ctx->GetOption(RSK_STARTING_NUTS).Get();
+    int startNuts = std::max(ctx->GetOption(RSK_STARTING_NUTS).Get() - 1);
     AddItemToPool(RG_PROGRESSIVE_NUT_UPGRADE,   std::max(0, 3 + infiniteProgressive + nutShuffle - startNuts),
                                                 std::max(0, 2 + infiniteProgressive + nutShuffle - startNuts),
                                                 std::max(0, 1 + infiniteProgressive + nutShuffle - startNuts),
