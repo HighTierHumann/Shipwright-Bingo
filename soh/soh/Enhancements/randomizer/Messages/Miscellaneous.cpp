@@ -74,6 +74,8 @@ void BuildSkwimbleMessage(uint16_t* textId, bool* loadFromMessageTable) {
         msg = CustomMessage("Greetings! My name is %rSkwimble%w.^It appears you have performed %rmy clip%w, well done!",
                             TODO_TRANSLATE,
                             TODO_TRANSLATE);
+    } else {
+        return;
     }
     msg.AutoFormat();
     msg.LoadIntoFont();
