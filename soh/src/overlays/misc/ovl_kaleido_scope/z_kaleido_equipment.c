@@ -194,10 +194,6 @@ void KaleidoScope_DrawEquipment(PlayState* play) {
     bool drawBronzeScale = false;
     bool obtainedBronzeScale = gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale;
 
-    if (Flags_GetRandomizerInf(RAND_INF_CAN_SWIM)) {
-        gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale = true;
-    }
-
     if (CVarGetInteger(CVAR_ENHANCEMENT("ToggleSwim"), 0) && CUR_UPG_VALUE(UPG_SCALE) == 0) {
         drawBronzeScale = true;
     } else if (CUR_UPG_VALUE(UPG_SCALE) != 0) {

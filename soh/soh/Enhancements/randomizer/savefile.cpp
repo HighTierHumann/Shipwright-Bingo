@@ -773,6 +773,7 @@ extern "C" void Randomizer_InitSaveFile() {
 
     if (Randomizer_GetSettingValue(RSK_SHUFFLE_SWIM) == RO_GENERIC_OFF) {
         Flags_SetRandomizerInf(RAND_INF_CAN_SWIM);
+        gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale = true;
     }
 
     if (Randomizer_GetSettingValue(RSK_SHUFFLE_GRAB) == RO_GENERIC_OFF) {

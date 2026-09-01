@@ -1277,6 +1277,9 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
     // if it's an item that just sets a randomizerInf, set it
     if (Rando::StaticData::RandoGetToRandInf.find(item) != Rando::StaticData::RandoGetToRandInf.end()) {
         Flags_SetRandomizerInf((RandomizerInf)Rando::StaticData::RandoGetToRandInf.find(item)->second);
+        if (item == RG_BRONZE_SCALE) {
+            gSaveContext.ship.quest.data.randomizer.obtainedBronzeScale = true;
+        }
         if (item == RG_SKELETON_KEY) {
             Flags_SetRandomizerInf(RAND_INF_HAS_SKELETON_KEY);
             // This isn't technically necessary, because keys will no longer be consumed,
