@@ -448,7 +448,7 @@ bool Item::IsMajorItem() const {
     }
 
     if ((randomizerGet == RG_BOMBCHU_5 || randomizerGet == RG_BOMBCHU_10 || randomizerGet == RG_BOMBCHU_20) &&
-        ctx->GetOption(RSK_BOMBCHU_BAG).IsNot(RO_BOMBCHU_BAG_NONE)) {
+        (ctx->GetOption(RSK_BOMBCHU_BAG).IsNot(RO_BOMBCHU_BAG_NONE) || ctx->GetOption(RSK_ENABLE_BOMBCHU_DROPS).IsNot(RO_GENERIC_OFF))) {
         return false;
     }
 
