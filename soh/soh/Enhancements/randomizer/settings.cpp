@@ -3506,9 +3506,14 @@ void Settings::ParseJson(const nlohmann::json& spoilerFileJson) {
     nlohmann::json jsonExcludedLocations = spoilerFileJson.value("excludedLocations", nlohmann::json());
     const auto ctx = Context::GetInstance();
 
+    std::set<RandomizerCheck> excludedLocations;
     for (auto it = jsonExcludedLocations.begin(); it != jsonExcludedLocations.end(); ++it) {
-        const RandomizerCheck rc = Rando::StaticData::locationNameToEnum[it.value()];
-        ctx->GetItemLocation(rc)->SetExcludedOption(RO_GENERIC_ON);
+        excludedLocations.insert(Rando::StaticData::locationNameToEnum[it.value()]);
+    }
+    
+    // Reset every location first, otherwise exclusions left over from a prior generation/session leak into this one.
+    for (const auto locationKey : ctx->everyPossibleLocation) {
+        ctx->GetItemLocation(locationKey)->SetExcludedOption(excludedLocations.contains(locationKey) ? RO_GENERIC_ON : RO_GENERIC_OFF);
     }
 
     nlohmann::json enabledTricksJson = spoilerFileJson.value("enabledTricks", nlohmann::json());
