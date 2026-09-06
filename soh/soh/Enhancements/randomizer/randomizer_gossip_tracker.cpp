@@ -162,6 +162,7 @@ std::unordered_map<RandomizerHint, HintAreaInfo> hintMetadata = {
     { RH_STORMS_HINT, { RCAREA_KAKARIKO_VILLAGE, TYPE_ITEM, RSK_STORMS_HINT, HINT_TRACKER_ITEM(QUEST_SONG_STORMS) } },
     { RH_EPONAS_HINT, { RCAREA_LON_LON_RANCH, TYPE_ITEM, RSK_EPONAS_HINT, HINT_TRACKER_ITEM(QUEST_SONG_EPONA) } },
     { RH_LULLABY_HINT, { RCAREA_HYRULE_CASTLE, TYPE_ITEM, RSK_LULLABY_HINT, HINT_TRACKER_ITEM(QUEST_SONG_LULLABY) } },
+    { RH_SONG_OF_TIME_HINT, { RCAREA_INVALID, TYPE_ITEM, RSK_SONG_OF_TIME_HINT, HINT_TRACKER_ITEM(QUEST_SONG_TIME) } },
     { RH_GREG_RUPEE, { RCAREA_MARKET, TYPE_ITEM, RSK_GREG_HINT, HINT_TRACKER_ITEM(ITEM_RUPEE_GREEN) } },
     { RH_DAMPES_DIARY, { RCAREA_GRAVEYARD, TYPE_ITEM, RSK_DAMPES_DIARY_HINT, HINT_TRACKER_ITEM(ITEM_HOOKSHOT) } },
     { RH_SCALE_HINT, { RCAREA_ZORAS_DOMAIN, TYPE_ITEM, RSK_SCALE_HINT, HINT_TRACKER_ITEM(ITEM_SCALE_SILVER) } },
@@ -227,7 +228,8 @@ void InitHintTrackingData() {
         HintEntry e;
         e.hintKey = hint;
         e.name = Rando::StaticData::hintNames.at(hint).GetForCurrentLanguage(MF_CLEAN);
-        e.areaName = RandomizerCheckObjects::GetRCAreaName(info.area);
+        // Using invalid as a 'can be gotten anywhere' marker.
+        e.areaName = (info.area != RCAREA_INVALID) ? RandomizerCheckObjects::GetRCAreaName(info.area) : "Acquired in multiple areas";
         e.revealed = IsHintDiscovered(static_cast<s16>(hint));
         e.iconTexture = info.trackerItemIcon.name;
         e.iconTextureFaded = info.trackerItemIcon.nameFaded;
@@ -235,6 +237,12 @@ void InitHintTrackingData() {
             cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW, 2);
         } else {
             cleanMsg = OTRGlobals::Instance->gRandoContext->GetHint(hint)->GetHintMessage(MF_RAW);
+        }
+
+        if (hint == RH_SHEIK_HINT && ctx->GetOption(RSK_MEDALLION_LOCKED_TRIALS)) {
+            CustomMessage medallionHint("^He also mentioned that you need %g[[d]] medallions %wto unlock every trial...");
+            medallionHint.InsertNumber(RAND_GET_OPTION(RSK_MEDALLION_LOCKED_TRIALS_THRESHOLD).Get() + 1);
+            cleanMsg += medallionHint;
         }
 
         if (hint == RH_LW_GOSSIP_STONE && ctx->GetOption(RSK_OCARINA_HINT)) {
@@ -365,7 +373,6 @@ static std::vector<HintColorSegment> ParseHintColorSegments(const std::string& t
     return segments;
 }
 
-// TODO figure out how to parse altar icons and return icon
 static std::vector<AltarIconSegment> ParseAltarIconSegments(const std::string& text) {
     std::vector<AltarIconSegment> segments;
     std::string current;

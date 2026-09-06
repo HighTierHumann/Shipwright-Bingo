@@ -63,8 +63,12 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
         case SCENE_INSIDE_GANONS_CASTLE:
-            if (RAND_GET_OPTION(RSK_SHEIK_LA_HINT) && INV_CONTENT(ITEM_ARROW_LIGHT) != ITEM_ARROW_LIGHT) {
+            if (RAND_GET_OPTION(RSK_SHEIK_LA_HINT) && !RAND_GET_OPTION(RSK_MEDALLION_LOCKED_TRIALS) && INV_CONTENT(ITEM_ARROW_LIGHT) != ITEM_ARROW_LIGHT) {
                 msg = RAND_GET_HINT(RH_SHEIK_HINT)->GetHintMessage(MF_RAW);
+            } else if (RAND_GET_OPTION(RSK_SHEIK_LA_HINT) && RAND_GET_OPTION(RSK_MEDALLION_LOCKED_TRIALS) && INV_CONTENT(ITEM_ARROW_LIGHT) != ITEM_ARROW_LIGHT) {
+                CustomMessage medallionHint("^He also mentioned that you need %g[[d]] medallions %wto unlock every trial...");
+                medallionHint.InsertNumber(RAND_GET_OPTION(RSK_MEDALLION_LOCKED_TRIALS_THRESHOLD).Get() + 1);
+                msg = RAND_GET_HINT(RH_SHEIK_HINT)->GetHintMessage(MF_RAW) + medallionHint;
             } else if (!(CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER) &&
                          INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT && CUR_CAPACITY(UPG_QUIVER) >= 30 &&
                          gSaveContext.isMagicAcquired)) {
@@ -94,6 +98,7 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
             }
             break;
     }
+    HintTracker::RevealHint(RH_SHEIK_HINT);
     msg.AutoFormat();
     msg.LoadIntoFont();
     *loadFromMessageTable = false;
@@ -457,6 +462,13 @@ void BuildBossKeyHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     }
 }
 
+void BuildSongOfTimeHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    CustomMessage msg = RAND_GET_HINT(RH_SONG_OF_TIME_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+    HintTracker::RevealHint(RH_SONG_OF_TIME_HINT);
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
 void RegisterStaticHints() {
     // Ganondorf
     COND_ID_HOOK(OnOpenText, TEXT_GANONDORF, RAND_GET_OPTION(RSK_GANONDORF_HINT), BuildGanondorfHint);
@@ -579,6 +591,9 @@ void RegisterStaticHints() {
     COND_ID_HOOK(OnOpenText, TEXT_WINDMILL_GUY_AROUND_AND_AROUND, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
     // Oasis Song of Storms Hint
     // COND_ID_HOOK(OnOpenText, TEXT_COLOSSUS_OASIS_NAVI, RAND_GET_OPTION(RSK_STORMS_HINT), BuildStormsHintMessage);
+    // Song of Time Block Hint
+    COND_ID_HOOK(OnOpenText, TEXT_NAVI_SONG_OF_TIME_HINT, RAND_GET_OPTION(RSK_SONG_OF_TIME_HINT), BuildSongOfTimeHintMessage);
+    COND_ID_HOOK(OnOpenText, TEXT_NAVI_HEY_ISNT_THAT_THE_SAME_DESIGN, RAND_GET_OPTION(RSK_SONG_OF_TIME_HINT), BuildSongOfTimeHintMessage);
     // Child Malon
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_FOND, RAND_GET_OPTION(RSK_EPONAS_HINT), BuildChildMalonMessage);
     // Boss C-Up Text

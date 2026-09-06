@@ -60,6 +60,8 @@ extern "C" {
 #include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
 #include "src/overlays/actors/ovl_En_Heishi2/z_en_heishi2.h"
 #include "src/overlays/actors/ovl_En_GirlA/z_en_girla.h"
+#include "src/overlays/actors/ovl_Obj_Timeblock/z_obj_timeblock.h"
+#include "src/overlays/actors/ovl_Elf_Msg2/z_elf_msg2.h"
 #include "draw.h"
 
 static ObjectExtension::Register<DnsItemEntry> RegisterDnsItemEntryOverride;
@@ -2296,13 +2298,31 @@ void EnDns_RandomizerPurchase(EnDns* enDns) {
 void RandomizerOnActorInitHandler(void* actorRef) {
     Actor* actor = static_cast<Actor*>(actorRef);
 
-    if (IS_RANDO && RAND_GET_OPTION(RSK_STORMS_HINT)) {
-        switch (gPlayState->sceneNum) {
-            case SCENE_DESERT_COLOSSUS:
-                if (actor->id == ACTOR_EN_WONDER_TALK2 && actor->params == -1) {
-                    Actor_Delete(&gPlayState->actorCtx, actor, gPlayState);
-                }
-                break;
+    if (IS_RANDO && RAND_GET_OPTION(RSK_SONG_OF_TIME_HINT) && actor->id == ACTOR_OBJ_TIMEBLOCK) {
+        ObjTimeblock* sotActor = reinterpret_cast<ObjTimeblock*>(actor);
+        ElfMsg2* elfMsg2 = reinterpret_cast<ElfMsg2*>(actor);
+        if ((sotActor->isVisible || !sotActor->isVisible && LINK_AGE_ADULT) && !CHECK_QUEST_ITEM(QUEST_SONG_TIME)) { // Dont spawn after SoT acquired
+            switch (gPlayState->sceneNum) {
+                 // These scenes already have an En_Elf_Mgs2 we can utilize
+                case SCENE_WINDMILL_AND_DAMPES_GRAVE:
+                    break;
+                case SCENE_FOREST_TEMPLE:
+                    break;
+                case SCENE_WATER_TEMPLE:
+                    break;
+                case SCENE_INSIDE_GANONS_CASTLE:
+                    Actor_SpawnAsChild(&gPlayState->actorCtx, &sotActor->dyna.actor, gPlayState, ACTOR_ELF_MSG2,
+                                sotActor->dyna.actor.world.pos.x, sotActor->dyna.actor.world.pos.y + 120.0f,
+                                sotActor->dyna.actor.world.pos.z, 0, 0, 1,
+                                static_cast<int16_t>(TEXT_NAVI_SONG_OF_TIME_HINT));
+                    break;
+                default:
+                    Actor_SpawnAsChild(&gPlayState->actorCtx, &sotActor->dyna.actor, gPlayState, ACTOR_ELF_MSG2,
+                                sotActor->dyna.actor.world.pos.x, sotActor->dyna.actor.world.pos.y + 60.0f,
+                                sotActor->dyna.actor.world.pos.z + 80.0f, 0, 0, 1,
+                                static_cast<int16_t>(TEXT_NAVI_SONG_OF_TIME_HINT));
+                    break;
+            }
         }
     }
 

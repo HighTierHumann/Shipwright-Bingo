@@ -2369,6 +2369,9 @@ void StaticData::HintTable_Init() {
     hintTextTable[RHT_EPONAS_HINT] = HintText(CustomMessage("Epona is really fond of you! She might let you ride her around if you learn %gher song %win %r[[1]]%w!",
                                                                TODO_TRANSLATE,
                                                                TODO_TRANSLATE));
+    hintTextTable[RHT_SONG_OF_TIME_HINT] = HintText(CustomMessage("%c@! I can hear Rauru's guidance! He's saying the %gSong of Time%c is in %w[[1]]%c!",
+                                                               TODO_TRANSLATE,
+                                                               TODO_TRANSLATE));
 
     /*--------------------------
     |    Static Entrance Hint   |

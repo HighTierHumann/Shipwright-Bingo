@@ -866,6 +866,8 @@ void Settings::CreateOptionDescriptions() {
         "Talking to the man in the Windmill as child will reveal the location of the Song of Storms.";
     mOptionDescriptions[RSK_EPONAS_HINT] =
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
+    mOptionDescriptions[RSK_SONG_OF_TIME_HINT] =
+        "Navi will tell you where to find the Song of Time when prompted from targeting a visible Song of Time block.";
     // end
     mOptionDescriptions[RSK_FULL_WALLETS] = "Start with a full wallet. All wallet upgrades come filled with rupees.";
     mOptionDescriptions[RSK_BOMBCHU_BAG] =
