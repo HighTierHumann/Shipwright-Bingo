@@ -902,6 +902,8 @@ void Settings::CreateOptionDescriptions() {
         "Item placement logic will respect this option, so it might be required to use this to progress.";
     mOptionDescriptions[RSK_SKELETON_KEY] =
         "Adds a new item called the \"Skeleton Key\", it unlocks every dungeon door locked by a small key.";
+    mOptionDescriptions[RSK_SKELETON_BOSS_KEY] =
+        "Adds a new item called the \"Skeleton Boss Key\", it unlocks every boss door.";
     mOptionDescriptions[RSK_SUNLIGHT_ARROWS] =
         "Light Arrows can be used to light up the sun switches instead of using the Mirror Shield. "
         "Item placement logic will respect this option, so it might be required to use this to progress.";

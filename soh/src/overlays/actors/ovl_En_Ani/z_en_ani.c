@@ -91,6 +91,10 @@ void EnAni_Init(Actor* thisx, PlayState* play) {
     this->unk_2A8 = 0;
     this->actor.minVelocityY = -1.0f;
     this->actor.velocity.y = -1.0f;
+
+    if (gPlayState->sceneNum == SCENE_BOTTOM_OF_THE_WELL) {
+        this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
+    }
 }
 
 void EnAni_Destroy(Actor* thisx, PlayState* play) {

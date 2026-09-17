@@ -1539,6 +1539,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_ROCS_FEATHER, "Roc's Feather", CVAR_RANDOMIZER_SETTING("RocsFeather"), mOptionDescriptions[RSK_ROCS_FEATHER]);
     OPT_U8(RSK_INFINITE_UPGRADES, "Infinite Upgrades", {"Off", "Progressive", "Condensed Progressive"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("InfiniteUpgrades"), mOptionDescriptions[RSK_INFINITE_UPGRADES]);
     OPT_BOOL(RSK_SKELETON_KEY, "Skeleton Key", CVAR_RANDOMIZER_SETTING("SkeletonKey"), mOptionDescriptions[RSK_SKELETON_KEY]);
+    OPT_BOOL(RSK_SKELETON_BOSS_KEY, "Skeleton Boss Key", CVAR_RANDOMIZER_SETTING("SkeletonBossKey"), mOptionDescriptions[RSK_SKELETON_BOSS_KEY]);
     OPT_BOOL(RSK_SLINGBOW_BREAK_BEEHIVES, "Slingshot/Bow Can Break Beehives", CVAR_RANDOMIZER_SETTING("SlingBowBeehives"), mOptionDescriptions[RSK_SLINGBOW_BREAK_BEEHIVES]);
     OPT_U8(RSK_ITEM_POOL, "Item Pool", {"Plentiful", "Balanced", "Scarce", "Minimal"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ItemPool"), mOptionDescriptions[RSK_ITEM_POOL], WIDGET_CVAR_COMBOBOX, RO_ITEM_POOL_BALANCED);
     OPT_BOOL(RSK_BASE_ICE_TRAPS, "Base Ice Traps", CVAR_RANDOMIZER_SETTING("BaseIceTraps"), mOptionDescriptions[RSK_BASE_ICE_TRAPS], IMFLAG_NONE, WIDGET_CVAR_COMBOBOX, RO_GENERIC_ON);
@@ -2358,6 +2359,7 @@ void Settings::CreateOptions() {
                                                                                  &mOptions[RSK_ENABLE_BOMBCHU_DROPS],
                                                                                  &mOptions[RSK_INFINITE_UPGRADES],
                                                                                  &mOptions[RSK_SKELETON_KEY],
+                                                                                 &mOptions[RSK_SKELETON_BOSS_KEY],
                                                                              },
                                                                              WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_ADDITIONAL_ITEMS] =
@@ -2781,6 +2783,7 @@ void Settings::CreateOptions() {
                                               &mOptions[RSK_SUNLIGHT_ARROWS],
                                               &mOptions[RSK_INFINITE_UPGRADES],
                                               &mOptions[RSK_SKELETON_KEY],
+                                              &mOptions[RSK_SKELETON_BOSS_KEY],
                                               &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                           });
     mOptionGroups[RSG_ITEM_POOL] =
@@ -3489,6 +3492,10 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
 
     if (mOptions[RSK_STARTING_SONG_OF_STORMS]) {
         mOptions[RSK_STORMS_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_SONG_OF_TIME]) {
+        mOptions[RSK_SONG_OF_TIME_HINT].Set(RO_GENERIC_OFF);
     }
 }
 

@@ -2788,6 +2788,15 @@ void RandomizerOnActorUpdateHandler(void* refActor) {
         }
     }
 
+    if (Flags_GetRandomizerInf(RAND_INF_HAS_SKELETON_BOSS_KEY)) {
+        if (actor->id == ACTOR_DOOR_SHUTTER) {
+            DoorShutter* shutterDoor = reinterpret_cast<DoorShutter*>(actor);
+            if (shutterDoor->doorType == SHUTTER_BOSS) {
+                shutterDoor->unlockTimer = 0;
+            }
+        }
+    }
+
     if (actor->id == ACTOR_BG_JYA_BIGMIRROR) {
         auto jyaBigMirror = reinterpret_cast<BgJyaBigmirror*>(actor);
         if ((jyaBigMirror->puzzleFlags & (BIGMIR_PUZZLE_COBRA1_SOLVED | BIGMIR_PUZZLE_COBRA2_SOLVED)) ==
