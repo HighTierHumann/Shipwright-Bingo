@@ -1576,6 +1576,13 @@ void Settings::CreateOptions() {
     });
     OPT_BOOL(RSK_STARTING_BEANS, "Start with Magic Beans", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBeans"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_BOOL(RSK_INDIVIDUAL_BEANS, "Reworked Magic Beans", CVAR_RANDOMIZER_SETTING("IndividualBeans"), mOptionDescriptions[RSK_INDIVIDUAL_BEANS]);
+    OPT_CALLBACK(RSK_INDIVIDUAL_BEANS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("IndividualBeans"), 1) == 1) {
+            mOptions[RSK_SKIP_PLANTING_BEANS].Disable("Magic Beans Rework is not currently compatible with Skip Planting Beans.");
+        } else {
+            mOptions[RSK_SKIP_PLANTING_BEANS].Enable();
+        }
+    });
     OPT_CALLBACK(RSK_SHUFFLE_MERCHANTS, {
         if ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_OFF) ||
             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_ALL_BUT_BEANS)) {

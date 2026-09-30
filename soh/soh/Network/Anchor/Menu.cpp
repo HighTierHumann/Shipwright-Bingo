@@ -162,7 +162,7 @@ void AnchorMainMenu(WidgetInfo& info) {
         "Show Name Tags in Global Room", CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"),
         UIWidgets::CheckboxOptions()
             .Color(THEME_COLOR)
-            .DefaultValue(true)
+            .DefaultValue(false)
             .Tooltip(isGlobalRoom
                          ? "Other players' name tags will be visible in the global room. There is no censorship, "
                            "so enable at your own risk! We are not responsible for any inappropriate names you may encounter."
@@ -176,7 +176,7 @@ void AnchorMainMenu(WidgetInfo& info) {
         "Show Global Room Player Locations", CVAR_REMOTE_ANCHOR("ShowGlobalLocations"),
         UIWidgets::CheckboxOptions()
             .Color(THEME_COLOR)
-            .DefaultValue(true)
+            .DefaultValue(false)
             .Tooltip(CVarGetInteger(CVAR_REMOTE_ANCHOR("ShowNameTagsInGlobalRoom"), 0)
                          ? "Other players' locations will be visible in the global room."
                          : "Option disabled because Global Room nametags are disabled."));
