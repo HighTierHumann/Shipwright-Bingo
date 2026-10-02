@@ -6664,11 +6664,19 @@ void Interface_Update(PlayState* play) {
 
     HealthMeter_HandleCriticalAlarm(play);
     sEnvHazard = Player_GetEnvironmentalHazard(play);
+    bool isZoraHeatedRoom = GameInteractor_Should(VB_ZORA_HAZARD_ROOM, false);
 
     if (sEnvHazard == PLAYER_ENV_HAZARD_HOTROOM) {
-        if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) == EQUIP_VALUE_TUNIC_GORON ||
-            CVarGetInteger(CVAR_CHEAT("SuperTunic"), 0) != 0) {
-            sEnvHazard = PLAYER_ENV_HAZARD_NONE;
+        if (isZoraHeatedRoom) {
+            if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) == EQUIP_VALUE_TUNIC_ZORA ||
+                CVarGetInteger(CVAR_CHEAT("SuperTunic"), 0) != 0) {
+                sEnvHazard = PLAYER_ENV_HAZARD_NONE;
+            }
+        } else {
+            if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) == EQUIP_VALUE_TUNIC_GORON ||
+                CVarGetInteger(CVAR_CHEAT("SuperTunic"), 0) != 0) {
+                sEnvHazard = PLAYER_ENV_HAZARD_NONE;
+            }
         }
     } else if ((Player_GetEnvironmentalHazard(play) >= 2) && (Player_GetEnvironmentalHazard(play) < 5)) {
         if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) == EQUIP_VALUE_TUNIC_ZORA ||

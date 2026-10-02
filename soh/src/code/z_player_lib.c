@@ -467,8 +467,8 @@ void Player_SetBootData(PlayState* play, Player* this) {
         if (this->stateFlags1 & PLAYER_STATE1_IN_WATER) {
             currentBoots = PLAYER_BOOTS_IRON_UNDERWATER;
         }
-        REG(27) = 500;
-        REG(48) = 100;
+        REG(27) = 500; // Turn speed (affects siderolls/downrolls)
+        REG(48) = 100; // Related to linearVelocity
     }
 
     bootRegs = sBootData[currentBoots];
@@ -478,11 +478,11 @@ void Player_SetBootData(PlayState* play, Player* this) {
     REG(34) = bootRegs[3];
     REG(35) = bootRegs[4];
     REG(36) = bootRegs[5];
-    REG(37) = bootRegs[6];
-    REG(38) = bootRegs[7];
+    REG(37) = bootRegs[6]; // ??
+    REG(38) = bootRegs[7]; // Animation Speed
     REG(43) = bootRegs[8];
-    REG(45) = bootRegs[9];
-    REG(68) = bootRegs[10];
+    REG(45) = bootRegs[9]; // Max speed
+    REG(68) = bootRegs[10]; // Gravity
     REG(69) = bootRegs[11];
     IREG(66) = bootRegs[12];
     IREG(67) = bootRegs[13];

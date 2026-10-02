@@ -1474,6 +1474,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // false
+    // ```
+    // #### `args`
+    // - None
+    VB_ZORA_HAZARD_ROOM,
+
+    // #### `result`
+    // ```c
     // true
     // ```
     // #### `args`

@@ -6,6 +6,7 @@
 #include "../entrance.h"
 #include "../trial.h"
 #include "../ShuffleSilverRupees.h"
+#include "../ShuffleHeatedRooms.h"
 #include "pool_functions.hpp"
 #include "soh/Enhancements/randomizer/randomizer_entrance_tracker.h"
 #include <nlohmann/json.hpp>
@@ -446,6 +447,7 @@ void SpoilerLog_Write() {
     WriteEnabledTricks();
     WriteMasterQuestDungeons();
     WriteShuffledSilverRupees();
+    ShuffleHeatedRooms_WriteSpoilerLog(jsonData);
     WriteChosenOptions();
     WritePlaythrough();
 

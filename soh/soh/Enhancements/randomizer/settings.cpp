@@ -896,6 +896,15 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_SHUFFLE_ICICLES, "Shuffle Icicles", CVAR_RANDOMIZER_SETTING("ShuffleIcicles"), mOptionDescriptions[RSK_SHUFFLE_ICICLES]);
     OPT_BOOL(RSK_SHUFFLE_RED_ICE, "Shuffle Red Ice", CVAR_RANDOMIZER_SETTING("ShuffleRedIce"), mOptionDescriptions[RSK_SHUFFLE_RED_ICE]);
     OPT_U8(RSK_SHUFFLE_SIGNS, "Shuffle Signs", {"Off", "Dungeons", "Overworld", "All Signs"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSigns"), mOptionDescriptions[RSK_SHUFFLE_SIGNS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_SIGNS_OFF);
+    OPT_U8(RSK_ADDITIONAL_HEATED_ROOMS, "Additional Heated Rooms to Shuffle", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AdditionalHeatedRooms"), mOptionDescriptions[RSK_ADDITIONAL_HEATED_ROOMS], WIDGET_CVAR_SLIDER_INT, 0, true);
+    OPT_U8(RSK_SHUFFLE_HEATED_ROOMS, "Shuffle Heated Rooms", {"Off", "Dungeons Only", "Overworld Only", "Any Rooms"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleHeatedRooms"), mOptionDescriptions[RSK_SHUFFLE_HEATED_ROOMS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_HEATED_ROOMS_OFF);
+    OPT_CALLBACK(RSK_SHUFFLE_HEATED_ROOMS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleHeatedRooms"), RO_GENERIC_OFF)) {
+            mOptions[RSK_ADDITIONAL_HEATED_ROOMS].Unhide();
+        } else {
+            mOptions[RSK_ADDITIONAL_HEATED_ROOMS].Hide();
+        }
+    });
     OPT_BOOL(RSK_SHUFFLE_FISHING_POLE, "Shuffle Fishing Pole", CVAR_RANDOMIZER_SETTING("ShuffleFishingPole"), mOptionDescriptions[RSK_SHUFFLE_FISHING_POLE]);
     OPT_CALLBACK(RSK_SHUFFLE_FISHING_POLE, {
         // Disable fishing pole hint if the fishing pole is not shuffled
@@ -2290,6 +2299,8 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SHUFFLE_ICICLES],
                                   &mOptions[RSK_SHUFFLE_RED_ICE],
                                   &mOptions[RSK_SHUFFLE_SIGNS],
+                                  &mOptions[RSK_SHUFFLE_HEATED_ROOMS],
+                                  &mOptions[RSK_ADDITIONAL_HEATED_ROOMS],
                                   &mOptions[RSK_SHUFFLE_FROG_SONG_RUPEES],
                                   &mOptions[RSK_SHUFFLE_ADULT_TRADE],
                                   &mOptions[RSK_SHUFFLE_100_GS_REWARD],
@@ -2594,6 +2605,8 @@ void Settings::CreateOptions() {
                                             &mOptions[RSK_SHUFFLE_ICICLES],
                                             &mOptions[RSK_SHUFFLE_RED_ICE],
                                             &mOptions[RSK_SHUFFLE_SIGNS],
+                                            &mOptions[RSK_SHUFFLE_HEATED_ROOMS],
+                                            &mOptions[RSK_ADDITIONAL_HEATED_ROOMS],
                                             &mOptions[RSK_SHUFFLE_KOKIRI_SWORD],
                                             &mOptions[RSK_SHUFFLE_OCARINA],
                                             &mOptions[RSK_SHUFFLE_OCARINA_BUTTONS],
