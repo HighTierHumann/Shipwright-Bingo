@@ -1885,14 +1885,15 @@ void SohMenu::AddMenuEnhancements() {
             "Oh no! Link sprained his leg while adventuring and is now mildly inconvenienced!\n\n"
             "Link will move at the same speed as Iron Boots, but his overall agility and ability to "
             "downroll and sideroll will be unaffected!\n\n"
-            "Oooooohhhh nooooooooo!!!"));
+            "Oooooohhhh nooooooooo!!!\n\n"
+            "Note: Some glitches may not be possible while enabled. Most should work as normal, however."));
     AddWidget(path, "Enable the Screams of the Damned", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("ScreamsOfTheDamned"))
         .PreFunc([](WidgetInfo& info) {
             info.options->disabled = !CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0);
         })
         .Options(CheckboxOptions().Tooltip(
-            "Stepping with Link's left leg causes him pure agony.\n\nYou will regret this."));
+            "Stepping with Link's bum leg makes him yell.\n\nYou will regret this."));
     AddWidget(path, "Hurt Container Mode", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("HurtContainer"))
         .Options(CheckboxOptions().Tooltip("Changes Heart Piece and Heart Container functionality.\n\n"

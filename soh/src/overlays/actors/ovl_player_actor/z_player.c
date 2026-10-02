@@ -1766,14 +1766,7 @@ void Player_PlaySteppingSfx(Player* this, f32 pitchAdjustment) {
     }
 
     func_800F4010(&this->actor.projectedPos, sfxId, pitchAdjustment);
-    if (CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0) && CVarGetInteger(CVAR_ENHANCEMENT("ScreamsOfTheDamned"), 0)) {
-        static int leftFoot = 1;
-        leftFoot++;
 
-        if (leftFoot % 2 != 0) {
-            func_800F4010(&this->actor.projectedPos, NA_SE_VO_LI_FALL_L, pitchAdjustment);
-        }
-    }
     // Gameplay stats: Count footsteps
     // Only count while game isn't complete and don't count Link's idle animations or crawling in crawlspaces
     if (!gSaveContext.ship.stats.gameComplete && !(this->stateFlags2 & PLAYER_STATE2_IDLE_FIDGET) &&
