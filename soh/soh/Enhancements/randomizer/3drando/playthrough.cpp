@@ -10,7 +10,7 @@
 #include "soh/cvar_prefixes.h"
 #include "../option.h"
 #include "soh/Enhancements/debugger/performanceTimer.h"
-#include "soh/Enhancements/randomizer/ShuffleHeatedRooms.h"
+#include "soh/Enhancements/randomizer/ShuffleHazardRooms.h"
 
 namespace Playthrough {
 
@@ -71,7 +71,7 @@ int Playthrough_Init(uint32_t seed, std::set<RandomizerCheck> excludedLocations,
     }
 
     // Cosmetic/non-logic seed-deterministic assignments, safe to randomize after the fill succeeds.
-    ShuffleHeatedRooms_GenerateHeatedRooms();
+    ShuffleRoomHazards_GenerateHazardRooms();
 
     // GenerateHash();
     GenerateLocationBasedHash();

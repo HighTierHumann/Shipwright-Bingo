@@ -927,9 +927,12 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_SHUFFLE_BOSS_SOULS] =
         "Shuffles 8 boss souls (one for each blue warp dungeon). A boss will not appear until you collect its "
         "respective soul.";
-    mOptionDescriptions[RSK_SHUFFLE_HEATED_ROOMS] =
-        "Shuffles heated rooms throughout the game.\n\n"
-        "Depending on the setting, you may restrict heated rooms to dungeons only, overworld only, or anywhere.\n\n"
-        "Without adding additional heated rooms, only the amount of heated rooms present in the vanilla game will be shuffled.";
+    mOptionDescriptions[RSK_SHUFFLE_HAZARD_ROOMS] =
+        "Shuffles hazard rooms throughout the game.\n\n"
+        "Hazard rooms are rooms that either require the Goron or Zora Tunic to survive prolonged periods of time in, indicated by the environmental fog of the room. "
+        "Do note that a \"room\" is the different parts of a scene that can be loaded; for example, the lower and upper halves "
+        "of Zora's River are technically two \"rooms\" separated by a loading zone.\n\n"
+        "Depending on the setting, you may restrict hazard rooms to dungeons only, overworld only, or anywhere in the game.\n\n"
+        "Without adding additional hazard rooms, only the 7 heated rooms present in the vanilla game will be shuffled.";
 }
 } // namespace Rando

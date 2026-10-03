@@ -925,8 +925,11 @@ s32 Player_GetEnvironmentalHazard(PlayState* play) {
     Player* this = GET_PLAYER(play);
     TextTriggerEntry* triggerEntry;
     s32 envHazard;
+    bool isZoraRoom = GameInteractor_Should(VB_ZORA_HAZARD_ROOM, false);
 
-    if (play->roomCtx.curRoom.behaviorType2 == ROOM_BEHAVIOR_TYPE2_3) { // Room is hot
+    if (isZoraRoom) {
+        return PLAYER_ENV_HAZARD_UNDERWATER_FLOOR; // Used for environment hazard shuffle
+    } else if (play->roomCtx.curRoom.behaviorType2 == ROOM_BEHAVIOR_TYPE2_3) { // Room is hot
         envHazard = PLAYER_ENV_HAZARD_HOTROOM - 1;
     } else if ((this->underwaterTimer > 80) &&
                ((this->currentBoots == PLAYER_BOOTS_IRON) || (this->underwaterTimer >= 300))) { // Deep underwater

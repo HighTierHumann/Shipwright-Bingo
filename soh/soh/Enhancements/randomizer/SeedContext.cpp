@@ -9,7 +9,7 @@
 #include "rando_hash.h"
 #include "fishsanity.h"
 #include "ShuffleSilverRupees.h"
-#include "ShuffleHeatedRooms.h"
+#include "ShuffleHazardRooms.h"
 #include "macros.h"
 #include "3drando/hints.hpp"
 #include "soh/util.h"
@@ -420,7 +420,7 @@ void Context::ParseSpoiler(const char* spoilerFileName) {
         mDungeons->ParseJson(spoilerFileJson);
         mTrials->ParseJson(spoilerFileJson);
         mSilverRupeeAreas->ParseJson(spoilerFileJson);
-        ShuffleHeatedRooms_ParseSpoilerLog(spoilerFileJson);
+        ShuffleRoomHazards_ParseSpoilerLog(spoilerFileJson);
         mSpoilerLoaded = true;
         mSeedGenerated = false;
     } catch (...) { LUSLOG_ERROR("Failed to load Spoiler File: %s", spoilerFileName); }

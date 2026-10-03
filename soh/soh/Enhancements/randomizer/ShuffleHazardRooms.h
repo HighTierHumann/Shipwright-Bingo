@@ -4,7 +4,7 @@
 
 // Builds the seed-deterministic set of rooms that should deal heat damage this seed.
 // Must be called once per seed generation, after the RNG has been seeded with the seed hash.
-void ShuffleHeatedRooms_GenerateHeatedRooms();
-void ShuffleHeatedRooms_WriteSpoilerLog(nlohmann::ordered_json& spoilerFileJson);
-void ShuffleHeatedRooms_ParseSpoilerLog(const nlohmann::json& spoilerFileJson);
+void ShuffleRoomHazards_GenerateHazardRooms();
+void ShuffleRoomHazards_WriteSpoilerLog(nlohmann::ordered_json& spoilerFileJson);
+void ShuffleRoomHazards_ParseSpoilerLog(const nlohmann::json& spoilerFileJson);
 
