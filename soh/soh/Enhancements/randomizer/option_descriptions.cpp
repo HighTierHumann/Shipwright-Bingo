@@ -933,6 +933,7 @@ void Settings::CreateOptionDescriptions() {
         "Do note that a \"room\" is the different parts of a scene that can be loaded; for example, the lower and upper halves "
         "of Zora's River are technically two \"rooms\" separated by a loading zone.\n\n"
         "Depending on the setting, you may restrict hazard rooms to dungeons only, overworld only, or anywhere in the game.\n\n"
-        "Without adding additional hazard rooms, only the 7 heated rooms present in the vanilla game will be shuffled.";
+        "Without adding additional hazard rooms, only the 7 heated rooms present in the vanilla game will be shuffled. Additionally, Child will be "
+        "able to equip tunics to avoid situations where progression is Child-only, but would be blocked by hazard rooms.";
 }
 } // namespace Rando

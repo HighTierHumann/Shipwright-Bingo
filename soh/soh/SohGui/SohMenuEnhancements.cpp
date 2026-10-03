@@ -927,6 +927,9 @@ void SohMenu::AddMenuEnhancements() {
     AddWidget(path, "Ask to Equip New Items", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("AskToEquip"))
         .Options(CheckboxOptions().Tooltip("Adds a prompt to equip newly-obtained Swords, Shields, and Tunics."));
+    AddWidget(path, "Double Defense affects Environment Timers", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("DDAffectsTimers"))
+        .Options(CheckboxOptions().Tooltip("Double Defense will double the duration of environmental hazard timers."));
 
     AddWidget(path, "Ocarina", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Prevent Dropped Ocarina Inputs", WIDGET_CVAR_CHECKBOX)

@@ -152,12 +152,15 @@ void ShuffleRoomHazards_GenerateHazardRooms() {
     // with vanilla heat removed from all of them until reassigned below.
     std::vector<std::pair<int16_t, int8_t>> eligibleRooms;
     for (const auto& [scene, roomCount] : kSceneRoomCounts) {
-        const bool isDungeon = IsDungeonScene(scene);
+        const bool isDungeon = (scene >= SCENE_DEKU_TREE_BOSS && scene <= SCENE_SHADOW_TEMPLE_BOSS) || IsDungeonScene(scene);
         if ((shuffleSetting.Is(RO_SHUFFLE_HAZARD_ROOMS_DUNGEONS) && !isDungeon) ||
             (shuffleSetting.Is(RO_SHUFFLE_HAZARD_ROOMS_OVERWORLD) && isDungeon)) {
             continue;
         }
         for (int8_t roomNum = 0; roomNum < roomCount; roomNum++) {
+            if (scene >= SCENE_DEKU_TREE_BOSS && scene <= SCENE_SHADOW_TEMPLE_BOSS && roomNum == 0) {
+                continue; // Bosses technically have a room 0x0, but it isn't actually playable
+            }
             eligibleRooms.emplace_back(scene, roomNum);
         }
     }
@@ -173,7 +176,7 @@ void ShuffleRoomHazards_GenerateHazardRooms() {
 
 void ShuffleRoomHazards_WriteSpoilerLog(nlohmann::ordered_json& spoilerFileJson) {
     for (const auto& [scene, roomNum, needZora] : GetHazardRoomSet()) {
-        spoilerFileJson["shuffledHeatedRooms"].push_back({ { "scene", scene }, { "room", roomNum }, { "needZora", needZora } });
+        spoilerFileJson["shuffledHeatedRooms"].push_back({ { "scene", SohUtils::GetSceneName(scene) }, { "room", roomNum }, { "needZora", needZora } });
     }
 }
 
@@ -182,8 +185,27 @@ void ShuffleRoomHazards_ParseSpoilerLog(const nlohmann::json& spoilerFileJson) {
     hazardRooms.clear();
 
     nlohmann::json heatedRoomsJson = spoilerFileJson.value("shuffledHeatedRooms", nlohmann::json::array());
+    Rando::StaticData::locationNameToEnum;
     for (const auto& roomJson : heatedRoomsJson) {
-        hazardRooms.emplace(roomJson.value("scene", static_cast<int16_t>(SCENE_ID_MAX)),
+        int16_t scene;
+
+        const auto& name = roomJson.at("scene").get_ref<const std::string&>();
+        bool found = false;
+
+        for (int32_t id = 0; id < SCENE_ID_MAX; ++id) {
+            if (SohUtils::GetSceneName(id) == name) {
+                scene = static_cast<int16_t>(id);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) { // This should never happen, but should it...
+            LUSLOG_WARN("Unknown scene name in spoiler log (%s).", name.c_str());
+            assert(false);
+        }
+        
+        hazardRooms.emplace(scene,
                             roomJson.value("room", static_cast<int8_t>(0)),
                             roomJson.value("needZora", static_cast<bool>(false)));
     }
@@ -235,6 +257,7 @@ void DrawHazardFog() {
     f32 intensity = 0.2f;
 
     if (player->currentTunic != PLAYER_TUNIC_ZORA && GameInteractor_Should(VB_ZORA_HAZARD_ROOM, false)) {
+        // Fog control taken from Nayru's code (z_magic_dark)
         if (gPlayState->roomCtx.curRoom.behaviorType1 != ROOM_BEHAVIOR_TYPE1_5) {
             intensity = CLAMP_MIN(intensity, 0.0f);
             intensity = CLAMP_MAX(intensity, 1.0f);
