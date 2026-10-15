@@ -97,7 +97,7 @@ uint8_t SuperFairy_RandomizerHoldsItem(ShotSun* spawnFairyActor, PlayState* play
     }
 
     if (!IS_RANDO || Flags_GetRandomizerInf(superFairyIdentity->randomizerInf) ||
-        superFairyIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        superFairyIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(superFairyIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;
@@ -142,7 +142,7 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
     Color_RGBA8 envColor;
 
     const auto superFairyIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(refActor);
-    if (superFairyIdentity == nullptr || (Rando::Context::GetInstance()->GetItemLocation(superFairyIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
+    if (superFairyIdentity == nullptr) {
         return;
     }
 
