@@ -119,6 +119,10 @@ void applyPreset(std::string presetName, std::vector<PresetSection> includeSecti
                     EntranceTracker::LoadFromPreset(
                         info.presetValues["blocks"][blockInfo[i].names[1]]["windows"]["Entrance Tracker"]);
                 }
+                if (info.presetValues["blocks"][blockInfo[i].names[1]]["windows"].contains("Bingo Board")) {
+                    BingoTracker::LoadFromPreset(
+                        info.presetValues["blocks"][blockInfo[i].names[1]]["windows"]["Bingo Board"]);
+                }
             }
             auto section = info.presetValues["blocks"][blockInfo[i].names[1]];
             std::string sectionStrategy = "overwrite";

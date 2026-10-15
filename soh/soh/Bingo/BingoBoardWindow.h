@@ -1,10 +1,10 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <imgui.h>
 #include <ship/window/gui/GuiWindow.h>
 
-namespace SohGui {
-
+namespace BingoTracker {
   class BingoBoardSettingsWindow final : public Ship::GuiWindow {
   public:
     using GuiWindow::GuiWindow;
@@ -24,4 +24,5 @@ class BingoBoardWindow final : public Ship::GuiWindow {
     void UpdateElement() override;
 };
 
-} // namespace SohGui
+void LoadFromPreset(const nlohmann::json& info);
+} // namespace BingoTracker

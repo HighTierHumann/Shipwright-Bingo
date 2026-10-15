@@ -1,5 +1,6 @@
 #include "SohMenu.h"
 #include "SohGui.hpp"
+#include "soh/Bingo/BingoClient.h"
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -27,8 +28,53 @@ void SohMenu::AddMenuBingo() {
     AddMenuEntry("Bingo", CVAR_SETTING("Menu.BingoSidebarSection"));
 
     // General
-    AddSidebarEntry("Bingo", "Login", 3);
+    AddSidebarEntry("Bingo", "Login", 1);
     WidgetPath path = { "Bingo", "Login", SECTION_COLUMN_1 };
+
+    AddWidget(path, "Connect to ShipBingo", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path,
+              "Enter the Game ID of the room you are playing in on shipbingo.zarashane.dev (the number at the end of "
+              "the /play/ URL). The board is read from the site and squares are marked automatically as you "
+              "complete them.\n"
+              "\n"
+              "The site only accepts logged in users. Log in on the site with Discord, then copy the value of its "
+              "\"sb.auth\" cookie (browser DevTools > Application > Cookies > shipbingo.zarashane.dev) into the box "
+              "below. Sessions expire after about 24 hours, so you will need to paste a fresh cookie each day.",
+              WIDGET_TEXT);
+    AddWidget(path, "Game ID & Session", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        ImGui::BeginDisabled(Bingo::Client::Instance().IsActive());
+        ImGui::Text("Game ID");
+        CVarInputString("##BingoGameId", CVAR_BINGO("GameId"),
+                        InputOptions()
+                            .Color(THEME_COLOR)
+                            .PlaceholderText("276")
+                            .Size(ImVec2(ImGui::GetFontSize() * 15, 0))
+                            .LabelPosition(LabelPositions::None));
+        ImGui::Text("Session cookie");
+        CVarInputString("##BingoSessionCookie", CVAR_BINGO("SessionCookie"),
+                        InputOptions()
+                            .Color(THEME_COLOR)
+                            .IsSecret(true)
+                            .Size(ImVec2(ImGui::GetFontSize() * 15, 0))
+                            .LabelPosition(LabelPositions::None));
+        ImGui::EndDisabled();
+    });
+    AddWidget(path, "Connect##Bingo", WIDGET_BUTTON)
+        .PreFunc([](WidgetInfo& info) {
+            info.name = Bingo::Client::Instance().IsActive() ? "Disconnect##Bingo" : "Connect##Bingo";
+        })
+        .Callback([](WidgetInfo& info) {
+            auto& client = Bingo::Client::Instance();
+            if (client.IsActive()) {
+                client.Disconnect();
+                return;
+            }
+            client.Connect(CVarGetString(CVAR_BINGO("GameId"), ""), CVarGetString(CVAR_BINGO("SessionCookie"), ""));
+            Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+        });
+    AddWidget(path, "Not connected", WIDGET_TEXT).PreFunc([](WidgetInfo& info) {
+        info.name = Bingo::Client::Instance().GetSnapshot().status;
+    });
 
     // Bingo Board
     path.sidebarName = "Bingo Board";
@@ -44,7 +90,9 @@ void SohMenu::AddMenuBingo() {
         .CVar(CVAR_WINDOW("BingoBoard"))
         .WindowName("Bingo Board")
         .HideInSearch(true)
-        .Options(WindowButtonOptions().Tooltip("Enables the separate Bingo Board Window."));
+        .Options(WindowButtonOptions()
+                     .Tooltip("Enables the separate Bingo Board Window.")
+                     .EmbedWindow(false));
 
     //// Console
     //path.sidebarName = "Console";

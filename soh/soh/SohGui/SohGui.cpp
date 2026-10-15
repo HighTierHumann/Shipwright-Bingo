@@ -90,8 +90,8 @@ std::shared_ptr<SohModalWindow> mModalWindow;
 std::shared_ptr<Notification::Window> mNotificationWindow;
 std::shared_ptr<TimeDisplayWindow> mTimeDisplayWindow;
 std::shared_ptr<AnchorRoomWindow> mAnchorRoomWindow;
-std::shared_ptr<BingoBoardWindow> mBingoBoardWindow;
-std::shared_ptr<BingoBoardSettingsWindow> mBingoBoardSettingsWindow;
+std::shared_ptr<BingoTracker::BingoBoardWindow> mBingoBoardWindow;
+std::shared_ptr<BingoTracker::BingoBoardSettingsWindow> mBingoBoardSettingsWindow;
 
 UIWidgets::Colors GetMenuThemeColor() {
     return mSohMenu->GetMenuThemeColor();
@@ -204,9 +204,9 @@ void SetupGuiElements() {
     gui->AddGuiWindow(mTimeDisplayWindow);
     mAnchorRoomWindow = std::make_shared<AnchorRoomWindow>(CVAR_WINDOW("AnchorRoom"), "Anchor Room");
     gui->AddGuiWindow(mAnchorRoomWindow);
-    mBingoBoardWindow = std::make_shared<BingoBoardWindow>(CVAR_WINDOW("BingoBoard"), "Bingo Board", ImVec2(420, 420));
+    mBingoBoardWindow = std::make_shared<BingoTracker::BingoBoardWindow>(CVAR_WINDOW("BingoBoard"), "Bingo Board", ImVec2(600, 600));
     gui->AddGuiWindow(mBingoBoardWindow);
-    mBingoBoardSettingsWindow = std::make_shared<BingoBoardSettingsWindow>(
+    mBingoBoardSettingsWindow = std::make_shared<BingoTracker::BingoBoardSettingsWindow>(
         CVAR_WINDOW("BingoBoardSettings"), "Bingo Board Settings", ImVec2(600, 375));
     gui->AddGuiWindow(mBingoBoardSettingsWindow);
 }
@@ -246,6 +246,7 @@ void Destroy() {
     mTimeDisplayWindow = nullptr;
     mAnchorRoomWindow = nullptr;
     mBingoBoardWindow = nullptr;
+    mBingoBoardSettingsWindow = nullptr;
 }
 
 void RegisterPopup(std::string title, std::string message, std::string button1, std::string button2,

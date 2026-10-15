@@ -1,4 +1,5 @@
 #include "BingoBoardWindow.h"
+#include "BingoClient.h"
 #include "bingoEnums.h"
 #include "soh/Enhancements/randomizer/rng.h"
 #include "soh/cvar_prefixes.h"
@@ -11,43 +12,146 @@
 #include <spdlog/spdlog.h>
 #include <imgui.h>
 #include <algorithm>
+#include <vector>
 #include <unordered_map>
+
+using namespace UIWidgets;
+
+namespace BingoTracker {
 
 Color_RGBA8 Color_Background = { 0, 0, 0, 255 };
 static WidgetInfo backgroundColorWidget;
 static WidgetInfo windowTypeWidget;
 
-using namespace UIWidgets;
+static bool presetLoaded = false;
+static ImVec2 presetPos;
+static ImVec2 presetSize;
 
-std::unordered_map<uint32_t, std::string> bingoSquares = {
-    { BS_TREASURE_ZELDA, "Obtain the Treasure thrown by Princess Zelda" },
-    { BS_PRELUDE_CHECK, "Prelude of Light Check" },
-    { BS_NOCTURNE_CHECK, "Nocturne of Shadow Check" },
-    { BS_FOREST_SPIRIT_MEDAL_RUBY, "Forest & Spirit Medallion and Goron Ruby" },
-    { BS_SHADOW_FIRE_MEDAL_EMERALD, "Shadow & Fire Medallion and Kokiri Emerald" },
-    { BS_LIGHT_WATER_MEDAL_SAPPHIRE, "Light & Water Medallion and Zora Sapphire" },
-    { BS_2_STONES, "2 Spiritual Stones" },
-    { BS_5_MEDALS, "5 Medallions" },
-    { BS_4_COMPASSES, "4 Compasses" },
-    { BS_6_COMPASSES, "6 Compasses" },
-    { BS_4_MAPS, "4 Maps" },
-    { BS_6_MAPS, "6 Maps" },
-    { BS_DEKU_MAP_COMPASS, "Map & Compass in Deku Tree" },
-    { BS_DC_MAP_COMPASS, "Map & Compass in Dodongo's Cavern" },
-    { BS_JABU_MAP_COMPASS, "Map & Compass in Jabu-Jabu's Belly" },
-    { BS_FOREST_MAP_COMPASS, "Map & Compass in Forest Temple" },
-    { BS_FIRE_MAP_COMPASS, "Map & Compass in Fire Temple" },
-    { BS_WATER_MAP_COMPASS, "Map & Compass in Water Temple" },
-    { BS_SHADOW_MAP_COMPASS, "Map & Compass in Shadow Temple" },
-    { BS_SPIRIT_MAP_COMPASS, "Map & Compass in Spirit Temple" },
-    { BS_ICE_MAP_COMPASS, "Map & Compass in Ice Cavern" },
-    { BS_BOTW_MAP_COMPASS, "Map & Compass in Bottom of the Well" },
-    { BS_3_BOSS_KEYS, "3 Boss Keys" },
-    { BS_5_BOSS_KEYS, "5 Boss Keys" },
-    { BS_FOREST_BOSS_KEY, "Forest Temple Boss Key" },
-};
+// Parses "#rrggbb" into an ImGui color, returning false for anything else.
+static bool ParseHexColor(const std::string& hex, ImU32& out, int alpha) {
+    if (hex.size() != 7 || hex[0] != '#') {
+        return false;
+    }
+    char* end = nullptr;
+    unsigned long rgb = strtoul(hex.c_str() + 1, &end, 16);
+    if (end != hex.c_str() + 7) {
+        return false;
+    }
+    out = IM_COL32((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, alpha);
+    return true;
+}
 
-namespace SohGui {
+static void DrawCellContents(ImDrawList* drawList, const Bingo::BoardSquare& square, ImVec2 cellTL, float cellSize) {
+    std::vector<ImU32> colors;
+    for (const std::string& hex : square.taken) {
+        ImU32 color;
+        if (ParseHexColor(hex, color, 200)) {
+            colors.push_back(color);
+        }
+    }
+    for (size_t i = 0; i < colors.size(); ++i) {
+        float left = cellTL.x + cellSize * i / colors.size();
+        float right = cellTL.x + cellSize * (i + 1) / colors.size();
+        drawList->AddRectFilled(ImVec2(left, cellTL.y), ImVec2(right, cellTL.y + cellSize), colors[i]);
+    }
+
+    const float textPadding = 4.0f;
+    const float wrapWidth = cellSize - textPadding * 2.0f;
+    if (wrapWidth <= 0.0f || square.name.empty()) {
+        return;
+    }
+    const char* text = square.name.c_str();
+    ImVec2 textSize = ImGui::CalcTextSize(text, nullptr, false, wrapWidth);
+    ImVec2 textPos(cellTL.x + (cellSize - std::min(textSize.x, wrapWidth)) * 0.5f,
+                   cellTL.y + std::max(textPadding, (cellSize - textSize.y) * 0.5f));
+    ImFont* font = ImGui::GetFont();
+    float fontSize = ImGui::GetFontSize();
+    drawList->PushClipRect(cellTL, ImVec2(cellTL.x + cellSize, cellTL.y + cellSize), true);
+    drawList->AddText(font, fontSize, ImVec2(textPos.x + 1.0f, textPos.y + 1.0f), IM_COL32(0, 0, 0, 255), text, nullptr,
+                      wrapWidth);
+    drawList->AddText(font, fontSize, textPos, IM_COL32(255, 255, 255, 255), text, nullptr, wrapWidth);
+    drawList->PopClipRect();
+}
+
+void LoadFromPreset(const nlohmann::json& info) {
+    presetLoaded = true;
+    presetPos = { info.at("pos").at("x"), info.at("pos").at("y") };
+    presetSize = { info.at("size").at("width"), info.at("size").at("height") };
+}
+
+void DrawBingoBoardContents() {
+    constexpr int GRID_N = 5; // 5x5 grid
+    constexpr float windowPadding = 6.0f;
+    gSaveContext.inventory.dungeonItems[0];
+
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    if (avail.x <= 0.0f || avail.y <= 0.0f) {
+        return;
+    }
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    bool canvasVisible =
+        ImGui::BeginChild("Bingo Board Squares", avail, false,
+                          ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    ImGui::PopStyleVar();
+
+    if (canvasVisible) {
+        ImGui::SetWindowFontScale(CVarGetFloat(CVAR_BINGO_BOARD("FontSize"), 1.0f));
+
+        ImVec2 canvasAvail = ImGui::GetContentRegionAvail();
+        float maxSide = std::min(canvasAvail.x, canvasAvail.y);
+        float gridTotalSpacing = GRID_N - 1;
+        float gridInnerSize = maxSide - (windowPadding * 2.0f);
+
+        if (gridInnerSize > 0.0f) {
+            float cellSize = (gridInnerSize - gridTotalSpacing) / static_cast<float>(GRID_N);
+            if (cellSize > 0.0f) {
+                float gridWidth = cellSize * GRID_N + gridTotalSpacing;
+                float gridHeight = gridWidth;
+                const ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+                ImVec2 gridTopLeft =
+                    ImVec2(canvasPos.x + (canvasAvail.x - gridWidth) * 0.5f,
+                           canvasPos.y + (canvasAvail.y - gridHeight) * 0.5f);
+
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                ImU32 outlineCol = IM_COL32(150, 150, 150, 255);
+                const float outlineThickness = 1.0f;
+                const Bingo::Snapshot snapshot = Bingo::Client::Instance().GetSnapshot();
+
+                for (int r = 0; r < GRID_N; ++r) {
+                    for (int c = 0; c < GRID_N; ++c) {
+                        ImVec2 cellTL = ImVec2(gridTopLeft.x + c * cellSize,
+                                               gridTopLeft.y + r * cellSize);
+                        ImVec2 cellBR = ImVec2(cellTL.x + cellSize, cellTL.y + cellSize);
+
+                        drawList->AddRectFilled(cellTL, cellBR, IM_COL32(50, 50, 50, 255), 0.0f);
+                        size_t index = static_cast<size_t>(r * GRID_N + c);
+                        if (index < snapshot.squares.size()) {
+                            DrawCellContents(drawList, snapshot.squares[index], cellTL, cellSize);
+                        }
+                        drawList->AddRect(cellTL, cellBR, outlineCol, 0.0f, 0, outlineThickness);
+                    }
+                }
+
+                if (snapshot.squares.empty()) {
+                    const char* message = snapshot.state == Bingo::ConnectionState::Disconnected
+                                              ? "Not connected. Enter a Game ID and session cookie under Bingo > Login."
+                                              : snapshot.status.c_str();
+                    float wrapWidth = gridWidth * 0.8f;
+                    ImVec2 textSize = ImGui::CalcTextSize(message, nullptr, false, wrapWidth);
+                    drawList->AddText(ImGui::GetFont(), ImGui::GetFontSize(),
+                                      ImVec2(gridTopLeft.x + (gridWidth - std::min(textSize.x, wrapWidth)) * 0.5f,
+                                             gridTopLeft.y + (gridHeight - textSize.y) * 0.5f),
+                                      IM_COL32(255, 255, 255, 255), message, nullptr, wrapWidth);
+                }
+
+                ImGui::Dummy(ImVec2(gridWidth, gridHeight));
+            }
+        }
+    }
+
+    ImGui::EndChild();
+}
 
 void BingoBoardSettingsWindow::InitElement() {
     // Nothing to initialize for now
@@ -63,6 +167,7 @@ void BingoBoardSettingsWindow::DrawElement() {
 
     SohGui::GetSohMenu()->MenuDrawItem(windowTypeWidget, static_cast<uint32_t>(ImGui::GetContentRegionAvail().x), THEME_COLOR);
 
+    Color_Background = CVarGetColor(CVAR_BINGO_BOARD("BgColor.Value"), Color_Bg_Default);
     if (CVarGetInteger(CVAR_BINGO_BOARD("WindowType"), TRACKER_WINDOW_WINDOW) == TRACKER_WINDOW_FLOATING) {
         CVarCheckbox("Enable Dragging", CVAR_BINGO_BOARD("Draggable"), CheckboxOptions().Color(THEME_COLOR));
     }
@@ -92,7 +197,7 @@ void BingoBoardSettingsWindow::DrawElement() {
     if (auto gui = Ship::Context::GetRawInstance()->GetWindow()->GetGui()) {
         auto boardWindow = gui->GetGuiWindow("Bingo Board");
         if (boardWindow != nullptr && !boardWindow->IsVisible()) {
-            boardWindow->DrawElement();
+            DrawBingoBoardContents();
         }
     }
 }
@@ -114,64 +219,19 @@ void BingoBoardWindow::UpdateElement() {
 }
 
 void BingoBoardWindow::DrawElement() {
-    constexpr int GRID_N = 5; // 5x5 grid
-    const float windowPadding = 6.0f;
-
-    ImGui::SetWindowFontScale(CVarGetFloat(CVAR_BINGO_BOARD("FontSize"), 1.0f));
-
-    // Determine the maximum square area that fits in the available content region
-    ImVec2 avail = ImGui::GetContentRegionAvail();
-    float maxSide = std::min(avail.x, avail.y);
-
-    float gridTotalSpacing = GRID_N - 1;
-    float gridInnerSize = maxSide - (windowPadding * 2.0f);
-    if (gridInnerSize <= 0.0f) {
-        return;
+    if (presetLoaded) {
+        ImGui::SetNextWindowSize(presetSize);
+        ImGui::SetNextWindowPos(presetPos);
+        presetLoaded = false;
+    } else {
+        ImGui::SetNextWindowSize(ImVec2(600, 600), ImGuiCond_FirstUseEver);
     }
-
-    float cellSize = (gridInnerSize - gridTotalSpacing) / static_cast<float>(GRID_N);
-    if (cellSize <= 0.0f) {
-        return;
-    }
-
-    float gridWidth = cellSize * GRID_N + gridTotalSpacing;
-    float gridHeight = gridWidth; // square
-
-    // Use a child region so the drawing doesn't overlap other widgets and is clipped
-    ImGui::BeginChild("BingoBoardCanvas", ImVec2(gridWidth + windowPadding, gridHeight + windowPadding), false,
-                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-    ImDrawList* drawList = ImGui::GetWindowDrawList();
-    const ImVec2 canvasPos = ImGui::GetCursorScreenPos();
-
-    // Center the grid inside the child area
-    ImVec2 gridTopLeft = ImVec2(canvasPos.x + windowPadding + (avail.x - gridWidth) * 0.5f,
-                                canvasPos.y + windowPadding + (avail.y - gridHeight) * 0.5f);
-
-    ImU32 outlineCol = IM_COL32(150, 150, 150, 255); // White color for outlines
-    const float outlineThickness = 3.0f;
-
-    for (int r = 0; r < GRID_N; ++r) {
-        for (int c = 0; c < GRID_N; ++c) {
-            ImVec2 cellTL = ImVec2(gridTopLeft.x + c * cellSize,
-                                   gridTopLeft.y + r * cellSize);
-            ImVec2 cellBR = ImVec2(cellTL.x + cellSize, cellTL.y + cellSize);
-
-            // Draw outline for each square
-            drawList->AddRectFilled(cellTL, cellBR, IM_COL32(50, 50, 50, 255), 0.0f);
-            drawList->AddRect(cellTL, cellBR, outlineCol, 0.0f, 0, outlineThickness);
-            drawList->AddText(ImVec2(cellTL.x + 5.0f, cellTL.y + 5.0f), IM_COL32(255, 255, 255, 255),
-                              "This is a test");
-        }
-    }
-
-    // Reserve the same space in the layout so other widgets don't overlap
-    ImGui::Dummy(ImVec2(gridWidth + windowPadding * 2.0f, gridHeight + windowPadding * 2.0f));
-
     if (Trackers::BeginFloatWindows(
-            "BingoBoardCanvas", mIsVisible, Color_Background,
+            "Bingo Board", mIsVisible, Color_Background,
             static_cast<TrackerWindowType>(CVarGetInteger(CVAR_BINGO_BOARD("WindowType"), TRACKER_WINDOW_WINDOW)),
             CVarGetInteger(CVAR_BINGO_BOARD("Draggable"), 1), ImGuiWindowFlags_NoScrollbar)) {
+
+        DrawBingoBoardContents();
 
         PushStyleCombobox(THEME_COLOR);
         PopStyleCombobox();
@@ -179,8 +239,6 @@ void BingoBoardWindow::DrawElement() {
         ImGui::Separator();
 
         ImGui::SetWindowFontScale(CVarGetFloat(CVAR_TRACKER_HINTS("FontSize"), 1.0f));
-
-        ImGui::EndChild();
     }
     Trackers::EndFloatWindows();
 }
@@ -205,4 +263,4 @@ void RegisterBingoBoardWidgets() {
 
 static RegisterShipInitFunc gInitFunc([]() { RegisterBingoBoardWidgets(); }, { "IS_RANDO" });
 
-} // namespace SohGui
+} // namespace BingoTracker

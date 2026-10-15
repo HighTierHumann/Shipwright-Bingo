@@ -636,6 +636,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     link_libraries(Opus::opus)
     find_package(OpusFile CONFIG REQUIRED)
     link_libraries(OpusFile::opusfile CONFIG REQUIRED)
+    find_package(CURL CONFIG REQUIRED)
     if(SOH_WINDOWS_64BIT)
         set(ADDITIONAL_LIBRARY_DEPENDENCIES
             "libultraship;"
@@ -644,6 +645,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             "SDL2::SDL2;"
             "SDL2::SDL2main;"
             "SDL2_net::SDL2_net-static"
+            "CURL::libcurl"
             "glfw;"
             "winmm;"
             "imm32;"
@@ -699,10 +701,12 @@ else()
     find_package(Vorbis REQUIRED)
     find_package(Opus REQUIRED)
     find_package(OpusFile REQUIRED)
+    find_package(CURL REQUIRED)
      set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "libultraship;"
         "ZAPDLib;"
         SDL2::SDL2
+        CURL::libcurl
         "Ogg::ogg"
         "Vorbis::vorbis"
         "Vorbis::vorbisenc"
