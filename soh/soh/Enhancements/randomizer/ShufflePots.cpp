@@ -85,7 +85,7 @@ uint8_t ObjTsubo_RandomizerHoldsItem(ObjTsubo* potActor, PlayState* play) {
     // Don't pull randomized item if pot isn't randomized or is already checked
     if (!IS_RANDO || (potSetting.Is(RO_SHUFFLE_POTS_OVERWORLD) && isDungeon) ||
         (potSetting.Is(RO_SHUFFLE_POTS_DUNGEONS) && !isDungeon) || Flags_GetRandomizerInf(potIdentity->randomizerInf) ||
-        potIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        potIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(potIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

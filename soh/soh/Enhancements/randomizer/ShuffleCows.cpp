@@ -107,7 +107,7 @@ uint8_t ShuffledCow_RandomizerHoldsItem(EnCow* enCow, PlayState* play) {
     }
 
     if (!IS_RANDO || Flags_GetRandomizerInf(cowIdentity->randomizerInf) || !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0) ||
-        cowIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        cowIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(cowIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;
@@ -161,7 +161,7 @@ void RegisterShuffleCows() {
         CheckIdentity cowIdentity = IdentifyCow(gPlayState->sceneNum, static_cast<int32_t>(enCow->actor.world.pos.x),
                                                 static_cast<int32_t>(enCow->actor.world.pos.z));
         // Has this cow already rewarded an item?
-        if (!Flags_GetRandomizerInf(cowIdentity.randomizerInf)) {
+        if (!Flags_GetRandomizerInf(cowIdentity.randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(cowIdentity.randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
             Flags_SetRandomizerInf(cowIdentity.randomizerInf);
             // setting the ocarina mode here prevents intermittent issues
             // with the item get not triggering until walking away

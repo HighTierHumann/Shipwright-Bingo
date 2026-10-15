@@ -152,7 +152,8 @@ uint8_t EnWonderItem_RandomizerHoldsItem(EnWonderItem* wonderActor, PlayState* p
     auto wonderSetting = RAND_GET_OPTION(RSK_SHUFFLE_WONDER_ITEMS);
     if (!IS_RANDO || (wonderSetting.Is(RO_SHUFFLE_WONDER_ITEMS_OVERWORLD) && isDungeon) ||
         (wonderSetting.Is(RO_SHUFFLE_WONDER_ITEMS_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(wonderIdentity->randomizerInf) || wonderIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(wonderIdentity->randomizerInf) || wonderIdentity->randomizerCheck == RC_UNKNOWN_CHECK ||
+        (Rando::Context::GetInstance()->GetItemLocation(wonderIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

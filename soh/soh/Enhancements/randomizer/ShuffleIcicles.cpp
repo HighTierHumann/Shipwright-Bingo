@@ -71,7 +71,7 @@ uint8_t BgIceTurara_RandomizerHoldsItem(Actor* actor) {
 
     // Don't pull randomized item if icicle isn't randomized or is already checked
     if (!IS_RANDO || Flags_GetRandomizerInf(icicleIdentity->randomizerInf) ||
-        icicleIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        icicleIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(icicleIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

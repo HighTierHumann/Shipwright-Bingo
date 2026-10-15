@@ -142,7 +142,7 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
     Color_RGBA8 envColor;
 
     const auto superFairyIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(refActor);
-    if (superFairyIdentity == nullptr) {
+    if (superFairyIdentity == nullptr || (Rando::Context::GetInstance()->GetItemLocation(superFairyIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return;
     }
 
@@ -162,7 +162,7 @@ void SuperFairySpot_RandomizerDrawSetup(void* refActor) {
 
 static bool SpawnFairy(f32 posX, f32 posY, f32 posZ, int32_t params, FairyType fairyType, ActorID id) {
     CheckIdentity fairyIdentity = ShuffleFairies_GetFairyIdentity(params, id);
-    if (!Flags_GetRandomizerInf(fairyIdentity.randomizerInf)) {
+    if (!Flags_GetRandomizerInf(fairyIdentity.randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(fairyIdentity.randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         Actor* fairy =
             Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_ELF, posX, posY - 30.0f, posZ, 0, 0, 0, fairyType);
         ObjectExtension::GetInstance().Set<CheckIdentity>(fairy, std::move(fairyIdentity));

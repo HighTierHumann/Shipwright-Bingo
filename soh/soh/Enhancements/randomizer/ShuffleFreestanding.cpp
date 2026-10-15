@@ -32,7 +32,7 @@ void RegisterShuffleFreestanding() {
         // Don't change to randomized item if current freestanding item isn't shuffled or already obtained.
         if ((freestandingSetting.Is(RO_SHUFFLE_FREESTANDING_OVERWORLD) && isDungeon) ||
             (freestandingSetting.Is(RO_SHUFFLE_FREESTANDING_DUNGEONS) && !isDungeon) ||
-            randomizerCheck == RC_UNKNOWN_CHECK) {
+            randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
             return;
         }
 

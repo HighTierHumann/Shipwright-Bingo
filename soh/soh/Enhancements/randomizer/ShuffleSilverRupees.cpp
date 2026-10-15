@@ -350,12 +350,20 @@ void RegisterShuffleSilverRupees() {
             TWO_ACTOR_PARAMS((int32_t)enGSwitch->actor.world.pos.x, (int32_t)enGSwitch->actor.world.pos.z),
             ACTOR_EN_G_SWITCH);
 
-        if (silverRupeeIdentity.randomizerCheck != RC_UNKNOWN_CHECK) {
+        Rando::Location* loc = Rando::StaticData::GetLocation(silverRupeeIdentity.randomizerCheck);
+
+        if (Rando::Context::GetInstance()->IsSilverRupeeAreaShuffled(loc->GetHintKey())) {
             *should = false;
-            if (!Flags_GetRandomizerInf(silverRupeeIdentity.randomizerInf)) {
-                SpawnSilverRupeeItem(enGSwitch->actor.world.pos.x, enGSwitch->actor.world.pos.y,
-                                     enGSwitch->actor.world.pos.z, silverRupeeIdentity);
-            }
+        }
+
+        if (silverRupeeIdentity.randomizerCheck == RC_UNKNOWN_CHECK ||
+            (Rando::Context::GetInstance()->GetItemLocation(silverRupeeIdentity.randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
+            return;
+        }
+
+        if (!Flags_GetRandomizerInf(silverRupeeIdentity.randomizerInf)) {
+            SpawnSilverRupeeItem(enGSwitch->actor.world.pos.x, enGSwitch->actor.world.pos.y,
+                                 enGSwitch->actor.world.pos.z, silverRupeeIdentity);
         }
     });
 }

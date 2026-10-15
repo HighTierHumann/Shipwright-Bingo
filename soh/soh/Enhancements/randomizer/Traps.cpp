@@ -1442,6 +1442,12 @@ static void InitTrickNames() {
         Text{ "Bottom of the Well Basement Gold Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
         Text{ "Top of the Well Basement Silver Rupee Bag", TODO_TRANSLATE, TODO_TRANSLATE },
     };
+    trickNameTable[RG_SKELETON_BOSS_KEY] = {
+        // TODO_TRANSLATE
+        Text{ "Skeleton Balls Key", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Skeleton Boss Koy", TODO_TRANSLATE, TODO_TRANSLATE },
+        Text{ "Spooky Scary Key", TODO_TRANSLATE, TODO_TRANSLATE },
+    };
 
     /*
     //Names for individual upgrades, in case progressive names are replaced

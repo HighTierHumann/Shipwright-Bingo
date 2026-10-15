@@ -117,7 +117,7 @@ void SoilSkulltula_RandomizerDrawSetup(void* refActor) {
     }
 
     if (!IS_RANDO || !CVarGetInteger(CVAR_ENHANCEMENT("ChestSizeAndTextureMatchContents"), 0) ||
-        identity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        identity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(identity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return;
     }
 

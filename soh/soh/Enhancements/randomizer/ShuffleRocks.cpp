@@ -142,7 +142,7 @@ uint8_t Rock_RandomizerHoldsItem(CheckIdentity rockIdentity, PlayState* play, bo
            ((!isBoulder && setting) || (isBoulder && (setting == RO_SHUFFLE_BOULDERS_ALL ||
                                                       (isDungeon && setting == RO_SHUFFLE_BOULDERS_DUNGEONS) ||
                                                       (!isDungeon && setting == RO_SHUFFLE_BOULDERS_OVERWORLD)))) &&
-           !Flags_GetRandomizerInf(rockIdentity.randomizerInf);
+           !Flags_GetRandomizerInf(rockIdentity.randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(rc)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0));
 }
 
 void Rock_RandomizerSpawnCollectible(Actor* actor, CheckIdentity rockIdentity, PlayState* play) {
