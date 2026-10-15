@@ -131,7 +131,7 @@ extern "C" void ObjKibako_RandomizerDraw(Actor* thisx, PlayState* play) {
 
 uint8_t ObjKibako2_RandomizerHoldsItem(ObjKibako2* crateActor, PlayState* play) {
     const auto crateIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(&crateActor->dyna.actor);
-    if (crateIdentity == nullptr || (Rando::Context::GetInstance()->GetItemLocation(crateIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
+    if (crateIdentity == nullptr) {
         return false;
     }
 
@@ -142,7 +142,7 @@ uint8_t ObjKibako2_RandomizerHoldsItem(ObjKibako2* crateActor, PlayState* play) 
     // Don't pull randomized item if crate isn't randomized or is already checked
     if (!IS_RANDO || (crateSetting.Is(RO_SHUFFLE_CRATES_OVERWORLD) && isDungeon) ||
         (crateSetting.Is(RO_SHUFFLE_CRATES_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK  || (Rando::Context::GetInstance()->GetItemLocation(crateIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;
