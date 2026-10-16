@@ -150,6 +150,7 @@ inline void to_json(json& j, const ShipSaveContextData& shipSaveContextData) {
         { "stats", shipSaveContextData.stats },
         { "quest", shipSaveContextData.quest },
         { "randomizerInf", shipSaveContextData.randomizerInf },
+        { "bingoInf", shipSaveContextData.quest.data.randomizer.bingoInf },
     };
 }
 
@@ -157,6 +158,7 @@ inline void from_json(const json& j, ShipSaveContextData& shipSaveContextData) {
     j.at("stats").get_to(shipSaveContextData.stats);
     j.at("quest").get_to(shipSaveContextData.quest);
     j.at("randomizerInf").get_to(shipSaveContextData.randomizerInf);
+    j.at("bingoInf").get_to(shipSaveContextData.quest.data.randomizer.bingoInf);
 }
 
 inline void to_json(json& j, const SaveContext& saveContext) {

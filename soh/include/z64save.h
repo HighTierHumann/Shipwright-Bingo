@@ -8,6 +8,7 @@
 #include "soh/Enhancements/gameplaystats.h"
 #include "soh/Enhancements/randomizer/randomizer_entrance.h"
 #include "soh/Enhancements/boss-rush/BossRush.h"
+#include "soh/Bingo/bingoEnums.h"
 
 #define FULL_HEART_HEALTH 0x10
 #define STARTING_HEALTH (3 * FULL_HEART_HEALTH)
@@ -235,6 +236,7 @@ typedef struct ShipRandomizerSaveContextData {
     bool loseCon;
     u8 bombchuUpgradeLevel;
     bool obtainedBronzeScale;
+    u16 bingoInf[(BINGO_INF_MAX + 15) / 16];
 } ShipRandomizerSaveContextData;
 
 typedef struct ShipBossRushSaveContextData {

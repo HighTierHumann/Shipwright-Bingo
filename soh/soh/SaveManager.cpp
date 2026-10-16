@@ -839,6 +839,10 @@ void SaveManager::InitFileNormal() {
     for (int flag = 0; flag < ARRAY_COUNT(gSaveContext.ship.randomizerInf); flag++) {
         gSaveContext.ship.randomizerInf[flag] = 0;
     }
+    // Currently bingo flags are accessible from all quests
+    for (int flag = 0; flag < ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf); flag++) {
+        gSaveContext.ship.quest.data.randomizer.bingoInf[flag] = 0;
+    }
     gSaveContext.worldMapAreaData = 0;
     gSaveContext.scarecrowLongSongSet = 0;
     for (int i = 0; i < ARRAY_COUNT(gSaveContext.scarecrowLongSong); i++) {
@@ -1630,6 +1634,9 @@ void SaveManager::LoadBaseVersion1() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    });
 }
 
 void SaveManager::LoadBaseVersion2() {
@@ -1809,6 +1816,9 @@ void SaveManager::LoadBaseVersion2() {
 
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
+    });
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
     });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
@@ -2039,6 +2049,9 @@ void SaveManager::LoadBaseVersion3() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
     if (isMQ) {
@@ -2212,6 +2225,9 @@ void SaveManager::LoadBaseVersion4() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
     if (isMQ) {
@@ -2381,6 +2397,9 @@ void SaveManager::SaveBase(SaveContext* saveContext, int sectionID, bool fullSav
 
     SaveManager::Instance->SaveArray("randomizerInf", ARRAY_COUNT(saveContext->ship.randomizerInf), [&](size_t i) {
         SaveManager::Instance->SaveData("", saveContext->ship.randomizerInf[i]);
+    });
+    SaveManager::Instance->SaveArray("bingoInf", ARRAY_COUNT(saveContext->ship.quest.data.randomizer.bingoInf), [&](size_t i) {
+        SaveManager::Instance->SaveData("", saveContext->ship.quest.data.randomizer.bingoInf[i]);
     });
     SaveManager::Instance->SaveData("isMasterQuest", saveContext->ship.quest.id == QUEST_MASTER);
     SaveManager::Instance->SaveStruct("backupFW", [&]() {

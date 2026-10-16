@@ -7,12 +7,17 @@
 #include "soh/Enhancements/randomizer/randomizerTypes.h"
 #include <ship/window/gui/GuiWindow.h>
 
+extern "C" {
+#include <z64.h>
+}
+
 typedef enum {
     EVENT_CHECK_INF,
     ITEM_GET_INF,
     INF_TABLE,
     EVENT_INF,
     RANDOMIZER_INF,
+    BINGO_INF,
 } FlagTableType;
 
 typedef struct {
@@ -366,6 +371,14 @@ const std::vector<FlagTable> flagTables = {
 #define RANDO_ENUM_ITEM(rand_inf) { rand_inf, #rand_inf },
 #include "soh/Enhancements/randomizer/randomizerEnums/RandomizerInf.h"
 #undef RANDO_ENUM_ITEM
+      } },
+    { "Bingo Inf Flags",
+      BINGO_INF,
+      (BINGO_INF_MAX + 15) / 16,
+      {
+#define BINGO_ENUM_ITEM(bingo_inf) { bingo_inf, #bingo_inf },
+#include "soh/Bingo/bingoEnums.h"
+#undef BINGO_ENUM_ITEM
       } },
 };
 

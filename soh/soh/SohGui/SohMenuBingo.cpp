@@ -23,6 +23,60 @@ using namespace UIWidgets;
 //     { 2, "Maxed" },
 // };
 
+void DrawRoomsWindow(WidgetInfo& info) {
+    auto& client = Bingo::Client::Instance();
+    const std::string sessionCookie = CVarGetString(CVAR_BINGO("SessionCookie"), "");
+    Bingo::RoomsSnapshot rooms = client.GetRoomsSnapshot();
+    if (!rooms.hasRequested) {
+        client.ReadRoomsList(sessionCookie);
+        rooms = client.GetRoomsSnapshot();
+    }
+
+    static ImVec2 cellPadding(8.0f, 8.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cellPadding);
+
+    ImGui::BeginDisabled(rooms.loading);
+    if (ImGui::Button("Refresh Rooms")) {
+        client.ReadRoomsList(sessionCookie);
+    }
+    ImGui::EndDisabled();
+    ImGui::TextUnformatted(rooms.status.c_str());
+
+    if (ImGui::BeginTable("tableRoomsAvailable", 4, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersV)) {
+        ImGui::TableSetupColumn("Host", ImGuiTableColumnFlags_WidthStretch, 200.0f);
+        ImGui::TableSetupColumn("Game Code", ImGuiTableColumnFlags_WidthStretch, 200.0f);
+        ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthStretch, 200.0f);
+        ImGui::TableSetupColumn("##Enter as", ImGuiTableColumnFlags_WidthStretch, 200.0f);
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::TableHeadersRow();
+        ImGui::PopItemFlag();
+
+        for (const Bingo::GameRoom& room : rooms.rooms) {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(room.host.empty() ? "-" : room.host.c_str());
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(room.gameCode.empty() ? "-" : room.gameCode.c_str());
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(room.description.empty() ? "-" : room.description.c_str());
+            ImGui::TableNextColumn();
+
+            if (client.IsActive()) {
+                if (ImGui::Button("Disconnect")) {
+                    client.Disconnect();
+                }
+            } else {
+                if (ImGui::Button("Join")) {
+                    client.Connect(room.gameCode, CVarGetString(CVAR_BINGO("SessionCookie"), ""));
+                }
+            }
+        }
+        ImGui::EndTable();
+    }
+
+    ImGui::PopStyleVar(1);
+}
+
 void SohMenu::AddMenuBingo() {
     // Add Dev Tools Menu
     AddMenuEntry("Bingo", CVAR_SETTING("Menu.BingoSidebarSection"));
@@ -37,19 +91,11 @@ void SohMenu::AddMenuBingo() {
               "the /play/ URL). The board is read from the site and squares are marked automatically as you "
               "complete them.\n"
               "\n"
-              "The site only accepts logged in users. Log in on the site with Discord, then copy the value of its "
-              "\"sb.auth\" cookie (browser DevTools > Application > Cookies > shipbingo.zarashane.dev) into the box "
-              "below. Sessions expire after about 24 hours, so you will need to paste a fresh cookie each day.",
+              "Marking squares only works for logged in users. Log in on the site with Discord, then copy the value of its "
+              "\"sb.auth\" cookie (browser DevTools > Application > Cookies > shipbingo.zarashane.dev) into the box below.",
               WIDGET_TEXT);
     AddWidget(path, "Game ID & Session", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
-        ImGui::BeginDisabled(Bingo::Client::Instance().IsActive());
-        ImGui::Text("Game ID");
-        CVarInputString("##BingoGameId", CVAR_BINGO("GameId"),
-                        InputOptions()
-                            .Color(THEME_COLOR)
-                            .PlaceholderText("276")
-                            .Size(ImVec2(ImGui::GetFontSize() * 15, 0))
-                            .LabelPosition(LabelPositions::None));
+        ImGui::BeginDisabled(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive());
         ImGui::Text("Session cookie");
         CVarInputString("##BingoSessionCookie", CVAR_BINGO("SessionCookie"),
                         InputOptions()
@@ -59,22 +105,30 @@ void SohMenu::AddMenuBingo() {
                             .LabelPosition(LabelPositions::None));
         ImGui::EndDisabled();
     });
-    AddWidget(path, "Connect##Bingo", WIDGET_BUTTON)
+    AddWidget(path, "Login##Bingo", WIDGET_BUTTON)
         .PreFunc([](WidgetInfo& info) {
-            info.name = Bingo::Client::Instance().IsActive() ? "Disconnect##Bingo" : "Connect##Bingo";
+            info.name = (Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive()) ? "Logout##Bingo" : "Login##Bingo";
         })
         .Callback([](WidgetInfo& info) {
             auto& client = Bingo::Client::Instance();
-            if (client.IsActive()) {
-                client.Disconnect();
+            if (client.IsLoggedIn()) {
+                client.Logout();
                 return;
             }
-            client.Connect(CVarGetString(CVAR_BINGO("GameId"), ""), CVarGetString(CVAR_BINGO("SessionCookie"), ""));
+            client.Login(CVarGetString(CVAR_BINGO("SessionCookie"), ""));
             Ship::Context::GetRawInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
         });
     AddWidget(path, "Not connected", WIDGET_TEXT).PreFunc([](WidgetInfo& info) {
         info.name = Bingo::Client::Instance().GetSnapshot().status;
     });
+
+    // Rooms
+    path.sidebarName = "Rooms";
+    AddSidebarEntry("Bingo", path.sidebarName, 1);
+    AddWidget(path, "Bingo Rooms", WIDGET_CUSTOM).CustomFunction(DrawRoomsWindow)
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive());
+        });
 
     // Bingo Board
     path.sidebarName = "Bingo Board";
@@ -93,6 +147,39 @@ void SohMenu::AddMenuBingo() {
         .Options(WindowButtonOptions()
                      .Tooltip("Enables the separate Bingo Board Window.")
                      .EmbedWindow(false));
+    AddWidget(path, "Renew Bingo Card", WIDGET_BUTTON)
+        .HideInSearch(true)
+        .Options(ButtonOptions()
+                     .Tooltip("Generates a new Bingo Card."))
+        .PreFunc([](WidgetInfo& info) {
+            info.options->disabled = !Bingo::Client::Instance().IsActive();
+        })
+        .Callback([](WidgetInfo& info) {
+            auto& client = Bingo::Client::Instance();
+            client.RenewCard(CVarGetString(CVAR_BINGO("GameId"), ""), CVarGetString(CVAR_BINGO("SessionCookie"), ""), "-1");
+        });
+    AddWidget(path, "Seed ID", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        ImGui::Text("Seed ID");
+        CVarInputString("##BingoSeedId", CVAR_BINGO("SeedId"),
+                        InputOptions()
+                            .Color(THEME_COLOR)
+                            .PlaceholderText("665274846")
+                            .Size(ImVec2(ImGui::GetFontSize() * 15, 0))
+                            .LabelPosition(LabelPositions::None));
+    });
+    AddWidget(path, "New Seeded Card", WIDGET_BUTTON)
+        .HideInSearch(true)
+        .Options(ButtonOptions()
+                     .Tooltip("Generates a new Bingo Card using a seed value."))
+        .PreFunc([](WidgetInfo& info) {
+            info.options->disabled = !Bingo::Client::Instance().IsActive();
+        })
+        .Callback([](WidgetInfo& info) {
+            auto& client = Bingo::Client::Instance();
+            client.RenewCard(CVarGetString(CVAR_BINGO("GameId"), ""), CVarGetString(CVAR_BINGO("SessionCookie"), ""),
+                             CVarGetString(CVAR_BINGO("SeedId"), ""));
+        });
+
 
     //// Console
     //path.sidebarName = "Console";

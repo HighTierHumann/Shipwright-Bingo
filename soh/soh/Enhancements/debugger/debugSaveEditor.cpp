@@ -732,6 +732,8 @@ static uint16_t& GetFlagTableEntry(const FlagTable& flagTable, size_t row) {
             return gSaveContext.eventInf[row];
         case RANDOMIZER_INF:
             return gSaveContext.ship.randomizerInf[row];
+        case BINGO_INF:
+            return gSaveContext.ship.quest.data.randomizer.bingoInf[row];
         default: // Shouldn't be hit
             assert(false);
             return gSaveContext.eventChkInf[row];
@@ -1175,6 +1177,10 @@ void DrawFlagsTab() {
                                 case RANDOMIZER_INF:
                                     DrawFlagTableArray16(flagTable, static_cast<uint16_t>(j),
                                                          gSaveContext.ship.randomizerInf[j]);
+                                    break;
+                                case BINGO_INF:
+                                    DrawFlagTableArray16(flagTable, static_cast<uint16_t>(j),
+                                                         gSaveContext.ship.quest.data.randomizer.bingoInf[j]);
                                     break;
                             }
                         },

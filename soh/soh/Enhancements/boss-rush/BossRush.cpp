@@ -635,6 +635,9 @@ extern "C" void BossRush_InitSave() {
     for (s32 i = 0; i < ARRAY_COUNT(gSaveContext.ship.randomizerInf); i++) {
         gSaveContext.ship.randomizerInf[i] = 0;
     }
+    for (s32 i = 0; i < ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf); i++) {
+        gSaveContext.ship.quest.data.randomizer.bingoInf[i] = 0;
+    }
 
     // Set items
     std::array<u8, 24> brItems = {

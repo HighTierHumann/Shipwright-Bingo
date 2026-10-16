@@ -13,7 +13,7 @@ namespace Bingo {
 namespace {
 
 constexpr const char* kBaseUrl = "https://shipbingo.zarashane.dev/";
-constexpr auto kPollInterval = std::chrono::milliseconds(250); // same rate as the website
+constexpr auto kPollInterval = std::chrono::milliseconds(250); // should be ~4 pings per second like the website?
 constexpr const char* kDefaultCookieName = "sb.auth";
 
 struct HttpResponse {
@@ -113,6 +113,11 @@ std::string StringField(const nlohmann::json& object, const char* key) {
     return it == object.end() ? "" : ToString(*it);
 }
 
+bool BoolField(const nlohmann::json& object, const char* key) {
+    auto it = object.find(key);
+    return it != object.end() && it->is_boolean() && it->get<bool>();
+}
+
 // Error responses are usually a bare JSON string such as "Failed to Find User".
 std::string DescribeError(const HttpResponse& response) {
     if (response.status == 0) {
@@ -138,12 +143,44 @@ Client& Client::Instance() {
 
 Client::~Client() {
     Disconnect();
+    roomsStopRequested = true;
+    std::lock_guard<std::mutex> workerLock(roomsWorkerMutex);
+    if (roomsWorker.joinable()) {
+        roomsWorker.join();
+    }
+}
+
+void Client::Login(const std::string& sessionCookie) {
+    Logout();
+
+    const std::string cookie = NormalizeCookie(sessionCookie);
+    if (cookie.empty()) {
+        SetStatus(ConnectionState::Error, "Paste your session cookie first");
+        return;
+    }
+
+    stopRequested = false;
+    SetStatus(ConnectionState::Connecting, "Logging in...");
+    worker = std::thread(&Client::Authenticate, this, cookie);
+}
+
+void Client::Logout() {
+    stopRequested = true;
+    wake.notify_all();
+    if (worker.joinable()) {
+        worker.join();
+    }
+
+    std::lock_guard<std::mutex> lock(mutex);
+    snapshot = Snapshot{};
+    pendingToggles.clear();
+    myIdentifiers.clear();
 }
 
 void Client::Connect(const std::string& gameIdInput, const std::string& sessionCookie) {
     Disconnect();
 
-    // Accept a full game URL such as https://shipbingo.zarashane.dev/play/276 as well as a bare ID.
+    // Accept a full game URL such as https://shipbingo.zarashane.dev/play/1 as well as a bare ID.
     std::string gameId = gameIdInput;
     while (!gameId.empty() && (std::isspace(static_cast<unsigned char>(gameId.back())) || gameId.back() == '/')) {
         gameId.pop_back();
@@ -177,14 +214,97 @@ void Client::Disconnect() {
     }
 
     std::lock_guard<std::mutex> lock(mutex);
-    snapshot = Snapshot{};
+    snapshot = Snapshot{ConnectionState::Authenticated};
     pendingToggles.clear();
-    myIdentifiers.clear();
+}
+
+void Client::RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID) {
+    HttpResponse join = HttpGet("api/Game/RefreshBoard/" + UrlEscape(gameIdInput) + "/" + UrlEscape(seedID),
+                                            NormalizeCookie(sessionCookie), stopRequested);
+}
+
+void Client::ReadRoomsList(const std::string& sessionCookie) {
+    std::lock_guard<std::mutex> workerLock(roomsWorkerMutex);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (roomsSnapshot.loading) {
+            return;
+        }
+        roomsSnapshot.hasRequested = true;
+        roomsSnapshot.loading = true;
+        roomsSnapshot.status = "Loading current rooms...";
+    }
+
+    if (roomsWorker.joinable()) {
+        roomsWorker.join();
+    }
+    roomsWorker = std::thread(&Client::RunRoomsRequest, this, NormalizeCookie(sessionCookie));
+}
+
+RoomsSnapshot Client::GetRoomsSnapshot() {
+    std::lock_guard<std::mutex> lock(mutex);
+    return roomsSnapshot;
+}
+
+void Client::RunRoomsRequest(std::string cookie) {
+    HttpResponse response = HttpGet("api/Game/GetGames/", cookie, roomsStopRequested);
+    if (roomsStopRequested) {
+        std::lock_guard<std::mutex> lock(mutex);
+        roomsSnapshot.loading = false;
+        return;
+    }
+
+    std::vector<GameRoom> rooms;
+    std::string status;
+    bool success = false;
+
+    if (response.status == 200) {
+        auto parsed = nlohmann::json::parse(response.body, nullptr, false);
+        if (parsed.is_array()) {
+            for (const auto& roomJson : parsed) {
+                if (!roomJson.is_object()) {
+                    continue;
+                }
+
+                GameRoom room;
+                room.host = StringField(roomJson, "host");
+                room.gameCode = StringField(roomJson, "gameCode");
+                room.description = StringField(roomJson, "description");
+                room.isRacer = BoolField(roomJson, "isRacer");
+                room.isStarted = BoolField(roomJson, "isStarted");
+                rooms.push_back(std::move(room));
+            }
+            success = true;
+            status = rooms.empty() ? "No current rooms." : std::to_string(rooms.size()) + " current room(s).";
+        } else {
+            status = "The server returned an invalid room list.";
+        }
+    } else if (IsAuthFailure(response)) {
+        status = "Session expired. Paste a new session cookie.";
+    } else {
+        status = "Could not load rooms: " + DescribeError(response);
+    }
+
+    if (!success) {
+        SPDLOG_WARN("[Bingo] Failed to load current rooms: {}", status);
+    }
+
+    std::lock_guard<std::mutex> lock(mutex);
+    if (success) {
+        roomsSnapshot.rooms = std::move(rooms);
+    }
+    roomsSnapshot.status = std::move(status);
+    roomsSnapshot.loading = false;
+}
+
+bool Client::IsLoggedIn() {
+    std::lock_guard<std::mutex> lock(mutex);
+    return snapshot.state == ConnectionState::Authenticated;
 }
 
 bool Client::IsActive() {
     std::lock_guard<std::mutex> lock(mutex);
-    return snapshot.state == ConnectionState::Connecting || snapshot.state == ConnectionState::Connected;
+    return snapshot.state == ConnectionState::Connected;
 }
 
 Snapshot Client::GetSnapshot() {
@@ -208,6 +328,41 @@ void Client::SetStatus(ConnectionState state, const std::string& status) {
     std::lock_guard<std::mutex> lock(mutex);
     snapshot.state = state;
     snapshot.status = status;
+}
+
+void Client::Authenticate(std::string cookie) {
+    SetStatus(ConnectionState::Authenticating, "Authenticating...");
+
+    HttpResponse auth = HttpGet("auth/IsAuthenticated", cookie, stopRequested);
+    if (stopRequested) {
+        return;
+    }
+    if (auth.status == 0) {
+        SetStatus(ConnectionState::Error, "Could not reach shipbingo: " + auth.error);
+        return;
+    }
+    auto authJson = nlohmann::json::parse(auth.body, nullptr, false);
+    if (auth.status != 200 || !authJson.is_boolean() || !authJson.get<bool>()) {
+        SetStatus(ConnectionState::Error,
+                  "Session cookie was rejected. It may be wrong or expired (sessions last about 24h).");
+        return;
+    }
+
+    HttpResponse me = HttpGet("auth/me", cookie, stopRequested);
+    if (me.status == 200) {
+        auto meJson = nlohmann::json::parse(me.body, nullptr, false);
+        if (meJson.is_object()) {
+            std::lock_guard<std::mutex> lock(mutex);
+            for (const char* key : { "id", "userId", "discordId", "name", "username", "userName", "displayName" }) {
+                std::string value = StringField(meJson, key);
+                if (!value.empty()) {
+                    myIdentifiers.push_back(Lower(value));
+                }
+            }
+        }
+    }
+
+    SetStatus(ConnectionState::Authenticated, "Authenticated");
 }
 
 void Client::Run(std::string gameId, std::string cookie) {
@@ -318,10 +473,9 @@ void Client::ApplyGameState(const nlohmann::json& state) {
 
     // The server only fills in sections it considers changed, so an empty section means "no change".
     if (snapshot.squares.empty()) {
-        snapshot.status = "Connected, but the server has not sent board data yet (updatedItems=" +
-                          std::to_string(state.value("updatedItems", 0)) +
-                          "). If the site is open on this account in a browser, it may be receiving the updates; "
-                          "close that tab and reconnect.";
+        snapshot.status = "Connected, but the server has not sent board data yet.\n\n"
+                          "If the site is open on this account in a browser, it may be receiving the updates instead; "
+                          "close that tab and reconnect in ship.";
     } else {
         snapshot.status = "Connected";
     }

@@ -192,6 +192,10 @@ void Anchor::HandlePacket_UpdateTeamState(nlohmann::json payload) {
             gSaveContext.ship.randomizerInf[i] |= loadedData.ship.randomizerInf[i];
         }
 
+        for (int i = 0; i < ceil((BINGO_INF_MAX + 15) / 16); i++) {
+            gSaveContext.ship.quest.data.randomizer.bingoInf[i] |= loadedData.ship.quest.data.randomizer.bingoInf[i];
+        }
+
         for (int i = 0; i < 6; i++) {
             gSaveContext.gsFlags[i] |= loadedData.gsFlags[i];
         }

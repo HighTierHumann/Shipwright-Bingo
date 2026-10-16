@@ -18,7 +18,12 @@ constexpr auto kRetryDelay = std::chrono::seconds(15);
 
 using Clock = std::chrono::steady_clock;
 
-std::unordered_map<std::string, Clock::time_point> sAttempts;
+struct ToggleAttempt {
+    bool shouldBeMarked;
+    Clock::time_point time;
+};
+
+std::unordered_map<std::string, ToggleAttempt> sAttempts;
 std::vector<std::string> sBoardIds;
 int sFrameCounter = 0;
 
@@ -49,24 +54,29 @@ void OnGameFrameUpdate() {
     const auto now = Clock::now();
     for (const BoardSquare& square : snapshot.squares) {
         const SquareDef* def = FindSquareByName(square.name);
-        if (def == nullptr || def->isComplete == nullptr || !def->isComplete()) {
+        if (def == nullptr) {
             continue;
         }
 
+        const bool shouldBeMarked = def->IsComplete();
         const bool markedByUs =
             !snapshot.myColor.empty() &&
             std::find(square.taken.begin(), square.taken.end(), snapshot.myColor) != square.taken.end();
-        if (markedByUs) {
+        if (shouldBeMarked == markedByUs) {
+            sAttempts.erase(square.id);
+            continue;
+        }
+        if (!shouldBeMarked && snapshot.myColor.empty()) {
             continue;
         }
 
-        // The server endpoint toggles, so never re-send unless we can confirm from our color that it did not stick.
         auto attempt = sAttempts.find(square.id);
-        if (attempt != sAttempts.end() && (snapshot.myColor.empty() || now - attempt->second < kRetryDelay)) {
+        if (attempt != sAttempts.end() && attempt->second.shouldBeMarked == shouldBeMarked &&
+            (snapshot.myColor.empty() || now - attempt->second.time < kRetryDelay)) {
             continue;
         }
 
-        sAttempts[square.id] = now;
+        sAttempts[square.id] = { shouldBeMarked, now };
         Client::Instance().RequestToggle(square.id);
     }
 }

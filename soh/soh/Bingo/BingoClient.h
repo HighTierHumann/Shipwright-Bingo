@@ -30,6 +30,8 @@ enum class ConnectionState {
     Connecting,
     Connected,
     Error,
+    Authenticating,
+    Authenticated,
 };
 
 struct Snapshot {
@@ -42,33 +44,60 @@ struct Snapshot {
     std::string myColor; // empty if our user could not be located in the user list
 };
 
+struct GameRoom {
+    std::string description;
+    std::string gameCode;
+    std::string host;
+    bool isRacer = false;
+    bool isStarted = false;
+};
+
+struct RoomsSnapshot {
+    bool hasRequested = false;
+    bool loading = false;
+    std::string status = "Rooms have not been loaded.";
+    std::vector<GameRoom> rooms;
+};
+
 // Talks to shipbingo.zarashane.dev on a worker thread. All public methods are safe to call from the game thread.
 class Client {
   public:
     static Client& Instance();
 
+    void Login(const std::string& sessionCookie);
+    void Logout();
     void Connect(const std::string& gameId, const std::string& sessionCookie);
     void Disconnect();
+    void RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID);
+    void ReadRoomsList(const std::string& sessionCookie);
+    RoomsSnapshot GetRoomsSnapshot();
+    bool IsLoggedIn();
     bool IsActive();
     Snapshot GetSnapshot();
 
-    // Asks the server to toggle a square for the logged in user. Callers must make sure the square is not already
-    // marked with the user's color, since the server endpoint is a toggle.
+    // Toggles a square for the logged in user. Callers must confirm its current mark state differs from the desired
+    // state, since the server endpoint is a toggle.
     void RequestToggle(const std::string& squareId);
 
   private:
     Client() = default;
     ~Client();
 
+    void Authenticate(std::string cookie);
     void Run(std::string gameId, std::string cookie);
+    void RunRoomsRequest(std::string cookie);
     void SetStatus(ConnectionState state, const std::string& status);
     void ApplyGameState(const nlohmann::json& state);
 
     std::mutex mutex;
+    std::mutex roomsWorkerMutex;
     std::condition_variable wake;
     std::thread worker;
+    std::thread roomsWorker;
     std::atomic<bool> stopRequested = false;
+    std::atomic<bool> roomsStopRequested = false;
     Snapshot snapshot;
+    RoomsSnapshot roomsSnapshot;
     std::deque<std::string> pendingToggles;
     std::vector<std::string> myIdentifiers; // values from /auth/me used to find our entry in the user list
 };

@@ -659,6 +659,7 @@ typedef enum FlagType {
     FLAG_EVENT_INF,
     FLAG_RANDOMIZER_INF,
     FLAG_GS_TOKEN,
+    FLAG_BINGO_INF,
 } FlagType;
 
 typedef struct PendingFlag {
