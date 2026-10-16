@@ -244,9 +244,14 @@ typedef struct ShipBossRushSaveContextData {
     u8 options[BR_OPTIONS_MAX];
 } ShipBossRushSaveContextData;
 
+typedef struct ShipBingoSaveContextData {
+    s8 dungeonsEntered[12];
+} ShipBingoSaveContextData;
+
 typedef union ShipQuestSpecificSaveContextData {
     ShipRandomizerSaveContextData randomizer;
     ShipBossRushSaveContextData bossRush;
+    ShipBingoSaveContextData bingo;
 } ShipQuestSpecificSaveContextData;
 
 typedef struct ShipQuestSaveContextData {

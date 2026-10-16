@@ -2228,6 +2228,13 @@ void SaveManager::LoadBaseVersion4() {
     SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
     });
+    SaveManager::Instance->LoadArray("dungeonsEntered",
+                                    ARRAY_COUNT(gSaveContext.ship.quest.data.bingo.dungeonsEntered),
+                                    [&](size_t i) {
+                                        int val = 0;
+                                        SaveManager::Instance->LoadData("", val);
+                                        gSaveContext.ship.quest.data.bingo.dungeonsEntered[i] = static_cast<int8_t>(val);
+                                    });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
     if (isMQ) {
@@ -2401,6 +2408,14 @@ void SaveManager::SaveBase(SaveContext* saveContext, int sectionID, bool fullSav
     SaveManager::Instance->SaveArray("bingoInf", ARRAY_COUNT(saveContext->ship.quest.data.randomizer.bingoInf), [&](size_t i) {
         SaveManager::Instance->SaveData("", saveContext->ship.quest.data.randomizer.bingoInf[i]);
     });
+    SaveManager::Instance->SaveArray("dungeonsEntered",
+                                    ARRAY_COUNT(saveContext->ship.quest.data.bingo.dungeonsEntered),
+                                    [&](size_t i) {
+                                        SaveManager::Instance->SaveData("",
+                                                                       static_cast<int>(
+                                                                           saveContext->ship.quest.data.bingo
+                                                                               .dungeonsEntered[i]));
+                                    });
     SaveManager::Instance->SaveData("isMasterQuest", saveContext->ship.quest.id == QUEST_MASTER);
     SaveManager::Instance->SaveStruct("backupFW", [&]() {
         SaveManager::Instance->SaveStruct("pos", [&]() {

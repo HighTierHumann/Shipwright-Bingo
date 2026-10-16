@@ -25,7 +25,7 @@ const std::vector<SquareDef>& Squares() {
         { "Shadow & Fire Medallion and Kokiri Emerald", BINGO_INF_SHADOW_FIRE_MEDAL_EMERALD },
         { "Light & Water Medallion and Zora Sapphire", BINGO_INF_LIGHT_WATER_MEDAL_SAPPHIRE },
         { "2 Spiritual Stones", BINGO_INF_2_STONES },
-        { "5 Medallions", BINGO_INF_5_MEDALS },
+        { "5 Medallions", BINGO_INF_5_MEDALLIONS },
 
         { "4 Compasses", BINGO_INF_4_COMPASSES },
         { "6 Compasses", BINGO_INF_6_COMPASSES },
