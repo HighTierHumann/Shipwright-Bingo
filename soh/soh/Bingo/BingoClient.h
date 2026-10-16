@@ -69,6 +69,7 @@ class Client {
     void Connect(const std::string& gameId, const std::string& sessionCookie);
     void Disconnect();
     void RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID);
+    void UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse);
     void ReadRoomsList(const std::string& sessionCookie);
     RoomsSnapshot GetRoomsSnapshot();
     bool IsLoggedIn();

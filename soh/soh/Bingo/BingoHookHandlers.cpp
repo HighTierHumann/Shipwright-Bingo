@@ -29,6 +29,53 @@ extern PlayState* gPlayState;
 static std::queue<RandomizerCheck> randomizerQueuedChecks;
 static RandomizerCheck randomizerQueuedCheck = RC_UNKNOWN_CHECK;
 static GetItemEntry randomizerQueuedItemEntry = GET_ITEM_NONE;
+static int16_t previousDungeonScene = -1;
+
+constexpr SceneID dungeonScenes[] = {
+    SCENE_DEKU_TREE,
+    SCENE_DODONGOS_CAVERN,
+    SCENE_JABU_JABU,
+    SCENE_FOREST_TEMPLE,
+    SCENE_FIRE_TEMPLE,
+    SCENE_WATER_TEMPLE,
+    SCENE_SPIRIT_TEMPLE,
+    SCENE_SHADOW_TEMPLE,
+    SCENE_INSIDE_GANONS_CASTLE,
+    SCENE_GANONS_TOWER,
+    SCENE_ICE_CAVERN,
+    SCENE_GERUDO_TRAINING_GROUND,
+    SCENE_BOTTOM_OF_THE_WELL,
+};
+
+constexpr SceneID bossScenes[] = {
+    SCENE_DEKU_TREE_BOSS,
+    SCENE_DODONGOS_CAVERN_BOSS,
+    SCENE_JABU_JABU_BOSS,
+    SCENE_FOREST_TEMPLE_BOSS,
+    SCENE_FIRE_TEMPLE_BOSS,
+    SCENE_WATER_TEMPLE_BOSS,
+    SCENE_SPIRIT_TEMPLE_BOSS,
+    SCENE_SHADOW_TEMPLE_BOSS,
+    SCENE_GANONDORF_BOSS,
+};
+
+bool IsDungeonScene(int16_t scene) {
+    for (SceneID dungeonScene : dungeonScenes) {
+        if (scene == dungeonScene) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsBossScene(int16_t scene) {
+    for (SceneID bossScene : bossScenes) {
+        if (scene == bossScene) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     if (flagType == FLAG_EVENT_CHECK_INF) {
@@ -65,6 +112,34 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
         if (Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_POT_1) &&
             Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_POT_2)) {
                 Flags_SetBingoInf(BINGO_INF_BREAK_LIGHT_TRIAL_POTS);
+        }
+    }
+    if (flagType == FLAG_RANDOMIZER_INF && (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1 &&
+                                            flag <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5)) {
+        int shadowSilverItemsCollected = 0;
+        int trialSilverItemsCollected = 0;
+        int iceSilverItemsCollected = 0;
+
+        for (int i = RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1; i <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5; i++) {
+            if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(i))) {
+                if (i >= RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1 && i <= RAND_INF_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_5) {
+                    ++shadowSilverItemsCollected;
+                } else if (i >= RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_1 && i <= RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_5) {
+                    ++trialSilverItemsCollected;
+                } else if (i >= RAND_INF_ICE_CAVERN_SCYTHE_SILVER_RUPEE_1 && i <= RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_5) {
+                    ++iceSilverItemsCollected;
+                }
+            }
+        }
+
+        if (shadowSilverItemsCollected == 15) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_SHADOW_TEMPLE_SILVER_ITEMS);
+        }
+        if (trialSilverItemsCollected == 20) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_GANONS_CASTLE_SILVER_ITEMS);
+        }
+        if (iceSilverItemsCollected == 10) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_ICE_CAVERN_SILVER_ITEMS);
         }
     }
 }
@@ -105,11 +180,81 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
         }
     }
+
+    if (flagType == FLAG_SCENE_CLEAR && flag == 0x1 && IsBossScene(sceneNum)) {
+        if (previousDungeonScene != -1) {
+            bool beatTemple = false;
+            switch (previousDungeonScene) {
+                case SCENE_DEKU_TREE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_DEKU_TREE);
+                    break;
+                case SCENE_DODONGOS_CAVERN:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_DODONGOS_CAVERN);
+                    break;
+                case SCENE_JABU_JABU:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_JABU_JABUS_BELLY);
+                    break;
+                case SCENE_FOREST_TEMPLE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_FOREST_TEMPLE);
+                    beatTemple = true;
+                    break;
+                case SCENE_FIRE_TEMPLE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_FIRE_TEMPLE);
+                    beatTemple = true;
+                    break;
+                case SCENE_WATER_TEMPLE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_WATER_TEMPLE);
+                    beatTemple = true;
+                    break;
+                case SCENE_SPIRIT_TEMPLE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_SPIRIT_TEMPLE);
+                    beatTemple = true;
+                    break;
+                case SCENE_SHADOW_TEMPLE:
+                    Flags_SetBingoInf(BINGO_INF_BEAT_SHADOW_TEMPLE);
+                    beatTemple = true;
+                    break;
+                default:
+                    break;
+            }
+
+            if (beatTemple) {
+                constexpr BingoInf templeBeatFlags[] = {
+                    BINGO_INF_BEAT_FOREST_TEMPLE,
+                    BINGO_INF_BEAT_FIRE_TEMPLE,
+                    BINGO_INF_BEAT_WATER_TEMPLE,
+                    BINGO_INF_BEAT_SPIRIT_TEMPLE,
+                    BINGO_INF_BEAT_SHADOW_TEMPLE,
+                };
+                int templesBeaten = 0;
+                for (BingoInf templeBeatFlag : templeBeatFlags) {
+                    if (Flags_GetBingoInf(templeBeatFlag)) {
+                        ++templesBeaten;
+                    }
+                }
+                if (templesBeaten >= 2) {
+                    Flags_SetBingoInf(BINGO_INF_BEAT_2_TEMPLES);
+                }
+                if (templesBeaten >= 4) {
+                    Flags_SetBingoInf(BINGO_INF_BEAT_4_TEMPLES);
+                }
+            }
+        } else {
+            // Defeat boss squares not yet added
+            return;
+        }
+    }
 }
 
 void BingoOnSceneInitHandler(int16_t sceneNum) {
-    if (sceneNum <= SCENE_INSIDE_GANONS_CASTLE && sceneNum >= SCENE_DEKU_TREE &&
-        sceneNum != SCENE_GANONS_TOWER && sceneNum != SCENE_THIEVES_HIDEOUT) {
+    if (IsDungeonScene(sceneNum)) {
+        previousDungeonScene = sceneNum;
+        LUSLOG_DEBUG("Previous dungeon scene set to %s", SohUtils::GetSceneName(previousDungeonScene).c_str());
+    } else if (!IsBossScene(sceneNum) && previousDungeonScene != -1) {
+        previousDungeonScene = -1;
+        LUSLOG_DEBUG("Previous dungeon scene reset to: %d", previousDungeonScene);
+    }
+    if (IsDungeonScene(sceneNum) && sceneNum != SCENE_GANONS_TOWER) {
         int dungeonIndex = sceneNum;
         if (sceneNum == SCENE_GERUDO_TRAINING_GROUND) {
             dungeonIndex = 10;
@@ -137,14 +282,18 @@ void BingoOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
         int mapsHeld = 0;
         int compassesHeld = 0;
         int bossKeysHeld = 0;
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 11; i++) {
             if (CHECK_DUNGEON_ITEM(DUNGEON_MAP, i) && CHECK_DUNGEON_ITEM(DUNGEON_COMPASS, i)) {
                 Flags_SetBingoInf(static_cast<BingoInf>(i + BINGO_INF_DEKU_MAP_COMPASS));
             }
             if (CHECK_DUNGEON_ITEM(DUNGEON_MAP, i)) mapsHeld++;
             if (CHECK_DUNGEON_ITEM(DUNGEON_COMPASS, i)) compassesHeld++;
             if (CHECK_DUNGEON_ITEM(DUNGEON_KEY_BOSS, i)) {
-                Flags_SetBingoInf(static_cast<BingoInf>(i + BINGO_INF_FOREST_BOSS_KEY));
+                if (i == SCENE_GANONS_TOWER) {
+                    Flags_SetBingoInf(BINGO_INF_GANON_BOSS_KEY);
+                } else if (i >= SCENE_FOREST_TEMPLE && i <= SCENE_SHADOW_TEMPLE) {
+                    Flags_SetBingoInf(static_cast<BingoInf>(i + (BINGO_INF_FOREST_BOSS_KEY - 3)));
+                }
                 bossKeysHeld++;
             }
         }
@@ -198,6 +347,8 @@ void BingoOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
             CHECK_QUEST_ITEM(QUEST_MEDALLION_WATER)) {
                 Flags_SetBingoInf(BINGO_INF_LIGHT_WATER_MEDAL_SAPPHIRE);
         }
+
+        LUSLOG_DEBUG("medallionsHeld: %d, stonesHeld: %d", medallionsHeld, stonesHeld);
     }
 }
 

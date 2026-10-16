@@ -2,6 +2,11 @@
 #include "SohGui.hpp"
 #include "soh/Bingo/BingoClient.h"
 
+#include <cstdio>
+#include <string>
+#include <charconv>
+#include <string_view>
+
 extern "C" {
 extern PlayState* gPlayState;
 }
@@ -22,6 +27,44 @@ using namespace UIWidgets;
 //     { 1, "Vanilla" },
 //     { 2, "Maxed" },
 // };
+
+std::string Rgba8ToHex(Color_RGBA8 color) {
+    char hex[8]; // '#' + 6 digits + null terminator
+    std::snprintf(hex, sizeof(hex), "%02X%02X%02X",
+                  static_cast<unsigned>(color.r),
+                  static_cast<unsigned>(color.g),
+                  static_cast<unsigned>(color.b));
+    return hex;
+}
+
+Color_RGBA8 HexToRgba8(std::string_view hex) {
+    const Color_RGBA8 defaultColor = { 255, 255, 255, 255 };
+    if (hex.empty()) {
+        return defaultColor;
+    }
+
+    if (hex.front() == '#') {
+        hex.remove_prefix(1);
+    }
+    if (hex.size() != 6) {
+        SPDLOG_WARN("[Bingo] Invalid user color '{}'; using white", std::string(hex));
+        return defaultColor;
+    }
+
+    unsigned int rgb = 0;
+    const auto result = std::from_chars(hex.data(), hex.data() + hex.size(), rgb, 16);
+    if (result.ec != std::errc{} || result.ptr != hex.data() + hex.size()) {
+        SPDLOG_WARN("[Bingo] Invalid user color '{}'; using white", std::string(hex));
+        return defaultColor;
+    }
+
+    return {
+        static_cast<u8>((rgb >> 16) & 0xFF),
+        static_cast<u8>((rgb >> 8) & 0xFF),
+        static_cast<u8>(rgb & 0xFF),
+        255
+    };
+}
 
 void DrawRoomsWindow(WidgetInfo& info) {
     auto& client = Bingo::Client::Instance();
@@ -147,6 +190,27 @@ void SohMenu::AddMenuBingo() {
         .Options(WindowButtonOptions()
                      .Tooltip("Enables the separate Bingo Board Window.")
                      .EmbedWindow(false));
+    AddWidget(path, "Pick your color", WIDGET_CVAR_COLOR_PICKER)
+        .HideInSearch(true)
+        .CVar(CVAR_BINGO("UserColor"))
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !Bingo::Client::Instance().IsActive();
+        })
+        .Options(
+            ColorPickerOptions().Color(THEME_COLOR).DefaultValue(HexToRgba8(Bingo::Client::Instance().GetSnapshot().myColor)).ShowReset().ShowRandom());
+    AddWidget(path, "Update Color", WIDGET_BUTTON)
+        .HideInSearch(true)
+        .SameLine(true)
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !Bingo::Client::Instance().IsActive();
+        })
+        .Options(ButtonOptions()
+            .Size(ImVec2(0, 0)))
+        .Callback([](WidgetInfo& info) {
+            auto& client = Bingo::Client::Instance();
+            client.UpdateUserColor(CVarGetString(CVAR_BINGO("GameId"), ""), CVarGetString(CVAR_BINGO("SessionCookie"), ""),
+            Rgba8ToHex(CVarGetColor(CVAR_BINGO("UserColor.Value"), HexToRgba8(Bingo::Client::Instance().GetSnapshot().myColor))));
+        });
     AddWidget(path, "Renew Bingo Card", WIDGET_BUTTON)
         .HideInSearch(true)
         .Options(ButtonOptions()
@@ -169,6 +233,7 @@ void SohMenu::AddMenuBingo() {
     });
     AddWidget(path, "New Seeded Card", WIDGET_BUTTON)
         .HideInSearch(true)
+        .SameLine(true)
         .Options(ButtonOptions()
                      .Tooltip("Generates a new Bingo Card using a seed value."))
         .PreFunc([](WidgetInfo& info) {

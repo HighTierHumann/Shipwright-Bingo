@@ -223,6 +223,12 @@ void Client::RenewCard(const std::string& gameIdInput, const std::string& sessio
                                             NormalizeCookie(sessionCookie), stopRequested);
 }
 
+void Client::UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse) {
+    SPDLOG_DEBUG("Updating user color: {}", colorToUse);
+    HttpResponse join = HttpGet("api/Game/UserColorSelected/" + UrlEscape(gameIdInput) + "/" + "!" + colorToUse,
+                                NormalizeCookie(sessionCookie), stopRequested);
+}
+
 void Client::ReadRoomsList(const std::string& sessionCookie) {
     std::lock_guard<std::mutex> workerLock(roomsWorkerMutex);
     {
