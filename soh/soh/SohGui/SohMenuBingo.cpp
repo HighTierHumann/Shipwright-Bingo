@@ -94,6 +94,7 @@ void DrawRoomsWindow(WidgetInfo& info) {
         ImGui::TableHeadersRow();
         ImGui::PopItemFlag();
 
+        int buttonId = 0;
         for (const Bingo::GameRoom& room : rooms.rooms) {
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -104,15 +105,75 @@ void DrawRoomsWindow(WidgetInfo& info) {
             ImGui::TextUnformatted(room.description.empty() ? "-" : room.description.c_str());
             ImGui::TableNextColumn();
 
+            std::string idToUse = std::to_string(buttonId);
             if (client.IsActive()) {
-                if (ImGui::Button("Disconnect")) {
+                if (ImGui::Button(("Disconnect##" + idToUse).c_str())) {
                     client.Disconnect();
                 }
             } else {
-                if (ImGui::Button("Join")) {
+                if (ImGui::Button(("Join##" + idToUse).c_str())) {
                     client.Connect(room.gameCode, CVarGetString(CVAR_BINGO("SessionCookie"), ""));
                 }
             }
+            buttonId++;
+        }
+        ImGui::EndTable();
+    }
+
+    ImGui::PopStyleVar(1);
+}
+
+void DrawWeekliesWindow(WidgetInfo& info) {
+    auto& client = Bingo::Client::Instance();
+    const std::string sessionCookie = CVarGetString(CVAR_BINGO("SessionCookie"), "");
+    Bingo::WeekliesSnapshot weeklies = client.GetWeekliesSnapshot();
+    if (!weeklies.hasRequested) {
+        client.ReadWeekliesList(sessionCookie);
+        weeklies = client.GetWeekliesSnapshot();
+    }
+
+    static ImVec2 cellPadding(8.0f, 8.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cellPadding);
+
+    ImGui::BeginDisabled(weeklies.loading);
+    if (ImGui::Button("Refresh Weeklies")) {
+        client.ReadWeekliesList(sessionCookie);
+    }
+    ImGui::EndDisabled();
+    ImGui::TextUnformatted(weeklies.status.c_str());
+
+    if (ImGui::BeginTable("tableWeekliesAvailable", 3, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersV)) {
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch, 400.0f);
+        ImGui::TableSetupColumn("##Game Type", ImGuiTableColumnFlags_WidthStretch, 100.0f);
+        ImGui::TableSetupColumn("##Run Status", ImGuiTableColumnFlags_WidthStretch, 100.0f);
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::TableHeadersRow();
+        ImGui::PopItemFlag();
+
+        int buttonId = 0;
+        for (const Bingo::Weeklies& weekly : weeklies.weeklies) {
+            if (weekly.runStatus == "1") {
+                continue;
+            }
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(weekly.name.empty() ? "-" : weekly.name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(weekly.isMystery == "true" ? "Mystery Seed" : "-");
+            ImGui::TableNextColumn();
+
+            std::string idToUse = std::to_string(buttonId);
+            if (weekly.runStatus == "0") {
+                if (ImGui::Button(("Resume##" + idToUse).c_str())) {
+                    //client.Disconnect();
+                }
+            } else {
+                if (ImGui::Button(("Start##" + idToUse).c_str())) {
+                    //client.Connect(weekly.name, CVarGetString(CVAR_BINGO("SessionCookie"), ""));
+                }
+            }
+
+            buttonId++;
         }
         ImGui::EndTable();
     }
@@ -168,7 +229,34 @@ void SohMenu::AddMenuBingo() {
     // Rooms
     path.sidebarName = "Rooms";
     AddSidebarEntry("Bingo", path.sidebarName, 1);
+    AddWidget(path, "Game Description", WIDGET_CUSTOM).CustomFunction([](WidgetInfo& info) {
+        ImGui::BeginDisabled(!(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive()));
+        ImGui::Text("Game Description");
+        CVarInputString("##BingoGameDescription", CVAR_BINGO("GameDescription"),
+                        InputOptions()
+                            .Color(THEME_COLOR)
+                            .LabelPosition(LabelPositions::None)
+                            .PlaceholderText("Max 100 characters."));
+        ImGui::EndDisabled();
+    });
+    AddWidget(path, "Create Room", WIDGET_BUTTON)
+        .PreFunc([](WidgetInfo& info) {
+            info.options->disabled = !(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive());
+        })
+        .Callback([](WidgetInfo& info) {
+            auto& client = Bingo::Client::Instance();
+            client.CreateGame(CVarGetString(CVAR_BINGO("SessionCookie"), ""), CVarGetString(CVAR_BINGO("GameDescription"), ""));
+        });
+    AddWidget(path, "##Bingo Room Separator", WIDGET_SEPARATOR);
     AddWidget(path, "Bingo Rooms", WIDGET_CUSTOM).CustomFunction(DrawRoomsWindow)
+        .PreFunc([](WidgetInfo& info) {
+            info.isHidden = !(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive());
+        });
+
+    // Weeklies
+    path.sidebarName = "Weeklies";
+    AddSidebarEntry("Bingo", path.sidebarName, 1);
+    AddWidget(path, "Bingo Weeklies", WIDGET_CUSTOM).CustomFunction(DrawWeekliesWindow)
         .PreFunc([](WidgetInfo& info) {
             info.isHidden = !(Bingo::Client::Instance().IsLoggedIn() || Bingo::Client::Instance().IsActive());
         });

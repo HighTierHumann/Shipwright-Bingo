@@ -25,9 +25,34 @@
 #include <filesystem>
 #include <array>
 #include <mutex>
+#include <type_traits>
 
 extern "C" SaveContext gSaveContext;
 using namespace std::string_literals;
+
+// 1-byte arrays are widened to int so they serialize as numbers rather than characters, and loaded as 0/1 flags.
+// Wider element types (e.g. u64 bitfields) are stored as-is.
+template <typename T> using BingoSaveType = std::conditional_t<sizeof(T) == 1, int, T>;
+
+template <typename T, size_t N>
+static void LoadBingoSceneArray(const char* name, T (&arr)[N]) {
+    SaveManager::Instance->LoadArray(name, N, [&arr](size_t i) {
+        BingoSaveType<T> val = 0;
+        SaveManager::Instance->LoadData("", val);
+        if constexpr (sizeof(T) == 1) {
+            arr[i] = val != 0;
+        } else {
+            arr[i] = val;
+        }
+    });
+}
+
+template <typename T, size_t N>
+static void SaveBingoSceneArray(const char* name, const T (&arr)[N]) {
+    SaveManager::Instance->SaveArray(name, N, [&arr](size_t i) {
+        SaveManager::Instance->SaveData("", static_cast<BingoSaveType<T>>(arr[i]));
+    });
+}
 
 void SaveManager::WriteSaveFile(const std::filesystem::path& savePath, const uintptr_t addr, void* dramAddr,
                                 const size_t size) {
@@ -840,8 +865,8 @@ void SaveManager::InitFileNormal() {
         gSaveContext.ship.randomizerInf[flag] = 0;
     }
     // Currently bingo flags are accessible from all quests
-    for (int flag = 0; flag < ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf); flag++) {
-        gSaveContext.ship.quest.data.randomizer.bingoInf[flag] = 0;
+    for (int flag = 0; flag < ARRAY_COUNT(gSaveContext.ship.bingoInf); flag++) {
+        gSaveContext.ship.bingoInf[flag] = 0;
     }
     gSaveContext.worldMapAreaData = 0;
     gSaveContext.scarecrowLongSongSet = 0;
@@ -1634,8 +1659,8 @@ void SaveManager::LoadBaseVersion1() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
-    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
-        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.bingoInf[i]);
     });
 }
 
@@ -1817,8 +1842,8 @@ void SaveManager::LoadBaseVersion2() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
-    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
-        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.bingoInf[i]);
     });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
@@ -2049,8 +2074,8 @@ void SaveManager::LoadBaseVersion3() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
-    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
-        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.bingoInf[i]);
     });
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
@@ -2225,16 +2250,15 @@ void SaveManager::LoadBaseVersion4() {
     SaveManager::Instance->LoadArray("randomizerInf", ARRAY_COUNT(gSaveContext.ship.randomizerInf), [](size_t i) {
         SaveManager::Instance->LoadData("", gSaveContext.ship.randomizerInf[i]);
     });
-    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.quest.data.randomizer.bingoInf), [](size_t i) {
-        SaveManager::Instance->LoadData("", gSaveContext.ship.quest.data.randomizer.bingoInf[i]);
+    SaveManager::Instance->LoadArray("bingoInf", ARRAY_COUNT(gSaveContext.ship.bingoInf), [](size_t i) {
+        SaveManager::Instance->LoadData("", gSaveContext.ship.bingoInf[i]);
     });
-    SaveManager::Instance->LoadArray("dungeonsEntered",
-                                    ARRAY_COUNT(gSaveContext.ship.quest.data.bingo.dungeonsEntered),
-                                    [&](size_t i) {
-                                        int val = 0;
-                                        SaveManager::Instance->LoadData("", val);
-                                        gSaveContext.ship.quest.data.bingo.dungeonsEntered[i] = static_cast<int8_t>(val);
-                                    });
+    LoadBingoSceneArray("bingoUniqueKeeseIgnitions", gSaveContext.ship.bingo.uniqueKeeseIgnitions);
+    LoadBingoSceneArray("bingoFlyingPotDamaged", gSaveContext.ship.bingo.flyingPotDamaged);
+    LoadBingoSceneArray("bingoWallmasterVoids", gSaveContext.ship.bingo.wallmasterVoids);
+    LoadBingoSceneArray("bingoEyeSwitchesActivated", gSaveContext.ship.bingo.eyeSwitchesActivated);
+    LoadBingoSceneArray("bingoEnteredDungeons", gSaveContext.ship.bingo.enteredDungeons);
+    LoadBingoSceneArray("bingoDcScrubsSpoken", gSaveContext.ship.bingo.dcScrubsSpoken);
     int isMQ = 0;
     SaveManager::Instance->LoadData("isMasterQuest", isMQ);
     if (isMQ) {
@@ -2405,17 +2429,15 @@ void SaveManager::SaveBase(SaveContext* saveContext, int sectionID, bool fullSav
     SaveManager::Instance->SaveArray("randomizerInf", ARRAY_COUNT(saveContext->ship.randomizerInf), [&](size_t i) {
         SaveManager::Instance->SaveData("", saveContext->ship.randomizerInf[i]);
     });
-    SaveManager::Instance->SaveArray("bingoInf", ARRAY_COUNT(saveContext->ship.quest.data.randomizer.bingoInf), [&](size_t i) {
-        SaveManager::Instance->SaveData("", saveContext->ship.quest.data.randomizer.bingoInf[i]);
+    SaveManager::Instance->SaveArray("bingoInf", ARRAY_COUNT(saveContext->ship.bingoInf), [&](size_t i) {
+        SaveManager::Instance->SaveData("", saveContext->ship.bingoInf[i]);
     });
-    SaveManager::Instance->SaveArray("dungeonsEntered",
-                                    ARRAY_COUNT(saveContext->ship.quest.data.bingo.dungeonsEntered),
-                                    [&](size_t i) {
-                                        SaveManager::Instance->SaveData("",
-                                                                       static_cast<int>(
-                                                                           saveContext->ship.quest.data.bingo
-                                                                               .dungeonsEntered[i]));
-                                    });
+    SaveBingoSceneArray("bingoUniqueKeeseIgnitions", saveContext->ship.bingo.uniqueKeeseIgnitions);
+    SaveBingoSceneArray("bingoFlyingPotDamaged", saveContext->ship.bingo.flyingPotDamaged);
+    SaveBingoSceneArray("bingoWallmasterVoids", saveContext->ship.bingo.wallmasterVoids);
+    SaveBingoSceneArray("bingoEyeSwitchesActivated", saveContext->ship.bingo.eyeSwitchesActivated);
+    SaveBingoSceneArray("bingoEnteredDungeons", saveContext->ship.bingo.enteredDungeons);
+    SaveBingoSceneArray("bingoDcScrubsSpoken", saveContext->ship.bingo.dcScrubsSpoken);
     SaveManager::Instance->SaveData("isMasterQuest", saveContext->ship.quest.id == QUEST_MASTER);
     SaveManager::Instance->SaveStruct("backupFW", [&]() {
         SaveManager::Instance->SaveStruct("pos", [&]() {

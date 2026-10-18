@@ -52,11 +52,24 @@ struct GameRoom {
     bool isStarted = false;
 };
 
+struct Weeklies {
+    std::string name;
+    std::string isMystery;
+    std::string runStatus;
+};
+
 struct RoomsSnapshot {
     bool hasRequested = false;
     bool loading = false;
     std::string status = "Rooms have not been loaded.";
     std::vector<GameRoom> rooms;
+};
+
+struct WeekliesSnapshot {
+    bool hasRequested = false;
+    bool loading = false;
+    std::string status = "Weeklies have not been loaded.";
+    std::vector<Weeklies> weeklies;
 };
 
 // Talks to shipbingo.zarashane.dev on a worker thread. All public methods are safe to call from the game thread.
@@ -70,8 +83,11 @@ class Client {
     void Disconnect();
     void RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID);
     void UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse);
+    void CreateGame(const std::string& sessionCookie, const std::string& gameDescription);
     void ReadRoomsList(const std::string& sessionCookie);
+    void ReadWeekliesList(const std::string& sessionCookie);
     RoomsSnapshot GetRoomsSnapshot();
+    WeekliesSnapshot GetWeekliesSnapshot();
     bool IsLoggedIn();
     bool IsActive();
     Snapshot GetSnapshot();
@@ -87,18 +103,23 @@ class Client {
     void Authenticate(std::string cookie);
     void Run(std::string gameId, std::string cookie);
     void RunRoomsRequest(std::string cookie);
+    void RunWeekliesRequest(std::string cookie);
     void SetStatus(ConnectionState state, const std::string& status);
     void ApplyGameState(const nlohmann::json& state);
 
     std::mutex mutex;
     std::mutex roomsWorkerMutex;
+    std::mutex weekliesWorkerMutex;
     std::condition_variable wake;
     std::thread worker;
     std::thread roomsWorker;
+    std::thread weekliesWorker;
     std::atomic<bool> stopRequested = false;
     std::atomic<bool> roomsStopRequested = false;
+    std::atomic<bool> weekliesStopRequested = false;
     Snapshot snapshot;
     RoomsSnapshot roomsSnapshot;
+    WeekliesSnapshot weekliesSnapshot;
     std::deque<std::string> pendingToggles;
     std::vector<std::string> myIdentifiers; // values from /auth/me used to find our entry in the user list
 };

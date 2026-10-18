@@ -63,10 +63,6 @@ static void DrawCellContents(ImDrawList* drawList, const Bingo::BoardSquare& squ
     ImFont* font = ImGui::GetFont();
     float fontSize = ImGui::GetFontSize();
     drawList->PushClipRect(cellTL, ImVec2(cellTL.x + cellSize, cellTL.y + cellSize), true);
-    if (!square.helpText.empty()) {
-        drawList->AddText(font, fontSize * 2, ImVec2(cellTL.x + (cellSize - ImGui::CalcTextSize("*").x * 2.5f), cellTL.y + 1.0f), IM_COL32(0, 255, 0, 255), "*", nullptr);
-    }
-
     const float textPadding = 4.0f;
     const float wrapWidth = cellSize - textPadding * 2.0f;
     if (wrapWidth > 0.0f && !square.name.empty()) {
@@ -77,6 +73,10 @@ static void DrawCellContents(ImDrawList* drawList, const Bingo::BoardSquare& squ
         drawList->AddText(font, fontSize, ImVec2(textPos.x + 1.0f, textPos.y + 1.0f), IM_COL32(0, 0, 0, 255), text,
                           nullptr, wrapWidth);
         drawList->AddText(font, fontSize, textPos, IM_COL32(255, 255, 255, 255), text, nullptr, wrapWidth);
+    }
+
+    if (!square.helpText.empty()) {
+        drawList->AddText(font, fontSize * 2, ImVec2(cellTL.x + (cellSize - ImGui::CalcTextSize("*").x * 2.5f), cellTL.y + 1.0f), IM_COL32(0, 255, 0, 255), "*", nullptr);
     }
 
     int& iconToUse = sSquareIcons[square.id];
@@ -93,7 +93,7 @@ static void DrawCellContents(ImDrawList* drawList, const Bingo::BoardSquare& squ
 
     if (isHovered && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
         if (!sSquareLongHoldTriggered[square.id]) {
-            iconToUse = (iconToUse + 1) % 10;
+            iconToUse = (iconToUse + 1) % 12;
         }
     }
 
@@ -120,22 +120,28 @@ static void DrawCellContents(ImDrawList* drawList, const Bingo::BoardSquare& squ
                 itemName = "ITEM_BOMB";
                 break;
             case 4:
-                itemName = "ITEM_ARROW_ICE";
-                break;
-            case 5:
                 itemName = "ITEM_HAMMER";
                 break;
-            case 6:
+            case 5:
                 itemName = "ITEM_SWORD_MASTER";
                 break;
-            case 7:
+            case 6:
                 itemName = "QUEST_KOKIRI_EMERALD";
                 break;
-            case 8:
+            case 7:
                 itemName = "QUEST_GORON_RUBY";
                 break;
-            case 9:
+            case 8:
                 itemName = "QUEST_ZORA_SAPPHIRE";
+                break;
+            case 9:
+                itemName = "ITEM_COMPASS";
+                break;
+            case 10:
+                itemName = "ITEM_DUNGEON_MAP";
+                break;
+            case 11:
+                itemName = "ITEM_SKULL_TOKEN";
                 break;
             default:
                 break;
@@ -307,7 +313,7 @@ void BingoBoardWindow::DrawElement() {
     if (Trackers::BeginFloatWindows(
             "Bingo Board", mIsVisible, Color_Background,
             static_cast<TrackerWindowType>(CVarGetInteger(CVAR_BINGO_BOARD("WindowType"), TRACKER_WINDOW_WINDOW)),
-            CVarGetInteger(CVAR_BINGO_BOARD("Draggable"), 1), ImGuiWindowFlags_NoScrollbar)) {
+            CVarGetInteger(CVAR_BINGO_BOARD("Draggable"), 1), ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
 
         DrawBingoBoardContents();
 

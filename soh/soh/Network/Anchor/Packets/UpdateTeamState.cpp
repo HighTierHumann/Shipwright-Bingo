@@ -193,7 +193,22 @@ void Anchor::HandlePacket_UpdateTeamState(nlohmann::json payload) {
         }
 
         for (int i = 0; i < ceil((BINGO_INF_MAX + 15) / 16); i++) {
-            gSaveContext.ship.quest.data.randomizer.bingoInf[i] |= loadedData.ship.quest.data.randomizer.bingoInf[i];
+            gSaveContext.ship.bingoInf[i] |= loadedData.ship.bingoInf[i];
+        }
+
+        for (int i = 0; i < BINGO_SCENE_INFO_COUNT; i++) {
+            gSaveContext.ship.bingo.uniqueKeeseIgnitions[i] |= loadedData.ship.bingo.uniqueKeeseIgnitions[i];
+            gSaveContext.ship.bingo.wallmasterVoids[i] |= loadedData.ship.bingo.wallmasterVoids[i];
+            gSaveContext.ship.bingo.eyeSwitchesActivated[i] |= loadedData.ship.bingo.eyeSwitchesActivated[i];
+            gSaveContext.ship.bingo.enteredDungeons[i] |= loadedData.ship.bingo.enteredDungeons[i];
+        }
+
+        for (size_t i = 0; i < ARRAY_COUNT(gSaveContext.ship.bingo.flyingPotDamaged); i++) {
+            gSaveContext.ship.bingo.flyingPotDamaged[i] |= loadedData.ship.bingo.flyingPotDamaged[i];
+        }
+
+        for (size_t i = 0; i < ARRAY_COUNT(gSaveContext.ship.bingo.dcScrubsSpoken); i++) {
+            gSaveContext.ship.bingo.dcScrubsSpoken[i] |= loadedData.ship.bingo.dcScrubsSpoken[i];
         }
 
         for (int i = 0; i < 6; i++) {

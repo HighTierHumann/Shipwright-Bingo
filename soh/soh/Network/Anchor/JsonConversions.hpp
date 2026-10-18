@@ -123,6 +123,26 @@ inline void from_json(const json& j, ShipRandomizerSaveContextData& shipRandomiz
     j.at("bombchuUpgradeLevel").get_to(shipRandomizerSaveContextData.bombchuUpgradeLevel);
 }
 
+inline void to_json(json& j, const ShipBingoSaveContextData& shipBingoSaveContextData) {
+    j = json{
+        { "uniqueKeeseIgnitions", shipBingoSaveContextData.uniqueKeeseIgnitions },
+        { "flyingPotDamaged", shipBingoSaveContextData.flyingPotDamaged },
+        { "wallmasterVoids", shipBingoSaveContextData.wallmasterVoids },
+        { "eyeSwitchesActivated", shipBingoSaveContextData.eyeSwitchesActivated },
+        { "enteredDungeons", shipBingoSaveContextData.enteredDungeons },
+        { "dcScrubsSpoken", shipBingoSaveContextData.dcScrubsSpoken },
+    };
+}
+
+inline void from_json(const json& j, ShipBingoSaveContextData& shipBingoSaveContextData) {
+    j.at("uniqueKeeseIgnitions").get_to(shipBingoSaveContextData.uniqueKeeseIgnitions);
+    j.at("flyingPotDamaged").get_to(shipBingoSaveContextData.flyingPotDamaged);
+    j.at("wallmasterVoids").get_to(shipBingoSaveContextData.wallmasterVoids);
+    j.at("eyeSwitchesActivated").get_to(shipBingoSaveContextData.eyeSwitchesActivated);
+    j.at("enteredDungeons").get_to(shipBingoSaveContextData.enteredDungeons);
+    j.at("dcScrubsSpoken").get_to(shipBingoSaveContextData.dcScrubsSpoken);
+}
+
 inline void to_json(json& j, const ShipQuestSpecificSaveContextData& shipQuestSpecificSaveContextData) {
     j = json{
         { "randomizer", shipQuestSpecificSaveContextData.randomizer },
@@ -150,7 +170,8 @@ inline void to_json(json& j, const ShipSaveContextData& shipSaveContextData) {
         { "stats", shipSaveContextData.stats },
         { "quest", shipSaveContextData.quest },
         { "randomizerInf", shipSaveContextData.randomizerInf },
-        { "bingoInf", shipSaveContextData.quest.data.randomizer.bingoInf },
+        { "bingoInf", shipSaveContextData.bingoInf },
+        { "bingo", shipSaveContextData.bingo },
     };
 }
 
@@ -158,7 +179,8 @@ inline void from_json(const json& j, ShipSaveContextData& shipSaveContextData) {
     j.at("stats").get_to(shipSaveContextData.stats);
     j.at("quest").get_to(shipSaveContextData.quest);
     j.at("randomizerInf").get_to(shipSaveContextData.randomizerInf);
-    j.at("bingoInf").get_to(shipSaveContextData.quest.data.randomizer.bingoInf);
+    j.at("bingoInf").get_to(shipSaveContextData.bingoInf);
+    j.at("bingo").get_to(shipSaveContextData.bingo);
 }
 
 inline void to_json(json& j, const SaveContext& saveContext) {

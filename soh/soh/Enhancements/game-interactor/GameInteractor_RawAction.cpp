@@ -250,7 +250,7 @@ void GameInteractor::RawAction::SetFlag(int16_t flagType, int16_t flag) {
             SET_GS_FLAGS((flag & 0x1F00) >> 8, flag & 0xFF);
             break;
         case FlagType::FLAG_BINGO_INF:
-            gSaveContext.ship.quest.data.randomizer.bingoInf[flag >> 4] |= (1 << (flag & 0xF));
+            gSaveContext.ship.bingoInf[flag >> 4] |= (1 << (flag & 0xF));
             break;
     }
 };
@@ -278,7 +278,7 @@ void GameInteractor::RawAction::UnsetFlag(int16_t flagType, int16_t flag) {
             gSaveContext.ship.randomizerInf[flag >> 4] &= ~(1 << (flag & 0xF));
             break;
         case FlagType::FLAG_BINGO_INF:
-            gSaveContext.ship.quest.data.randomizer.bingoInf[flag >> 4] &= ~(1 << (flag & 0xF));
+            gSaveContext.ship.bingoInf[flag >> 4] &= ~(1 << (flag & 0xF));
             break;
     }
 };

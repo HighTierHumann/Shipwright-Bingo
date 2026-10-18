@@ -5107,7 +5107,7 @@ void Flags_UnsetRandomizerInf(RandomizerInf flag) {
  * Tests if "bingoInf" flag is set.
  */
 s32 Flags_GetBingoInf(BingoInf flag) {
-    return gSaveContext.ship.quest.data.randomizer.bingoInf[flag >> 4] & (1 << (flag & 0xF));
+    return gSaveContext.ship.bingoInf[flag >> 4] & (1 << (flag & 0xF));
 }
 
 /**
@@ -5116,7 +5116,7 @@ s32 Flags_GetBingoInf(BingoInf flag) {
 void Flags_SetBingoInf(BingoInf flag) {
     s32 previouslyOff = !Flags_GetBingoInf(flag);
     if (previouslyOff) {
-        gSaveContext.ship.quest.data.randomizer.bingoInf[flag >> 4] |= (1 << (flag & 0xF));
+        gSaveContext.ship.bingoInf[flag >> 4] |= (1 << (flag & 0xF));
         LUSLOG_INFO("BingoInf Flag Set - %#x", flag);
         GameInteractor_ExecuteOnFlagSet(FLAG_BINGO_INF, flag);
     }
@@ -5128,7 +5128,7 @@ void Flags_SetBingoInf(BingoInf flag) {
 void Flags_UnsetBingoInf(BingoInf flag) {
     s32 previouslyOn = Flags_GetBingoInf(flag);
     if (previouslyOn) {
-        gSaveContext.ship.quest.data.randomizer.bingoInf[flag >> 4] &= ~(1 << (flag & 0xF));
+        gSaveContext.ship.bingoInf[flag >> 4] &= ~(1 << (flag & 0xF));
         LUSLOG_INFO("BingoInf Flag Unset - %#x", flag);
         GameInteractor_ExecuteOnFlagUnset(FLAG_BINGO_INF, flag);
     }

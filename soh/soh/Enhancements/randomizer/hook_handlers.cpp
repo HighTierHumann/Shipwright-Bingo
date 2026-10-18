@@ -368,6 +368,9 @@ void RandomizerOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t
                 if (!isVanilla && flag == 0x28) {
                     Flags_SetRandomizerInf(RAND_INF_FIRE_MQ_LOBBY_TORCHES);
                 }
+                if (flag == 0x3B) {
+                    Flags_SetRandomizerInf(RAND_INF_FIRE_TEMPLE_TEMP_HAMMER_SWITCH);
+                }
                 break;
             case SCENE_SPIRIT_TEMPLE:
                 if (isVanilla && flag == 0x23) {
@@ -2348,6 +2351,9 @@ void RandomizerOnActorInitHandler(void* actorRef) {
             case SCENE_FIRE_TEMPLE:
                 if (!isVanilla && Flags_GetRandomizerInf(RAND_INF_FIRE_MQ_LOBBY_TORCHES)) {
                     Flags_SetSwitch(gPlayState, 0x28);
+                }
+                if (Flags_GetRandomizerInf(RAND_INF_FIRE_TEMPLE_TEMP_HAMMER_SWITCH)) {
+                    Flags_SetSwitch(gPlayState, 0x3B);
                 }
                 break;
             case SCENE_SPIRIT_TEMPLE:

@@ -144,9 +144,14 @@ Client& Client::Instance() {
 Client::~Client() {
     Disconnect();
     roomsStopRequested = true;
-    std::lock_guard<std::mutex> workerLock(roomsWorkerMutex);
+    std::lock_guard<std::mutex> roomsWorkerLock(roomsWorkerMutex);
     if (roomsWorker.joinable()) {
         roomsWorker.join();
+    }
+    weekliesStopRequested = true;
+    std::lock_guard<std::mutex> weekliesWorkerLock(weekliesWorkerMutex);
+    if (weekliesWorker.joinable()) {
+        weekliesWorker.join();
     }
 }
 
@@ -224,9 +229,39 @@ void Client::RenewCard(const std::string& gameIdInput, const std::string& sessio
 }
 
 void Client::UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse) {
-    SPDLOG_DEBUG("Updating user color: {}", colorToUse);
     HttpResponse join = HttpGet("api/Game/UserColorSelected/" + UrlEscape(gameIdInput) + "/" + "!" + colorToUse,
                                 NormalizeCookie(sessionCookie), stopRequested);
+}
+
+void Client::CreateGame(const std::string& sessionCookie, const std::string& gameDescription) {
+    const std::string cookie = NormalizeCookie(sessionCookie);
+    if (cookie.empty()) {
+        SetStatus(ConnectionState::Error, "Paste your session cookie first");
+        return;
+    }
+
+    std::atomic<bool> cancel = false;
+    HttpResponse response = HttpGet("api/Game/StartGame/" + UrlEscape(gameDescription), cookie, cancel);
+    if (IsAuthFailure(response)) {
+        SetStatus(ConnectionState::Error, "Session expired. Paste a new session cookie.");
+        return;
+    }
+    if (response.status != 200) {
+        const std::string status = "Could not create game: " + DescribeError(response);
+        SPDLOG_WARN("[Bingo] {}", status);
+        SetStatus(ConnectionState::Error, status);
+        return;
+    }
+
+    const auto gameId = nlohmann::json::parse(response.body, nullptr, false);
+    if (!gameId.is_number_integer() && !gameId.is_number_unsigned()) {
+        const std::string status = "The server returned an invalid Game ID.";
+        SPDLOG_WARN("[Bingo] {}", status);
+        SetStatus(ConnectionState::Error, status);
+        return;
+    }
+
+    Connect(gameId.dump(), cookie);
 }
 
 void Client::ReadRoomsList(const std::string& sessionCookie) {
@@ -301,6 +336,78 @@ void Client::RunRoomsRequest(std::string cookie) {
     }
     roomsSnapshot.status = std::move(status);
     roomsSnapshot.loading = false;
+}
+
+void Client::ReadWeekliesList(const std::string& sessionCookie) {
+    std::lock_guard<std::mutex> workerLock(weekliesWorkerMutex);
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        if (weekliesSnapshot.loading) {
+            return;
+        }
+        weekliesSnapshot.hasRequested = true;
+        weekliesSnapshot.loading = true;
+        weekliesSnapshot.status = "Loading current weeklies...";
+    }
+
+    if (weekliesWorker.joinable()) {
+        weekliesWorker.join();
+    }
+    weekliesWorker = std::thread(&Client::RunWeekliesRequest, this, NormalizeCookie(sessionCookie));
+}
+
+WeekliesSnapshot Client::GetWeekliesSnapshot() {
+    std::lock_guard<std::mutex> lock(mutex);
+    return weekliesSnapshot;
+}
+
+void Client::RunWeekliesRequest(std::string cookie) {
+    HttpResponse response = HttpGet("api/WeeklySeed/ListWeeklies/", cookie, weekliesStopRequested);
+    if (weekliesStopRequested) {
+        std::lock_guard<std::mutex> lock(mutex);
+        weekliesSnapshot.loading = false;
+        return;
+    }
+
+    std::vector<Weeklies> weeklies;
+    std::string status;
+    bool success = false;
+
+    if (response.status == 200) {
+        auto parsed = nlohmann::json::parse(response.body, nullptr, false);
+        if (parsed.is_array()) {
+            for (const auto& weeklyJson : parsed) {
+                if (!weeklyJson.is_object()) {
+                    continue;
+                }
+
+                Weeklies weekly;
+                weekly.name = StringField(weeklyJson, "name");
+                weekly.isMystery = StringField(weeklyJson, "isMystery");
+                weekly.runStatus = StringField(weeklyJson, "runStatus");
+                weeklies.push_back(std::move(weekly));
+            }
+            success = true;
+            status = weeklies.empty() ? "No current weeklies." : std::to_string(weeklies.size()) + " current weeklies.";
+        } else {
+            status = "The server returned an invalid weeklies list.";
+        }
+    } else if (IsAuthFailure(response)) {
+        status = "Session expired. Paste a new session cookie.";
+    } else {
+        status = "Could not load weeklies: " + DescribeError(response);
+    }
+
+    if (!success) {
+        SPDLOG_WARN("[Bingo] Failed to load current weeklies: {}", status);
+    }
+
+    std::lock_guard<std::mutex> lock(mutex);
+    if (success) {
+        weekliesSnapshot.weeklies = std::move(weeklies);
+    }
+    weekliesSnapshot.status = std::move(status);
+    weekliesSnapshot.loading = false;
 }
 
 bool Client::IsLoggedIn() {

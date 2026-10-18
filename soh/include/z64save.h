@@ -236,7 +236,6 @@ typedef struct ShipRandomizerSaveContextData {
     bool loseCon;
     u8 bombchuUpgradeLevel;
     bool obtainedBronzeScale;
-    u16 bingoInf[(BINGO_INF_MAX + 15) / 16];
 } ShipRandomizerSaveContextData;
 
 typedef struct ShipBossRushSaveContextData {
@@ -244,14 +243,22 @@ typedef struct ShipBossRushSaveContextData {
     u8 options[BR_OPTIONS_MAX];
 } ShipBossRushSaveContextData;
 
+// 101 is the end of the non-debug scene list, which is SCENE_OUTSIDE_GANONS_CASTLE
+#define BINGO_SCENE_INFO_COUNT 101
+
 typedef struct ShipBingoSaveContextData {
-    s8 dungeonsEntered[12];
+    u8 uniqueKeeseIgnitions[BINGO_SCENE_INFO_COUNT];
+    u8 flyingPotDamaged[5];
+    u8 wallmasterVoids[BINGO_SCENE_INFO_COUNT];
+    u8 enteredDungeons[BINGO_SCENE_INFO_COUNT];
+    u8 dcScrubsSpoken[4];
+    u64 eyeSwitchesActivated[BINGO_SCENE_INFO_COUNT];
+    u8 waterCrystalsActivated[8];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {
     ShipRandomizerSaveContextData randomizer;
     ShipBossRushSaveContextData bossRush;
-    ShipBingoSaveContextData bingo;
 } ShipQuestSpecificSaveContextData;
 
 typedef struct ShipQuestSaveContextData {
@@ -268,8 +275,10 @@ typedef struct ShipSaveContextData {
     ShipQuestSaveContextData quest;
     u8 maskMemory;
     u8 filenameLanguage;
+    ShipBingoSaveContextData bingo;
     //TODO: Move non-rando specific flags to a new sohInf and move the remaining randomizerInf to ShipRandomizerSaveContextData
     u16 randomizerInf[(RAND_INF_MAX + 15) / 16];
+    u16 bingoInf[(BINGO_INF_MAX + 15) / 16];
 } ShipSaveContextData;
 
 #pragma endregion
