@@ -29,6 +29,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "src/overlays/actors/ovl_En_Wallmas/z_en_wallmas.h"
 #include "src/overlays/actors/ovl_En_Ru1/z_en_ru1.h"
+#include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
 #include "src/overlays/actors/ovl_Obj_Switch/z_obj_switch.h"
 extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
@@ -675,6 +676,14 @@ void BingoOnActorUpdateHandler(void* refActor) {
 void BingoShouldActorUpdateHandler(void* refActor, bool*) {
     Actor* actor = static_cast<Actor*>(refActor);
 
+    if (actor->id == ACTOR_EN_WONDER_ITEM && gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE &&
+        gPlayState->roomCtx.curRoom.num == 0x5) {
+        EnWonderItem* wonderItem = reinterpret_cast<EnWonderItem*>(actor);
+        if (wonderItem->wonderMode == WONDERITEM_INTERACT_SWITCH && wonderItem->collider.base.acFlags & AC_HIT) {
+            Flags_SetBingoInf(BINGO_INF_SPIRIT_STATUE_NIPPLE_PIERCING);
+        }
+    }
+
     if (actor->id == ACTOR_EN_FIREFLY) {
         EnFirefly* firefly = reinterpret_cast<EnFirefly*>(actor);
         if (firefly->collider.base.atFlags & AT_HIT && firefly->auraType == 1 &&
@@ -739,8 +748,8 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
         /*
             Even with the below checks in place, hitting the switch even when it's "on"
             still triggers this logic. The ObjSwitch actor doesn't seem to have anything
-            I can look at to prevent this, so we will assume an honor system for now; even still,
-            it's not really a big deal.
+            I can look at to prevent this, so we will assume an honor system for now;
+            even still, it's not really a big deal.
         */
         if (objSwitch->jntSph.col.base.acFlags & AC_HIT) {
             if (objSwitch->dyna.actor.world.pos.y == -212) {
@@ -749,6 +758,23 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
                 gSaveContext.ship.bingo.waterCrystalsActivated[2] = true;
             }
         }
+    }
+}
+
+void BingoOnSceneSpawnActorsHandler() {
+    switch(gPlayState->sceneNum) {
+        case SCENE_SPIRIT_TEMPLE:
+            // I kinda really hate needing to spawn actors to make the Nipple Piercing square work, but at least a wonder
+            // item is minimally invasive and preserves the spirit of the game?
+            if (gPlayState->roomCtx.curRoom.num == 0x5 && !Flags_GetBingoInf(BINGO_INF_SPIRIT_STATUE_NIPPLE_PIERCING)) {
+                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_WONDER_ITEM,
+                            150.0f, 800.0f, -1440.0f, 0, 0, 6, 0x193F);
+                Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_WONDER_ITEM,
+                            -30.0f, 800.0f, -1440.0f, 0, 0, 6, 0x193F);
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -857,8 +883,8 @@ static void BingoRegisterHooks() {
         //     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnPlayerUpdate>(BingoOnPlayerUpdateHandler);
         // onGameFrameUpdateHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnGameFrameUpdate>(
         //     BingoOnGameFrameUpdateHandler);
-        // onSceneSpawnActorsHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnSceneSpawnActors>(
-        //     BingoOnSceneSpawnActorsHandler);
+        onSceneSpawnActorsHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnSceneSpawnActors>(
+            BingoOnSceneSpawnActorsHandler);
         // onPlayDestroyHook =
         //     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnPlayDestroy>(BingoOnPlayDestroyHandler);
         // onExitGameHook =
