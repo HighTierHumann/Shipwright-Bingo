@@ -243,7 +243,12 @@ typedef struct ShipBossRushSaveContextData {
     u8 options[BR_OPTIONS_MAX];
 } ShipBossRushSaveContextData;
 
-// 101 is the end of the non-debug scene list, which is SCENE_OUTSIDE_GANONS_CASTLE
+/*
+    101 is the end of the non-debug scene list, which is SCENE_OUTSIDE_GANONS_CASTLE.
+
+    We should avoid using this ideally, but it's good for when you're unsure what scenes
+    are valid to reference for data in ShipBingoSaveContextData.
+*/
 #define BINGO_SCENE_INFO_COUNT 101
 
 typedef struct ShipBingoSaveContextData {
@@ -255,6 +260,8 @@ typedef struct ShipBingoSaveContextData {
     u64 eyeSwitchesActivated[BINGO_SCENE_INFO_COUNT];
     u8 waterCrystalsActivated[8];
     u8 blueBubblesDefeated[7];
+    u8 redBubblesDefeated[5];
+    u8 greenBubblesDefeated[5];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {

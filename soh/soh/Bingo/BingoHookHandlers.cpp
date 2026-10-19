@@ -16,6 +16,7 @@
 #include "soh/Enhancements/randomizer/randomizer_check_tracker.h"
 #include "soh/Enhancements/randomizer/RCToRandInf.h"
 #include "soh/Bingo/BingoSquareMap.h"
+#include "soh/ObjectExtension/ActorListIndex.h"
 
 #include <algorithm>
 #include <bitset>
@@ -175,6 +176,82 @@ static void BingoRecordEyeSwitch(int16_t sceneNum, int16_t flag) {
     }
     if (scenesWithSwitch >= 4) {
         Flags_SetBingoInf(BINGO_INF_4_EYE_SWITCHES_IN_DIFFERENT_DUNGEONS);
+    }
+}
+
+// Actor Index is a safe metric to go by for tracking this; index is set when the actor was
+// placed in the scene during development, not by load-in order like I initially suspected!
+static void BingoRecordBlueBubbleDeath(int16_t actorIndex, int16_t curRoom) {
+    if (Flags_GetBingoInf(BINGO_INF_DEFEAT_ALL_FOREST_BLUE_BUBBLES)) {
+        return;
+    }
+
+    static constexpr struct { int16_t actorIndex; int16_t actorRoom; uint8_t arrayIndex; } blueBubbles[] = {
+        { 0, 0x4, 0 }, { 0, 0x15, 1 }, { 1, 0x15, 2 }, { 0, 0xB, 3 },
+        { 1, 0xB, 4 }, { 2, 0xB, 5 },  { 0, 0xA, 6 }
+    };
+    for (const auto& bubble : blueBubbles) {
+        if (curRoom == bubble.actorRoom && actorIndex == bubble.actorIndex) {
+            gSaveContext.ship.bingo.blueBubblesDefeated[bubble.arrayIndex] = true;
+            LUSLOG_DEBUG("Blue bubble killed in room: %d, actor index: %d", curRoom, actorIndex);
+            break;
+        }
+    }
+
+    auto& defeated = gSaveContext.ship.bingo.blueBubblesDefeated;
+    if (std::all_of(std::begin(defeated), std::end(defeated), [](u8 bubbleDefeated) { return bubbleDefeated != 0; })) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_FOREST_BLUE_BUBBLES);
+    }
+}
+
+static void BingoRecordRedBubbleDeath(int16_t sceneNum, int16_t params) {
+    if (Flags_GetBingoInf(BINGO_INF_DEFEAT_2_DIFFERENT_RED_BUBBLES)) {
+        return;
+    }
+
+    static constexpr struct { int16_t scene; uint8_t arrayIndex; } redBubbles[] = {
+        { SCENE_DEATH_MOUNTAIN_CRATER, 0 }, { SCENE_FIRE_TEMPLE, 1 }, { SCENE_SHADOW_TEMPLE, 2 },
+        { SCENE_GERUDO_TRAINING_GROUND, 3 }, { SCENE_INSIDE_GANONS_CASTLE, 4 }
+    };
+    for (const auto& bubble : redBubbles) {
+        if (sceneNum == bubble.scene) {
+            gSaveContext.ship.bingo.redBubblesDefeated[bubble.arrayIndex] = true;
+            LUSLOG_DEBUG("redBubblesDefeated: %d", bubble.arrayIndex);
+            break;
+        }
+    }
+
+    auto& defeated = gSaveContext.ship.bingo.redBubblesDefeated;
+    if (std::count_if(std::begin(defeated), std::end(defeated), [](u8 bubbleDefeated) { return bubbleDefeated != 0; }) >= 2) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_2_DIFFERENT_RED_BUBBLES);
+    }
+}
+
+static void BingoRecordGreenBubbleDeath(int16_t sceneNum, int16_t actorIndex = -1) {
+    if (Flags_GetBingoInf(BINGO_INF_DEFEAT_3_DIFFERENT_GREEN_BUBBLES)) {
+        return;
+    }
+    
+    static constexpr struct { int16_t scene; uint8_t arrayIndex; int16_t actorIndex; } greenBubbles[] = {
+        { SCENE_SPIRIT_TEMPLE, 0 }, { SCENE_BOTTOM_OF_THE_WELL, 1 },
+        { SCENE_FOREST_TEMPLE, 2, 0 }, { SCENE_FOREST_TEMPLE, 3, 1 },
+        { SCENE_INSIDE_GANONS_CASTLE, 4 }
+    };
+    for (const auto& bubble : greenBubbles) {
+        if (sceneNum == bubble.scene) {
+            if (sceneNum == SCENE_FOREST_TEMPLE && actorIndex != bubble.actorIndex) {
+                continue;
+            }
+
+            gSaveContext.ship.bingo.greenBubblesDefeated[bubble.arrayIndex] = true;
+            LUSLOG_DEBUG("greenBubblesDefeated: %d", bubble.arrayIndex);
+            break;
+        }
+    }
+
+    auto& defeated = gSaveContext.ship.bingo.greenBubblesDefeated;
+    if (std::count_if(std::begin(defeated), std::end(defeated), [](u8 bubbleDefeated) { return bubbleDefeated != 0; }) >= 3) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_3_DIFFERENT_GREEN_BUBBLES);
     }
 }
 
@@ -367,23 +444,6 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
             default:
                 break;
-        }
-
-        if (sceneNum == SCENE_FOREST_TEMPLE) {
-            static constexpr struct { int16_t flag; uint8_t index; } blueBubbles[] = {
-                    { 0x4, 0 },
-                };
-                for (const auto& bubble : blueBubbles) {
-                    if (flag == bubble.flag) {
-                        gSaveContext.ship.bingo.blueBubblesDefeated[bubble.index] = true;
-                        break;
-                    }
-                }
-
-            auto& defeated = gSaveContext.ship.bingo.blueBubblesDefeated;
-            if (std::all_of(std::begin(defeated), std::end(defeated), [](u8 bubbleDefeated) { return bubbleDefeated != 0; })) {
-                Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_FOREST_BLUE_BUBBLES);
-            }
         }
 
         if (flag == 0x1 && IsBossScene(sceneNum)) {
@@ -688,6 +748,29 @@ void BingoOnActorUpdateHandler(void* refActor) {
         EnRu1* ruto = reinterpret_cast<EnRu1*>(actor);
         if (ruto->waterState != 0) {
             Flags_SetBingoInf(BINGO_INF_DROWN_RUTO);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_BB && reinterpret_cast<EnBb*>(actor)->action == 1) {
+        int actorIndex = GetActorListIndex(actor);
+        switch(actor->params) {
+            case ENBB_BLUE:
+                BingoRecordBlueBubbleDeath(actorIndex, gPlayState->roomCtx.curRoom.num);
+                break;
+            case ENBB_RED:
+                BingoRecordRedBubbleDeath(gPlayState->sceneNum, actor->params);
+                break;
+            case ENBB_GREEN:
+                BingoRecordGreenBubbleDeath(gPlayState->sceneNum, actorIndex);
+                break;
+            case ENBB_GREEN_BIG:
+                BingoRecordGreenBubbleDeath(gPlayState->sceneNum);
+                break;
+            case ENBB_WHITE:
+                Flags_SetBingoInf(BINGO_INF_DEFEAT_A_WHITE_BUBBLE);
+                break;
+            default:
+                break;
         }
     }
 }
