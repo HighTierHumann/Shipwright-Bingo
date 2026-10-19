@@ -795,14 +795,24 @@ s32 Flags_GetTempClear(PlayState* play, s32 flag) {
  * Sets current scene temp clear flag.
  */
 void Flags_SetTempClear(PlayState* play, s32 flag) {
+    u8 previouslyOff = !Flags_GetTempClear(play, flag);
     play->actorCtx.flags.tempClear |= (1 << flag);
+    if (previouslyOff) {
+        LUSLOG_INFO("Temp Clear Flag Set - %#x", flag);
+        GameInteractor_ExecuteOnSceneFlagSet(play->sceneNum, FLAG_SCENE_CLEAR, flag);
+    }
 }
 
 /**
  * Unsets current scene temp clear flag.
  */
 void Flags_UnsetTempClear(PlayState* play, s32 flag) {
+    u8 previouslyOn = Flags_GetTempClear(play, flag);
     play->actorCtx.flags.tempClear &= ~(1 << flag);
+    if (previouslyOn) {
+        LUSLOG_INFO("Temp Clear Flag Unset - %#x", flag);
+        GameInteractor_ExecuteOnSceneFlagUnset(play->sceneNum, FLAG_SCENE_CLEAR, flag);
+    }
 }
 
 /**

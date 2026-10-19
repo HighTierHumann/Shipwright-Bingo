@@ -53,12 +53,7 @@ void OnGameFrameUpdate() {
 
     const auto now = Clock::now();
     for (const BoardSquare& square : snapshot.squares) {
-        const SquareDef* def = FindSquareByName(square.name);
-        if (def == nullptr) {
-            continue;
-        }
-
-        const bool shouldBeMarked = def->IsComplete();
+        const bool shouldBeMarked = IsComplete(square.name);
         const bool markedByUs =
             !snapshot.myColor.empty() &&
             std::find(square.taken.begin(), square.taken.end(), snapshot.myColor) != square.taken.end();

@@ -254,6 +254,7 @@ typedef struct ShipBingoSaveContextData {
     u8 dcScrubsSpoken[4];
     u64 eyeSwitchesActivated[BINGO_SCENE_INFO_COUNT];
     u8 waterCrystalsActivated[8];
+    u8 blueBubblesDefeated[7];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {

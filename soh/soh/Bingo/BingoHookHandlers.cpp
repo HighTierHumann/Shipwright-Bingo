@@ -31,6 +31,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Ru1/z_en_ru1.h"
 #include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
 #include "src/overlays/actors/ovl_Obj_Switch/z_obj_switch.h"
+#include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
 extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
 }
@@ -149,7 +150,7 @@ static uint64_t GetEyeSwitchMask(int16_t sceneNum) {
 }
 
 static void BingoRecordEyeSwitch(int16_t sceneNum, int16_t flag) {
-    if (flag < 0 || flag > 0x3F || !(GetEyeSwitchMask(sceneNum) & (1ULL << flag))) {
+    if (!(GetEyeSwitchMask(sceneNum) & (1ULL << flag))) {
         return;
     }
 
@@ -363,8 +364,26 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
             case SCENE_WATER_TEMPLE:
                 if (flag == 0xD) Flags_SetBingoInf(BINGO_INF_DEFEAT_DARK_LINK);
+                break;
             default:
                 break;
+        }
+
+        if (sceneNum == SCENE_FOREST_TEMPLE) {
+            static constexpr struct { int16_t flag; uint8_t index; } blueBubbles[] = {
+                    { 0x4, 0 },
+                };
+                for (const auto& bubble : blueBubbles) {
+                    if (flag == bubble.flag) {
+                        gSaveContext.ship.bingo.blueBubblesDefeated[bubble.index] = true;
+                        break;
+                    }
+                }
+
+            auto& defeated = gSaveContext.ship.bingo.blueBubblesDefeated;
+            if (std::all_of(std::begin(defeated), std::end(defeated), [](u8 bubbleDefeated) { return bubbleDefeated != 0; })) {
+                Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_FOREST_BLUE_BUBBLES);
+            }
         }
 
         if (flag == 0x1 && IsBossScene(sceneNum)) {
