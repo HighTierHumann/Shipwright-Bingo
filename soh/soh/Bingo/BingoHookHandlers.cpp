@@ -33,6 +33,8 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
 #include "src/overlays/actors/ovl_Obj_Switch/z_obj_switch.h"
 #include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
+#include "src/overlays/actors/ovl_Door_Killer/z_door_killer.h"
+#include "src/overlays/actors/ovl_En_Honotrap/z_en_honotrap.h"
 extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
 }
@@ -255,8 +257,73 @@ static void BingoRecordGreenBubbleDeath(int16_t sceneNum, int16_t actorIndex = -
     }
 }
 
+static void BingoHandleSilverRupeeData(int16_t flagType, int16_t sceneNum, int16_t flag, class std::shared_ptr<Rando::Context> ctx) {
+    auto checkSilversFlags = []() {
+        auto& tracked = gSaveContext.ship.bingo.silverRupeeTracking;
+        if (std::count_if(std::begin(tracked), std::begin(tracked) + 3,
+                        [](u8 silverTracked) { return silverTracked != 0; }) == 3) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_SHADOW_TEMPLE_SILVER_ITEMS);
+        } else if (std::count_if(std::begin(tracked) + 4, std::begin(tracked) + 7,
+                        [](u8 silverTracked) { return silverTracked != 0; }) == 4) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_GANONS_CASTLE_SILVER_ITEMS);
+        } else if (std::count_if(std::begin(tracked) + 8, std::begin(tracked) + 11,
+                        [](u8 silverTracked) { return silverTracked != 0; }) == 3) {
+            Flags_SetBingoInf(BINGO_INF_COLLECT_ICE_CAVERN_SILVER_ITEMS);
+        }
+    };
+
+    if (flagType == FLAG_RANDOMIZER_INF) {
+        static constexpr struct {
+            int firstRandInf;
+            int lastRandInf;
+            uint8_t arrayIndex;
+        } silverRupeeFlags[] = {
+            { RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1, RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_5, 0 },
+            { RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_1, RAND_INF_SHADOW_TEMPLE_BEAMOS_SILVER_RUPEE_5, 1 },
+            { RAND_INF_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_1, RAND_INF_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_5, 2 },
+            { RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_1, RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_5, 3 },
+            { RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_1, RAND_INF_GANONS_CASTLE_FIRE_TRIAL_SILVER_RUPEE_5, 4 },
+            { RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_1, RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SILVER_RUPEE_5, 5 },
+            { RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_1, RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_5, 6 },
+            { RAND_INF_ICE_CAVERN_SCYTHE_SILVER_RUPEE_1, RAND_INF_ICE_CAVERN_SCYTHE_SILVER_RUPEE_5, 7 },
+            { RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_1, RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_5, 8 },
+        };
+
+        for (const auto& flag : silverRupeeFlags) {
+            int silverItemsCollected = 0;
+            for (int i = flag.firstRandInf; i <= flag.lastRandInf; ++i) {
+                if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(i))) {
+                    ++silverItemsCollected;
+                }
+            }
+
+            if (silverItemsCollected == 5) {
+                gSaveContext.ship.bingo.silverRupeeTracking[flag.arrayIndex] = true;
+                LUSLOG_DEBUG("silverRupeeTracking: %d", flag.arrayIndex);
+            }
+        }
+        checkSilversFlags();
+        return;
+    }
+
+    static constexpr struct { int16_t scene; RandomizerSettingKey settingKey; uint8_t switchflag; uint8_t arrayIndex; } silversData[] = {
+        { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_SCYTHE, 0x1, 0 },
+        { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_BEAMOS, 0x9, 1 },
+        { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_REDEAD, 0x8, 2 },
+    };
+    for (const auto& silver : silversData) {
+        if (sceneNum == silver.scene && flag == silver.switchflag && ctx->GetOption(silver.settingKey).Is(RO_GENERIC_OFF)) {
+            gSaveContext.ship.bingo.silverRupeeTracking[silver.arrayIndex] = true;
+            LUSLOG_DEBUG("silverRupeeTracking: %d", silver.arrayIndex);
+            break;
+        }
+    }
+    checkSilversFlags();
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     Player* player = GET_PLAYER(gPlayState);
+    auto ctx = Rando::Context::GetInstance();
 
     if (flagType == FLAG_EVENT_CHECK_INF) {
         switch (flag) {
@@ -293,38 +360,17 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
             Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_POT_2)) {
                 Flags_SetBingoInf(BINGO_INF_BREAK_LIGHT_TRIAL_POTS);
         }
-    }
-    if (flagType == FLAG_RANDOMIZER_INF && (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1 &&
-                                            flag <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5)) {
-        int shadowSilverItemsCollected = 0;
-        int trialSilverItemsCollected = 0;
-        int iceSilverItemsCollected = 0;
 
-        for (int i = RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1; i <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5; i++) {
-            if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(i))) {
-                if (i >= RAND_INF_SHADOW_TEMPLE_SCYTHE_SILVER_RUPEE_1 && i <= RAND_INF_SHADOW_TEMPLE_REDEAD_SILVER_RUPEE_5) {
-                    ++shadowSilverItemsCollected;
-                } else if (i >= RAND_INF_GANONS_CASTLE_FOREST_TRIAL_SILVER_RUPEE_1 && i <= RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_SILVER_RUPEE_5) {
-                    ++trialSilverItemsCollected;
-                } else if (i >= RAND_INF_ICE_CAVERN_SCYTHE_SILVER_RUPEE_1 && i <= RAND_INF_ICE_CAVERN_PUSH_BLOCK_SILVER_RUPEE_5) {
-                    ++iceSilverItemsCollected;
-                }
-            }
-        }
-
-        if (shadowSilverItemsCollected == 15) {
-            Flags_SetBingoInf(BINGO_INF_COLLECT_SHADOW_TEMPLE_SILVER_ITEMS);
-        }
-        if (trialSilverItemsCollected == 20) {
-            Flags_SetBingoInf(BINGO_INF_COLLECT_GANONS_CASTLE_SILVER_ITEMS);
-        }
-        if (iceSilverItemsCollected == 10) {
-            Flags_SetBingoInf(BINGO_INF_COLLECT_ICE_CAVERN_SILVER_ITEMS);
+        if (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1 &&
+            flag <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5) {
+            BingoHandleSilverRupeeData(flagType, gPlayState->sceneNum, flag, ctx);
         }
     }
 }
 
 void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag) {
+    auto ctx = Rando::Context::GetInstance();
+
     constexpr int bossKeyScenes[] = { // I dont think this is actually necessary (as I don't believe mini-dungeons and
         SCENE_FOREST_TEMPLE,          // child dungeons use 0x14) but better safe than sorry?
         SCENE_FIRE_TEMPLE,
@@ -380,6 +426,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
             case SCENE_SPIRIT_TEMPLE:
                 if (Flags_GetSwitch(gPlayState, 0x7) && Flags_GetSwitch(gPlayState, 0xB)) {
                     Flags_SetBingoInf(BINGO_INF_SPIRIT_RUSTY_HAMMER_SWITCHES);
+                }
+                break;
+            case SCENE_SHADOW_TEMPLE:
+                if (flag == 0x1|| flag == 0x9 || flag == 0x8) {
+                    BingoHandleSilverRupeeData(flagType, sceneNum, flag, ctx);
                 }
                 break;
             default:
@@ -750,31 +801,9 @@ void BingoOnActorUpdateHandler(void* refActor) {
             Flags_SetBingoInf(BINGO_INF_DROWN_RUTO);
         }
     }
-
-    if (actor->id == ACTOR_EN_BB && reinterpret_cast<EnBb*>(actor)->action == 1) {
-        int actorIndex = GetActorListIndex(actor);
-        switch(actor->params) {
-            case ENBB_BLUE:
-                BingoRecordBlueBubbleDeath(actorIndex, gPlayState->roomCtx.curRoom.num);
-                break;
-            case ENBB_RED:
-                BingoRecordRedBubbleDeath(gPlayState->sceneNum, actor->params);
-                break;
-            case ENBB_GREEN:
-                BingoRecordGreenBubbleDeath(gPlayState->sceneNum, actorIndex);
-                break;
-            case ENBB_GREEN_BIG:
-                BingoRecordGreenBubbleDeath(gPlayState->sceneNum);
-                break;
-            case ENBB_WHITE:
-                Flags_SetBingoInf(BINGO_INF_DEFEAT_A_WHITE_BUBBLE);
-                break;
-            default:
-                break;
-        }
-    }
 }
 
+// Use this to check for when we specifically need to check AC_HIT and AT_HIT flags
 void BingoShouldActorUpdateHandler(void* refActor, bool*) {
     Actor* actor = static_cast<Actor*>(refActor);
 
@@ -788,8 +817,7 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
 
     if (actor->id == ACTOR_EN_FIREFLY) {
         EnFirefly* firefly = reinterpret_cast<EnFirefly*>(actor);
-        if (firefly->collider.base.atFlags & AT_HIT && firefly->auraType == 1 &&
-            !gSaveContext.ship.bingo.uniqueKeeseIgnitions[gPlayState->sceneNum]) {
+        if (firefly->collider.base.atFlags & AT_HIT && firefly->auraType == 1) {
             // Because you can ignite ANY keese with Din's Fire for the "Be Ignited" square,
             // we will save which scenes you were ignited in to the below array.
             // Additionally, only 1 grotto has keese, so we don't need to worry about grotto indexing.
@@ -848,10 +876,10 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
         ObjSwitch* objSwitch = reinterpret_cast<ObjSwitch*>(actor);
 
         /*
-            Even with the below checks in place, hitting the switch even when it's "on"
-            still triggers this logic. The ObjSwitch actor doesn't seem to have anything
-            I can look at to prevent this, so we will assume an honor system for now;
-            even still, it's not really a big deal.
+            Even with checks for disableAcTimer, cooldownTimer, and cooldownOn, hitting the
+            switch even when it's "on" still triggers this logic. The ObjSwitch actor doesn't
+            seem to have anything I can look at to prevent this so we'll keep this as a
+            lil secret; even still, it's not really a big deal.
         */
         if (objSwitch->jntSph.col.base.acFlags & AC_HIT) {
             if (objSwitch->dyna.actor.world.pos.y == -212) {
@@ -861,6 +889,65 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
             }
         }
     }
+
+    // ActorKill runs for the flame it spawns as well, hence why we handle this here.
+    if (actor->id == ACTOR_EN_HONOTRAP && reinterpret_cast<EnHonotrap*>(actor)->collider.tris.base.acFlags & AC_HIT) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_THE_SHADOW_EYE_SWITCH);
+    }
+}
+
+void BingoOnEnemyDefeatHandler(void* refActor) {
+    Actor* actor = static_cast<Actor*>(refActor);
+
+    if (actor->id == ACTOR_DOOR_KILLER) {
+        DoorKiller* doorKiller = reinterpret_cast<DoorKiller*>(actor);
+
+        switch(gPlayState->sceneNum) {
+            case SCENE_FIRE_TEMPLE:
+                gSaveContext.ship.bingo.doorMimicsDefeated[0] = true;
+                break;
+            case SCENE_GERUDO_TRAINING_GROUND:
+                gSaveContext.ship.bingo.doorMimicsDefeated[1] = true;
+                break;
+            case SCENE_SPIRIT_TEMPLE:
+                gSaveContext.ship.bingo.doorMimicsDefeated[2] = true;
+                break;
+        }
+
+        auto& defeated = gSaveContext.ship.bingo.doorMimicsDefeated;
+        if (std::count_if(std::begin(defeated), std::end(defeated), [](u8 doorMimicDefeated)
+            { return doorMimicDefeated != 0; }) >= 2) {
+            Flags_SetBingoInf(BINGO_INF_BREAK_2_DOOR_MIMICS);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_BB) {
+        int actorIndex = GetActorListIndex(actor);
+        switch(actor->params) {
+            case ENBB_BLUE:
+                BingoRecordBlueBubbleDeath(actorIndex, gPlayState->roomCtx.curRoom.num);
+                break;
+            case ENBB_RED:
+                BingoRecordRedBubbleDeath(gPlayState->sceneNum, actor->params);
+                break;
+            case ENBB_GREEN:
+                BingoRecordGreenBubbleDeath(gPlayState->sceneNum, actorIndex);
+                break;
+            case ENBB_GREEN_BIG:
+                BingoRecordGreenBubbleDeath(gPlayState->sceneNum);
+                break;
+            case ENBB_WHITE:
+                Flags_SetBingoInf(BINGO_INF_DEFEAT_A_WHITE_BUBBLE);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void BingoOnActorKillHandler(void* refActor) {
+    Actor* actor = static_cast<Actor*>(refActor);
+
 }
 
 void BingoOnSceneSpawnActorsHandler() {
@@ -899,6 +986,8 @@ static void BingoRegisterHooks() {
     static uint32_t onPlayDestroyHook = 0;
     static uint32_t onExitGameHook = 0;
     static uint32_t onKaleidoUpdateHook = 0;
+    static uint32_t onEnemyDefeatHook = 0;
+    static uint32_t onActorKillHook = 0;
 
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnLoadGame>([](int32_t fileNum) {
         ShipInit::Init("IS_RANDO");
@@ -925,6 +1014,8 @@ static void BingoRegisterHooks() {
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnPlayDestroy>(onPlayDestroyHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnExitGame>(onExitGameHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnKaleidoscopeUpdate>(onKaleidoUpdateHook);
+        GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnEnemyDefeat>(onEnemyDefeatHook);
+        GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnActorKill>(onActorKillHook);
 
         onFlagSetHook = 0;
         onSceneFlagSetHook = 0;
@@ -944,6 +1035,8 @@ static void BingoRegisterHooks() {
         onPlayDestroyHook = 0;
         onExitGameHook = 0;
         onKaleidoUpdateHook = 0;
+        onEnemyDefeatHook = 0;
+        onActorKillHook = 0;
 
         if (!IS_RANDO)
             return;
@@ -993,6 +1086,10 @@ static void BingoRegisterHooks() {
         //     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnExitGame>(BingoOnExitGameHandler);
         // onKaleidoUpdateHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnKaleidoscopeUpdate>(
         //     BingoOnKaleidoscopeUpdateHandler);
+        onEnemyDefeatHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnEnemyDefeat>(
+            BingoOnEnemyDefeatHandler);
+        onActorKillHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnActorKill>(
+            BingoOnActorKillHandler);
     });
 }
 

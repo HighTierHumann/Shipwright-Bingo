@@ -262,6 +262,8 @@ typedef struct ShipBingoSaveContextData {
     u8 blueBubblesDefeated[7];
     u8 redBubblesDefeated[5];
     u8 greenBubblesDefeated[5];
+    u8 doorMimicsDefeated[3];
+    u8 silverRupeeTracking[9];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {
