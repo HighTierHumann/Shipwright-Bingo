@@ -310,6 +310,12 @@ static void BingoHandleSilverRupeeData(int16_t flagType, int16_t sceneNum, int16
         { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_SCYTHE, 0x1, 0 },
         { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_BEAMOS, 0x9, 1 },
         { SCENE_SHADOW_TEMPLE, RSK_SILVERS_SHADOW_TEMPLE_REDEAD, 0x8, 2 },
+        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_FOREST_TRIAL, 0xE, 3 },
+        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_FIRE_TRIAL, 0x9, 4 },
+        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_SPIRIT_TRIAL, 0xB, 5 },
+        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_LIGHT_TRIAL, 0x1D, 6 },
+        { SCENE_ICE_CAVERN, RSK_SILVERS_ICE_CAVERN_SCYTHE, 0x8, 7 },
+        { SCENE_ICE_CAVERN, RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK, 0x9, 8 },
     };
     for (const auto& silver : silversData) {
         if (sceneNum == silver.scene && flag == silver.switchflag && ctx->GetOption(silver.settingKey).Is(RO_GENERIC_OFF)) {
