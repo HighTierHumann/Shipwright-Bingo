@@ -263,11 +263,13 @@ static void BingoHandleSilverRupeeData(int16_t flagType, int16_t sceneNum, int16
         if (std::count_if(std::begin(tracked), std::begin(tracked) + 3,
                         [](u8 silverTracked) { return silverTracked != 0; }) == 3) {
             Flags_SetBingoInf(BINGO_INF_COLLECT_SHADOW_TEMPLE_SILVER_ITEMS);
-        } else if (std::count_if(std::begin(tracked) + 4, std::begin(tracked) + 7,
+        }
+        if (std::count_if(std::begin(tracked) + 3, std::begin(tracked) + 7,
                         [](u8 silverTracked) { return silverTracked != 0; }) == 4) {
             Flags_SetBingoInf(BINGO_INF_COLLECT_GANONS_CASTLE_SILVER_ITEMS);
-        } else if (std::count_if(std::begin(tracked) + 8, std::begin(tracked) + 11,
-                        [](u8 silverTracked) { return silverTracked != 0; }) == 3) {
+        }
+        if (std::count_if(std::begin(tracked) + 7, std::begin(tracked) + 9,
+                        [](u8 silverTracked) { return silverTracked != 0; }) == 2) {
             Flags_SetBingoInf(BINGO_INF_COLLECT_ICE_CAVERN_SILVER_ITEMS);
         }
     };
@@ -313,7 +315,7 @@ static void BingoHandleSilverRupeeData(int16_t flagType, int16_t sceneNum, int16
         { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_FOREST_TRIAL, 0xE, 3 },
         { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_FIRE_TRIAL, 0x9, 4 },
         { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_SPIRIT_TRIAL, 0xB, 5 },
-        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_LIGHT_TRIAL, 0x1D, 6 },
+        { SCENE_INSIDE_GANONS_CASTLE, RSK_SILVERS_LIGHT_TRIAL, 0x12, 6 },
         { SCENE_ICE_CAVERN, RSK_SILVERS_ICE_CAVERN_SCYTHE, 0x8, 7 },
         { SCENE_ICE_CAVERN, RSK_SILVERS_ICE_CAVERN_PUSH_BLOCK, 0x9, 8 },
     };
@@ -436,6 +438,16 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
             case SCENE_SHADOW_TEMPLE:
                 if (flag == 0x1|| flag == 0x9 || flag == 0x8) {
+                    BingoHandleSilverRupeeData(flagType, sceneNum, flag, ctx);
+                }
+                break;
+            case SCENE_INSIDE_GANONS_CASTLE:
+                if (flag == 0xE || flag == 0x9 || flag == 0xB || flag == 0x12) {
+                    BingoHandleSilverRupeeData(flagType, sceneNum, flag, ctx);
+                }
+                break;
+            case SCENE_ICE_CAVERN:
+                if (flag == 0x8 || flag == 0x9) {
                     BingoHandleSilverRupeeData(flagType, sceneNum, flag, ctx);
                 }
                 break;
