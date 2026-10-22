@@ -219,7 +219,7 @@ void DrawBingoBoardContents() {
 
                 if (snapshot.squares.empty()) {
                     const char* message = snapshot.state == Bingo::ConnectionState::Disconnected
-                                              ? "Not logged in. Enter a session cookie under Bingo > Login."
+                                              ? "Not connected. Link your ShipBingo account under Bingo > Login, then join a room."
                                               : snapshot.status.c_str();
                     float wrapWidth = gridWidth * 0.8f;
                     ImVec2 textSize = ImGui::CalcTextSize(message, nullptr, false, wrapWidth);

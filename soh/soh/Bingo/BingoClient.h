@@ -12,6 +12,9 @@
 
 namespace Bingo {
 
+// Initializes libcurl exactly once; call before the first request from any thread.
+void EnsureCurlInitialized();
+
 struct BoardSquare {
     std::string id;
     std::string name;
@@ -30,8 +33,6 @@ enum class ConnectionState {
     Connecting,
     Connected,
     Error,
-    Authenticating,
-    Authenticated,
 };
 
 struct Snapshot {
@@ -72,22 +73,22 @@ struct WeekliesSnapshot {
     std::vector<Weeklies> weeklies;
 };
 
-// Talks to shipbingo.zarashane.dev on a worker thread. All public methods are safe to call from the game thread.
+// Talks to shipbingo.zarashane.dev on worker threads, authenticated through the linked ShipBingo account (OAuthClient).
+// All public methods are safe to call from the game thread.
 class Client {
   public:
     static Client& Instance();
 
-    void Login(const std::string& sessionCookie);
-    void Logout();
-    void Connect(const std::string& gameId, const std::string& sessionCookie);
+    void Connect(const std::string& gameId);
     void Disconnect();
-    void RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID);
-    void UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse);
-    void CreateGame(const std::string& sessionCookie, const std::string& gameDescription);
-    void ReadRoomsList(const std::string& sessionCookie);
-    void ReadWeekliesList(const std::string& sessionCookie);
+    void RenewCard(const std::string& gameIdInput, const std::string& seedID);
+    void UpdateUserColor(const std::string& gameIdInput, const std::string& colorToUse);
+    void CreateGame(const std::string& gameDescription);
+    void ReadRoomsList();
+    void ReadWeekliesList();
     RoomsSnapshot GetRoomsSnapshot();
     WeekliesSnapshot GetWeekliesSnapshot();
+    // True while the ShipBingo account is linked, which is required for every call below.
     bool IsLoggedIn();
     bool IsActive();
     Snapshot GetSnapshot();
@@ -100,10 +101,9 @@ class Client {
     Client() = default;
     ~Client();
 
-    void Authenticate(std::string cookie);
-    void Run(std::string gameId, std::string cookie);
-    void RunRoomsRequest(std::string cookie);
-    void RunWeekliesRequest(std::string cookie);
+    void Run(std::string gameId);
+    void RunRoomsRequest();
+    void RunWeekliesRequest();
     void SetStatus(ConnectionState state, const std::string& status);
     void ApplyGameState(const nlohmann::json& state);
 
@@ -121,7 +121,7 @@ class Client {
     RoomsSnapshot roomsSnapshot;
     WeekliesSnapshot weekliesSnapshot;
     std::deque<std::string> pendingToggles;
-    std::vector<std::string> myIdentifiers; // values from /auth/me used to find our entry in the user list
+    std::vector<std::string> myIdentifiers; // values from /api/app/v1/me used to find our entry in the user list
 };
 
 } // namespace Bingo

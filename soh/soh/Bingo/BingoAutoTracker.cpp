@@ -1,4 +1,5 @@
 #include "BingoClient.h"
+#include "BingoOAuth.h"
 #include "BingoSquareMap.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/ShipInit.hpp"
@@ -32,6 +33,12 @@ void OnGameFrameUpdate() {
         return;
     }
     sFrameCounter = 0;
+
+    static bool sVerifiedLink = false;
+    if (!sVerifiedLink) {
+        sVerifiedLink = true;
+        OAuthClient::Instance().VerifyLink();
+    }
 
     if (!GameInteractor::IsSaveLoaded()) {
         return;

@@ -1,4 +1,5 @@
 #include "BingoClient.h"
+#include "BingoOAuth.h"
 
 #include <curl/curl.h>
 #include <spdlog/spdlog.h>
@@ -10,26 +11,16 @@
 
 namespace Bingo {
 
+void EnsureCurlInitialized() {
+    static std::once_flag curlInit;
+    std::call_once(curlInit, []() { curl_global_init(CURL_GLOBAL_DEFAULT); });
+}
+
 namespace {
 
-constexpr const char* kBaseUrl = "https://shipbingo.zarashane.dev/";
 constexpr auto kPollInterval = std::chrono::milliseconds(250); // should be ~4 pings per second like the website?
-constexpr const char* kDefaultCookieName = "sb.auth";
-
-struct HttpResponse {
-    long status = 0; // 0 means the request itself failed
-    std::string body;
-    std::string error;
-};
-
-size_t WriteBody(char* data, size_t size, size_t count, void* user) {
-    static_cast<std::string*>(user)->append(data, size * count);
-    return size * count;
-}
-
-int AbortIfCancelled(void* user, curl_off_t, curl_off_t, curl_off_t, curl_off_t) {
-    return static_cast<std::atomic<bool>*>(user)->load() ? 1 : 0;
-}
+constexpr const char* kNotLinkedMessage = "Link your ShipBingo account first";
+constexpr const char* kLinkLostMessage = "ShipBingo account is not linked. Link it again on the Login page.";
 
 std::string UrlEscape(const std::string& value) {
     char* escaped = curl_easy_escape(nullptr, value.c_str(), static_cast<int>(value.size()));
@@ -38,64 +29,13 @@ std::string UrlEscape(const std::string& value) {
     return result;
 }
 
-HttpResponse HttpGet(const std::string& path, const std::string& cookie, std::atomic<bool>& cancel) {
-    static std::once_flag curlInit;
-    std::call_once(curlInit, []() { curl_global_init(CURL_GLOBAL_DEFAULT); });
-
-    HttpResponse response;
-    CURL* curl = curl_easy_init();
-    if (curl == nullptr) {
-        response.error = "Failed to initialize HTTP client";
-        return response;
-    }
-
-    const std::string url = kBaseUrl + path;
-    curl_slist* headers = curl_slist_append(nullptr, "Accept: application/json");
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_COOKIE, cookie.c_str());
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Shipwright-Bingo");
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L); // a redirect means we were sent to the login page
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 8L);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);
-    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteBody);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response.body);
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-    curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, AbortIfCancelled);
-    curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &cancel);
-
-    CURLcode result = curl_easy_perform(curl);
-    if (result == CURLE_OK) {
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response.status);
-    } else {
-        response.error = curl_easy_strerror(result);
-    }
-
-    curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
-    return response;
+ApiResponse HttpGet(const std::string& path, std::atomic<bool>& cancel) {
+    return OAuthClient::Instance().AuthorizedRequest("GET", "/" + path, "", &cancel);
 }
 
 std::string Lower(std::string value) {
     std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) { return std::tolower(c); });
     return value;
-}
-
-// Accepts either the raw value of the session cookie or a full "name=value; name2=value2" cookie string.
-std::string NormalizeCookie(std::string cookie) {
-    auto isSpace = [](unsigned char c) { return std::isspace(c) != 0; };
-    cookie.erase(cookie.begin(), std::find_if_not(cookie.begin(), cookie.end(), isSpace));
-    cookie.erase(std::find_if_not(cookie.rbegin(), cookie.rend(), isSpace).base(), cookie.end());
-
-    if (Lower(cookie.substr(0, 7)) == "cookie:") {
-        cookie.erase(0, 7);
-        cookie.erase(cookie.begin(), std::find_if_not(cookie.begin(), cookie.end(), isSpace));
-    }
-    if (!cookie.empty() && cookie.find('=') == std::string::npos) {
-        cookie = std::string(kDefaultCookieName) + "=" + cookie;
-    }
-    return cookie;
 }
 
 std::string ToString(const nlohmann::json& value) {
@@ -119,19 +59,26 @@ bool BoolField(const nlohmann::json& object, const char* key) {
 }
 
 // Error responses are usually a bare JSON string such as "Failed to Find User".
-std::string DescribeError(const HttpResponse& response) {
-    if (response.status == 0) {
-        return response.error;
+std::string DescribeError(const ApiResponse& response) {
+    switch (response.result) {
+        case AuthResult::Network:
+            return response.error;
+        case AuthResult::Unlinked:
+            return kLinkLostMessage;
+        case AuthResult::Outdated:
+            return "Update the game to keep using ShipBingo";
+        default:
+            break;
     }
-    auto parsed = nlohmann::json::parse(response.body, nullptr, false);
-    if (parsed.is_string()) {
-        return parsed.get<std::string>();
+    if (response.body.is_string()) {
+        return response.body.get<std::string>();
     }
     return "HTTP " + std::to_string(response.status);
 }
 
-bool IsAuthFailure(const HttpResponse& response) {
-    return response.status == 401 || response.status == 403 || (response.status >= 300 && response.status < 400);
+bool IsAuthFailure(const ApiResponse& response) {
+    return response.result == AuthResult::Unlinked || response.result == AuthResult::Forbidden ||
+           response.result == AuthResult::Outdated;
 }
 
 } // namespace
@@ -155,34 +102,7 @@ Client::~Client() {
     }
 }
 
-void Client::Login(const std::string& sessionCookie) {
-    Logout();
-
-    const std::string cookie = NormalizeCookie(sessionCookie);
-    if (cookie.empty()) {
-        SetStatus(ConnectionState::Error, "Paste your session cookie first");
-        return;
-    }
-
-    stopRequested = false;
-    SetStatus(ConnectionState::Connecting, "Logging in...");
-    worker = std::thread(&Client::Authenticate, this, cookie);
-}
-
-void Client::Logout() {
-    stopRequested = true;
-    wake.notify_all();
-    if (worker.joinable()) {
-        worker.join();
-    }
-
-    std::lock_guard<std::mutex> lock(mutex);
-    snapshot = Snapshot{};
-    pendingToggles.clear();
-    myIdentifiers.clear();
-}
-
-void Client::Connect(const std::string& gameIdInput, const std::string& sessionCookie) {
+void Client::Connect(const std::string& gameIdInput) {
     Disconnect();
 
     // Accept a full game URL such as https://shipbingo.zarashane.dev/play/1 as well as a bare ID.
@@ -200,15 +120,14 @@ void Client::Connect(const std::string& gameIdInput, const std::string& sessionC
         SetStatus(ConnectionState::Error, "Enter a valid Game ID");
         return;
     }
-    const std::string cookie = NormalizeCookie(sessionCookie);
-    if (cookie.empty()) {
-        SetStatus(ConnectionState::Error, "Paste your session cookie first");
+    if (!IsLoggedIn()) {
+        SetStatus(ConnectionState::Error, kNotLinkedMessage);
         return;
     }
 
     stopRequested = false;
     SetStatus(ConnectionState::Connecting, "Connecting...");
-    worker = std::thread(&Client::Run, this, gameId, cookie);
+    worker = std::thread(&Client::Run, this, gameId);
 }
 
 void Client::Disconnect() {
@@ -219,31 +138,34 @@ void Client::Disconnect() {
     }
 
     std::lock_guard<std::mutex> lock(mutex);
-    snapshot = Snapshot{ConnectionState::Authenticated};
+    snapshot = Snapshot{};
     pendingToggles.clear();
 }
 
-void Client::RenewCard(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& seedID) {
-    HttpResponse join = HttpGet("api/Game/RefreshBoard/" + UrlEscape(gameIdInput) + "/" + UrlEscape(seedID),
-                                            NormalizeCookie(sessionCookie), stopRequested);
+void Client::RenewCard(const std::string& gameIdInput, const std::string& seedID) {
+    if (!IsLoggedIn()) {
+        return;
+    }
+    HttpGet("api/Game/RefreshBoard/" + UrlEscape(gameIdInput) + "/" + UrlEscape(seedID), stopRequested);
 }
 
-void Client::UpdateUserColor(const std::string& gameIdInput, const std::string& sessionCookie, const std::string& colorToUse) {
-    HttpResponse join = HttpGet("api/Game/UserColorSelected/" + UrlEscape(gameIdInput) + "/" + "!" + colorToUse,
-                                NormalizeCookie(sessionCookie), stopRequested);
+void Client::UpdateUserColor(const std::string& gameIdInput, const std::string& colorToUse) {
+    if (!IsLoggedIn()) {
+        return;
+    }
+    HttpGet("api/Game/UserColorSelected/" + UrlEscape(gameIdInput) + "/" + "!" + colorToUse, stopRequested);
 }
 
-void Client::CreateGame(const std::string& sessionCookie, const std::string& gameDescription) {
-    const std::string cookie = NormalizeCookie(sessionCookie);
-    if (cookie.empty()) {
-        SetStatus(ConnectionState::Error, "Paste your session cookie first");
+void Client::CreateGame(const std::string& gameDescription) {
+    if (!IsLoggedIn()) {
+        SetStatus(ConnectionState::Error, kNotLinkedMessage);
         return;
     }
 
     std::atomic<bool> cancel = false;
-    HttpResponse response = HttpGet("api/Game/StartGame/" + UrlEscape(gameDescription), cookie, cancel);
+    ApiResponse response = HttpGet("api/Game/StartGame/" + UrlEscape(gameDescription), cancel);
     if (IsAuthFailure(response)) {
-        SetStatus(ConnectionState::Error, "Session expired. Paste a new session cookie.");
+        SetStatus(ConnectionState::Error, DescribeError(response));
         return;
     }
     if (response.status != 200) {
@@ -253,7 +175,7 @@ void Client::CreateGame(const std::string& sessionCookie, const std::string& gam
         return;
     }
 
-    const auto gameId = nlohmann::json::parse(response.body, nullptr, false);
+    const auto& gameId = response.body;
     if (!gameId.is_number_integer() && !gameId.is_number_unsigned()) {
         const std::string status = "The server returned an invalid Game ID.";
         SPDLOG_WARN("[Bingo] {}", status);
@@ -261,14 +183,19 @@ void Client::CreateGame(const std::string& sessionCookie, const std::string& gam
         return;
     }
 
-    Connect(gameId.dump(), cookie);
+    Connect(gameId.dump());
 }
 
-void Client::ReadRoomsList(const std::string& sessionCookie) {
+void Client::ReadRoomsList() {
     std::lock_guard<std::mutex> workerLock(roomsWorkerMutex);
+    const bool linked = IsLoggedIn();
     {
         std::lock_guard<std::mutex> lock(mutex);
         if (roomsSnapshot.loading) {
+            return;
+        }
+        if (!linked) {
+            roomsSnapshot.status = "Link your ShipBingo account to load rooms.";
             return;
         }
         roomsSnapshot.hasRequested = true;
@@ -279,7 +206,7 @@ void Client::ReadRoomsList(const std::string& sessionCookie) {
     if (roomsWorker.joinable()) {
         roomsWorker.join();
     }
-    roomsWorker = std::thread(&Client::RunRoomsRequest, this, NormalizeCookie(sessionCookie));
+    roomsWorker = std::thread(&Client::RunRoomsRequest, this);
 }
 
 RoomsSnapshot Client::GetRoomsSnapshot() {
@@ -287,8 +214,8 @@ RoomsSnapshot Client::GetRoomsSnapshot() {
     return roomsSnapshot;
 }
 
-void Client::RunRoomsRequest(std::string cookie) {
-    HttpResponse response = HttpGet("api/Game/GetGames/", cookie, roomsStopRequested);
+void Client::RunRoomsRequest() {
+    ApiResponse response = HttpGet("api/Game/GetGames/", roomsStopRequested);
     if (roomsStopRequested) {
         std::lock_guard<std::mutex> lock(mutex);
         roomsSnapshot.loading = false;
@@ -300,7 +227,7 @@ void Client::RunRoomsRequest(std::string cookie) {
     bool success = false;
 
     if (response.status == 200) {
-        auto parsed = nlohmann::json::parse(response.body, nullptr, false);
+        const auto& parsed = response.body;
         if (parsed.is_array()) {
             for (const auto& roomJson : parsed) {
                 if (!roomJson.is_object()) {
@@ -321,7 +248,7 @@ void Client::RunRoomsRequest(std::string cookie) {
             status = "The server returned an invalid room list.";
         }
     } else if (IsAuthFailure(response)) {
-        status = "Session expired. Paste a new session cookie.";
+        status = DescribeError(response);
     } else {
         status = "Could not load rooms: " + DescribeError(response);
     }
@@ -338,11 +265,16 @@ void Client::RunRoomsRequest(std::string cookie) {
     roomsSnapshot.loading = false;
 }
 
-void Client::ReadWeekliesList(const std::string& sessionCookie) {
+void Client::ReadWeekliesList() {
     std::lock_guard<std::mutex> workerLock(weekliesWorkerMutex);
+    const bool linked = IsLoggedIn();
     {
         std::lock_guard<std::mutex> lock(mutex);
         if (weekliesSnapshot.loading) {
+            return;
+        }
+        if (!linked) {
+            weekliesSnapshot.status = "Link your ShipBingo account to load weeklies.";
             return;
         }
         weekliesSnapshot.hasRequested = true;
@@ -353,7 +285,7 @@ void Client::ReadWeekliesList(const std::string& sessionCookie) {
     if (weekliesWorker.joinable()) {
         weekliesWorker.join();
     }
-    weekliesWorker = std::thread(&Client::RunWeekliesRequest, this, NormalizeCookie(sessionCookie));
+    weekliesWorker = std::thread(&Client::RunWeekliesRequest, this);
 }
 
 WeekliesSnapshot Client::GetWeekliesSnapshot() {
@@ -361,8 +293,8 @@ WeekliesSnapshot Client::GetWeekliesSnapshot() {
     return weekliesSnapshot;
 }
 
-void Client::RunWeekliesRequest(std::string cookie) {
-    HttpResponse response = HttpGet("api/WeeklySeed/ListWeeklies/", cookie, weekliesStopRequested);
+void Client::RunWeekliesRequest() {
+    ApiResponse response = HttpGet("api/WeeklySeed/ListWeeklies/", weekliesStopRequested);
     if (weekliesStopRequested) {
         std::lock_guard<std::mutex> lock(mutex);
         weekliesSnapshot.loading = false;
@@ -374,7 +306,7 @@ void Client::RunWeekliesRequest(std::string cookie) {
     bool success = false;
 
     if (response.status == 200) {
-        auto parsed = nlohmann::json::parse(response.body, nullptr, false);
+        const auto& parsed = response.body;
         if (parsed.is_array()) {
             for (const auto& weeklyJson : parsed) {
                 if (!weeklyJson.is_object()) {
@@ -393,7 +325,7 @@ void Client::RunWeekliesRequest(std::string cookie) {
             status = "The server returned an invalid weeklies list.";
         }
     } else if (IsAuthFailure(response)) {
-        status = "Session expired. Paste a new session cookie.";
+        status = DescribeError(response);
     } else {
         status = "Could not load weeklies: " + DescribeError(response);
     }
@@ -411,8 +343,7 @@ void Client::RunWeekliesRequest(std::string cookie) {
 }
 
 bool Client::IsLoggedIn() {
-    std::lock_guard<std::mutex> lock(mutex);
-    return snapshot.state == ConnectionState::Authenticated;
+    return OAuthClient::Instance().IsLinked();
 }
 
 bool Client::IsActive() {
@@ -443,80 +374,36 @@ void Client::SetStatus(ConnectionState state, const std::string& status) {
     snapshot.status = status;
 }
 
-void Client::Authenticate(std::string cookie) {
-    SetStatus(ConnectionState::Authenticating, "Authenticating...");
-
-    HttpResponse auth = HttpGet("auth/IsAuthenticated", cookie, stopRequested);
-    if (stopRequested) {
-        return;
-    }
-    if (auth.status == 0) {
-        SetStatus(ConnectionState::Error, "Could not reach shipbingo: " + auth.error);
-        return;
-    }
-    auto authJson = nlohmann::json::parse(auth.body, nullptr, false);
-    if (auth.status != 200 || !authJson.is_boolean() || !authJson.get<bool>()) {
-        SetStatus(ConnectionState::Error,
-                  "Session cookie was rejected. It may be wrong or expired (sessions last about 24h).");
-        return;
-    }
-
-    HttpResponse me = HttpGet("auth/me", cookie, stopRequested);
-    if (me.status == 200) {
-        auto meJson = nlohmann::json::parse(me.body, nullptr, false);
-        if (meJson.is_object()) {
-            std::lock_guard<std::mutex> lock(mutex);
-            for (const char* key : { "id", "userId", "discordId", "name", "username", "userName", "displayName" }) {
-                std::string value = StringField(meJson, key);
-                if (!value.empty()) {
-                    myIdentifiers.push_back(Lower(value));
-                }
-            }
-        }
-    }
-
-    SetStatus(ConnectionState::Authenticated, "Authenticated");
-}
-
-void Client::Run(std::string gameId, std::string cookie) {
+void Client::Run(std::string gameId) {
     const std::string escapedGameId = UrlEscape(gameId);
 
-    HttpResponse auth = HttpGet("auth/IsAuthenticated", cookie, stopRequested);
+    ApiResponse me = HttpGet("api/app/v1/me", stopRequested);
     if (stopRequested) {
         return;
     }
-    if (auth.status == 0) {
-        SetStatus(ConnectionState::Error, "Could not reach shipbingo: " + auth.error);
+    if (me.result != AuthResult::Ok) {
+        SetStatus(ConnectionState::Error, IsAuthFailure(me) ? DescribeError(me)
+                                                           : "Could not reach ShipBingo: " + DescribeError(me));
         return;
     }
-    auto authJson = nlohmann::json::parse(auth.body, nullptr, false);
-    if (auth.status != 200 || !authJson.is_boolean() || !authJson.get<bool>()) {
-        SetStatus(ConnectionState::Error,
-                  "Session cookie was rejected. It may be wrong or expired (sessions last about 24h).");
-        return;
-    }
-
-    HttpResponse me = HttpGet("auth/me", cookie, stopRequested);
-    if (me.status == 200) {
-        auto meJson = nlohmann::json::parse(me.body, nullptr, false);
-        if (meJson.is_object()) {
-            std::lock_guard<std::mutex> lock(mutex);
-            for (const char* key : { "id", "userId", "discordId", "name", "username", "userName", "displayName" }) {
-                std::string value = StringField(meJson, key);
-                if (!value.empty()) {
-                    myIdentifiers.push_back(Lower(value));
-                }
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        myIdentifiers.clear();
+        for (const char* key : { "userId", "username" }) {
+            std::string value = StringField(me.body, key);
+            if (!value.empty()) {
+                myIdentifiers.push_back(Lower(value));
             }
         }
     }
 
     SetStatus(ConnectionState::Connecting, "Joining game " + gameId + "...");
-    HttpResponse join = HttpGet("api/Game/JoinGame/" + escapedGameId + "/false", cookie, stopRequested);
+    ApiResponse join = HttpGet("api/Game/JoinGame/" + escapedGameId + "/false", stopRequested);
     if (stopRequested) {
         return;
     }
     if (IsAuthFailure(join)) {
-        SetStatus(ConnectionState::Error, "Session expired. Paste a new session cookie.");
+        SetStatus(ConnectionState::Error, DescribeError(join));
         return;
     }
     if (join.status != 200) {
@@ -531,26 +418,25 @@ void Client::Run(std::string gameId, std::string cookie) {
             toggles.swap(pendingToggles);
         }
         for (const std::string& squareId : toggles) {
-            HttpResponse toggle =
-                HttpGet("api/Game/ToggleCell/" + escapedGameId + "/" + UrlEscape(squareId), cookie, stopRequested);
+            ApiResponse toggle =
+                HttpGet("api/Game/ToggleCell/" + escapedGameId + "/" + UrlEscape(squareId), stopRequested);
             if (toggle.status != 200 && !stopRequested) {
                 SPDLOG_WARN("[Bingo] Failed to mark square {}: {}", squareId, DescribeError(toggle));
             }
         }
 
         // The server decides which sections to include per account, so the id is only a hint; -1 asks for everything.
-        HttpResponse stateResponse = HttpGet("api/Game/GetGameState/" + escapedGameId + "/-1", cookie, stopRequested);
+        ApiResponse stateResponse = HttpGet("api/Game/GetGameState/" + escapedGameId + "/-1", stopRequested);
         if (stopRequested) {
             return;
         }
         if (IsAuthFailure(stateResponse)) {
-            SetStatus(ConnectionState::Error, "Session expired. Paste a new session cookie.");
+            SetStatus(ConnectionState::Error, DescribeError(stateResponse));
             return;
         }
         if (stateResponse.status == 200) {
-            auto state = nlohmann::json::parse(stateResponse.body, nullptr, false);
-            if (state.is_object()) {
-                ApplyGameState(state);
+            if (stateResponse.body.is_object()) {
+                ApplyGameState(stateResponse.body);
             }
         } else {
             SetStatus(ConnectionState::Connecting, "Retrying: " + DescribeError(stateResponse));
