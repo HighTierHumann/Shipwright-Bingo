@@ -124,7 +124,7 @@ const std::unordered_map<std::string, BingoInf> squares = {
     { "Defeat a Like-Like in 3 different dungeons", BINGO_INF_DEFEAT_3_DIFFERENT_DUNGEON_LIKE_LIKES },
     { "Defeat all Wolfos and Like-Likes in Gerudo Training Ground", BINGO_INF_DEFEAT_ALL_WOLFOS_AND_LIKE_LIKES_IN_GTG },
     { "Defeat the White Wolfos in Ice Cavern", BINGO_INF_DEFEAT_ICE_CAVERN_WOLFOS },
-    { "Defeat all 3 White Wolfos", BINGO_INF_DEFEATL_ALL_WHITE_WOLFOS },
+    { "Defeat all 3 White Wolfos", BINGO_INF_DEFEAT_ALL_3_WHITE_WOLFOS },
     { "Defeat Big Octo", BINGO_INF_DEFEAT_BIG_OCTO },
     { "Defeat Amy (Green Poe)", BINGO_INF_DEFEAT_AMY },
     { "Defeat Joelle and Beth (Red and Blue Poe)", BINGO_INF_DEFEAT_JOELLE_AND_BETH },

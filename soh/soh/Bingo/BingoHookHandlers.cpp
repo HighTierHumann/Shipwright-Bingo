@@ -35,6 +35,10 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
 #include "src/overlays/actors/ovl_Door_Killer/z_door_killer.h"
 #include "src/overlays/actors/ovl_En_Honotrap/z_en_honotrap.h"
+#include "src/overlays/actors/ovl_En_Wf/z_en_wf.h"
+#include "src/overlays/actors/ovl_En_Zf/z_en_zf.h"
+#include "src/overlays/actors/ovl_Bg_Haka_Tubo/z_bg_haka_tubo.h"
+#include "src/overlays/actors/ovl_Bg_Haka_Trap/z_bg_haka_trap.h"
 extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
 }
@@ -329,6 +333,37 @@ static void BingoHandleSilverRupeeData(int16_t flagType, int16_t sceneNum, int16
     checkSilversFlags();
 }
 
+static void BingoRecordLockedDoors(int16_t sceneNum, int16_t flag) {
+    auto checkDoorFlags = []() {
+        auto& tracked = gSaveContext.ship.bingo.lockedDungeonDoors;
+        if (std::count_if(std::begin(tracked), std::begin(tracked) + 5,
+                        [](u8 waterDoors) { return waterDoors != 0; }) == 5) {
+            Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_WATER_DOORS);
+        }
+        if (std::count_if(std::begin(tracked) + 5, std::begin(tracked) + 10,
+                        [](u8 spiritDoors) { return spiritDoors != 0; }) == 5) {
+            Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_SPIRIT_DOORS);
+        }
+    };
+    
+    static constexpr struct { int16_t scene; uint8_t doorFlag; int16_t arrayIndex; } lockedDoors[] = {
+        { SCENE_WATER_TEMPLE, 0x1, 0 }, { SCENE_WATER_TEMPLE, 0x2, 1 },
+        { SCENE_WATER_TEMPLE, 0x5, 2 }, { SCENE_WATER_TEMPLE, 0x6, 3 },
+        { SCENE_WATER_TEMPLE, 0x9, 4 },
+        { SCENE_SPIRIT_TEMPLE, 0xD, 5 }, { SCENE_SPIRIT_TEMPLE, 0x15, 6 },
+        { SCENE_SPIRIT_TEMPLE, 0x1B, 7 }, { SCENE_SPIRIT_TEMPLE, 0x1C, 8 },
+        { SCENE_SPIRIT_TEMPLE, 0x1E, 9 }
+    };
+    for (const auto& door : lockedDoors) {
+        if (sceneNum == door.scene && flag == door.doorFlag) {
+            gSaveContext.ship.bingo.lockedDungeonDoors[door.arrayIndex] = true;
+            LUSLOG_DEBUG("lockedDungeonDoors: %d", door.arrayIndex);
+            break;
+        }
+    }
+    checkDoorFlags();
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     Player* player = GET_PLAYER(gPlayState);
     auto ctx = Rando::Context::GetInstance();
@@ -340,6 +375,9 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
                 break;
             case EVENTCHKINF_BONGO_BONGO_ESCAPED_FROM_WELL:
                 Flags_SetBingoInf(BINGO_INF_NOCTURNE_CHECK);
+                break;
+            case EVENTCHKINF_DISPELLED_GANONS_TOWER_BARRIER:
+                Flags_SetBingoInf(BINGO_INF_DISABLE_THE_BARRIER);
                 break;
         }
     }
@@ -372,6 +410,11 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
         if (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1 &&
             flag <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5) {
             BingoHandleSilverRupeeData(flagType, gPlayState->sceneNum, flag, ctx);
+        }
+
+        if (Flags_GetRandomizerInf(RAND_INF_HAS_SKELETON_KEY)) {
+            Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_WATER_DOORS);
+            Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_SPIRIT_DOORS);
         }
     }
 }
@@ -418,6 +461,10 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
             case SCENE_WATER_TEMPLE: {
                 if (flag == 0x1D) Flags_SetBingoInf(BINGO_INF_WATER_TEMPLE_MIDDLE_LEVEL);
 
+                if (flag == 0x1 || flag == 0x2 || flag == 0x5 || flag == 0x6 || flag == 0x9) {
+                    BingoRecordLockedDoors(sceneNum, flag);
+                }
+
                 // Indices 1 and 2 share switch flag 0x1B,
                 // so it's being handled in the ShouldActorUpdate function instead.
                 static constexpr struct { int16_t flag; uint8_t index; } waterCrystals[] = {
@@ -435,6 +482,14 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 if (Flags_GetSwitch(gPlayState, 0x7) && Flags_GetSwitch(gPlayState, 0xB)) {
                     Flags_SetBingoInf(BINGO_INF_SPIRIT_RUSTY_HAMMER_SWITCHES);
                 }
+                if (Flags_GetSwitch(gPlayState, 0x31) && Flags_GetSwitch(gPlayState, 0x33) &&
+                    Flags_GetSwitch(gPlayState, 0x35)) {
+                    Flags_SetBingoInf(BINGO_INF_PLAYED_FOR_ALL_3_TRIFORCES_IN_SPIRIT);
+                }
+                if (flag == 0xD || flag == 0x15 || flag == 0x1B || flag == 0x1C || flag == 0x1E) {
+                    BingoRecordLockedDoors(sceneNum, flag);
+                }
+
                 break;
             case SCENE_SHADOW_TEMPLE:
                 if (flag == 0x1|| flag == 0x9 || flag == 0x8) {
@@ -449,6 +504,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
             case SCENE_ICE_CAVERN:
                 if (flag == 0x8 || flag == 0x9) {
                     BingoHandleSilverRupeeData(flagType, sceneNum, flag, ctx);
+                }
+                break;
+            case SCENE_BOTTOM_OF_THE_WELL:
+                if (flag == 0x3) {
+                    Flags_SetBingoInf(BINGO_INF_LOWER_THE_WATER_IN_BOTTOM_OF_THE_WELL);
                 }
                 break;
             default:
@@ -485,11 +545,40 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
     }
 
     if (flagType == FLAG_SCENE_TREASURE) {
+        int dekuChestsOpened = 0;
         switch (sceneNum) {
+            case SCENE_DEKU_TREE:
+                for (int i = 1; i < 7; i++) {
+                    if (Flags_GetTreasure(gPlayState, i)) {
+                        ++dekuChestsOpened;
+                    }
+                }
+                if (dekuChestsOpened >= 6) {
+                    Flags_SetBingoInf(BINGO_INF_ALL_DEKU_TREE_CHESTS);
+                }
+                break;
+            case SCENE_JABU_JABU:
+                if (Flags_GetTreasure(gPlayState, 0x1) && Flags_GetTreasure(gPlayState, 0x2) && Flags_GetTreasure(gPlayState, 0x4)) {
+                    Flags_SetBingoInf(BINGO_INF_ALL_JABU_JABU_CHESTS);
+                }
+                break;
             case SCENE_FIRE_TEMPLE:
                 if (Flags_GetTreasure(gPlayState, 0x5) && Flags_GetTreasure(gPlayState, 0xD)) {
                     Flags_SetBingoInf(BINGO_INF_FIRE_TEMPLE_TIMER_CHALLENGE_CHESTS);
                 }
+                break;
+            case SCENE_GERUDO_TRAINING_GROUND:
+                if (flag == 0xC) Flags_SetBingoInf(BINGO_INF_ICE_ARROW_CHEST);
+                if (flag == 0xD) Flags_SetBingoInf(BINGO_INF_TOILET_ROOM_CHEST);
+                break;
+            case SCENE_INSIDE_GANONS_CASTLE:
+                if (flag == 0x5) Flags_SetBingoInf(BINGO_INF_GOLD_GAUNTLETS_CHEST);
+                break;
+            case SCENE_GANONS_TOWER:
+                if (flag == 0xB) Flags_SetBingoInf(BINGO_INF_GANON_BOSS_KEY_CHEST);
+                break;
+            case SCENE_DESERT_COLOSSUS:
+                if (Flags_GetTreasure(gPlayState, 0x9) && Flags_GetTreasure(gPlayState, 0xB)) Flags_SetBingoInf(BINGO_INF_DESERT_COLOSSUS_HAND_CHESTS);
                 break;
             default:
                 break;
@@ -503,6 +592,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                     Flags_SetBingoInf(BINGO_INF_SCARE_OFF_ALL_DEKU_SCRUBS_IN_TREE);
                 }
                 break;
+            case SCENE_JABU_JABU:
+                if (flag == 0x6) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_BIG_OCTO);
+                }
+                break;
             case SCENE_FIRE_TEMPLE:
                 if (Flags_GetClear(gPlayState, 0x3) && Flags_GetClear(gPlayState, 0x18)) {
                     Flags_SetBingoInf(BINGO_INF_DEFEAT_BOTH_FLARE_DANCERS);
@@ -510,6 +604,19 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
             case SCENE_WATER_TEMPLE:
                 if (flag == 0xD) Flags_SetBingoInf(BINGO_INF_DEFEAT_DARK_LINK);
+                break;
+            case SCENE_SHADOW_TEMPLE:
+                if (flag == 0x4) Flags_SetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_SHADOW_TEMPLE);
+                break;
+            case SCENE_GERUDO_TRAINING_GROUND:
+                if (Flags_GetClear(gPlayState, 0x3) && Flags_GetClear(gPlayState, 0xA)) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_WOLFOS_AND_LIKE_LIKES_IN_GTG);
+                }
+                break;
+            case SCENE_BOTTOM_OF_THE_WELL:
+                if (flag == 0x4) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_BOTTOM_OF_THE_WELL);
+                }
                 break;
             default:
                 break;
@@ -889,6 +996,25 @@ void BingoShouldActorUpdateHandler(void* refActor, bool*) {
         }
     }
 
+    if (actor->id == ACTOR_BG_HAKA_TUBO) {
+        BgHakaTubo* skullPot = reinterpret_cast<BgHakaTubo*>(actor);
+        int actorIndex = GetActorListIndex(actor);
+        if (skullPot->potCollider.base.acFlags & AC_HIT) {
+            if (gPlayState->roomCtx.curRoom.num == 0xC) {
+                gSaveContext.ship.bingo.skullPotsDestroyed[actorIndex - 8] = true;
+            }
+            if (gPlayState->roomCtx.curRoom.num == 0xE) {
+                gSaveContext.ship.bingo.skullPotsDestroyed[3] = true;
+            }
+        }
+
+        auto& tracked = gSaveContext.ship.bingo.skullPotsDestroyed;
+        if (std::count_if(std::begin(tracked), std::end(tracked),
+                        [](u8 skullPotTracked) { return skullPotTracked != 0; }) >= 4) {
+            Flags_SetBingoInf(BINGO_INF_EXPLODE_4_SKULL_POTS);
+        }
+    }
+
     if (gPlayState->sceneNum == SCENE_WATER_TEMPLE && gPlayState->roomCtx.curRoom.num == 0x8 &&
         actor->id == ACTOR_OBJ_SWITCH) {
         ObjSwitch* objSwitch = reinterpret_cast<ObjSwitch*>(actor);
@@ -961,11 +1087,153 @@ void BingoOnEnemyDefeatHandler(void* refActor) {
                 break;
         }
     }
+
+    if (actor->id == ACTOR_EN_WF && actor->params == WOLFOS_WHITE) {
+        int actorIndex = GetActorListIndex(actor);
+        if (gPlayState->sceneNum == SCENE_GERUDO_TRAINING_GROUND) {
+            if (actorIndex == 4) gSaveContext.ship.bingo.whiteWolfosDefeated[0] = true;
+            if (actorIndex == 5) gSaveContext.ship.bingo.whiteWolfosDefeated[1] = true;
+        }
+        if (gPlayState->sceneNum == SCENE_ICE_CAVERN) {
+            gSaveContext.ship.bingo.whiteWolfosDefeated[2] = true;
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_ICE_CAVERN_WOLFOS);
+        }
+
+        if (std::count_if(std::begin(gSaveContext.ship.bingo.whiteWolfosDefeated), std::end(gSaveContext.ship.bingo.whiteWolfosDefeated), [](u8 defeated)
+            { return defeated != 0; }) >= 3) {
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_3_WHITE_WOLFOS);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_ZF) {
+        int actorIndex = GetActorListIndex(actor);
+        switch(actor->params) {
+            case ENZF_TYPE_DINOLFOS:
+                if (gPlayState->sceneNum == SCENE_GERUDO_TRAINING_GROUND) {
+                    if (actorIndex == 0) gSaveContext.ship.bingo.dinolfosDefeated[0] = true;
+                    if (actorIndex == 1) gSaveContext.ship.bingo.dinolfosDefeated[1] = true;
+                }
+                if (gPlayState->sceneNum == SCENE_GANONS_TOWER) {
+                    if (actorIndex == 1) gSaveContext.ship.bingo.dinolfosDefeated[2] = true;
+                    if (actorIndex == 2) gSaveContext.ship.bingo.dinolfosDefeated[3] = true;
+                }
+
+                if (std::count_if(std::begin(gSaveContext.ship.bingo.dinolfosDefeated), std::end(gSaveContext.ship.bingo.dinolfosDefeated), [](u8 defeated)
+                    { return defeated != 0; }) >= 4) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_4_DIFFERENT_DINOLFOS);
+                }
+                break;
+            case ENZF_TYPE_LIZALFOS_LONE:
+                if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE) {
+                    if (gPlayState->roomCtx.curRoom.num == 0x4) {
+                        if (actorIndex == 4) gSaveContext.ship.bingo.spiritLizalfosDefeated[0] = true;
+                        if (actorIndex == 5) gSaveContext.ship.bingo.spiritLizalfosDefeated[1] = true;
+                    }
+                    if (gPlayState->roomCtx.curRoom.num == 0x1A) {
+                        if (actorIndex == 3) gSaveContext.ship.bingo.spiritLizalfosDefeated[2] = true;
+                        if (actorIndex == 4) gSaveContext.ship.bingo.spiritLizalfosDefeated[3] = true;
+                    }
+                }
+
+                if (std::count_if(std::begin(gSaveContext.ship.bingo.spiritLizalfosDefeated), std::end(gSaveContext.ship.bingo.spiritLizalfosDefeated), [](u8 defeated)
+                    { return defeated != 0; }) >= 4) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_SPIRIT_LIZALFOS);
+                }
+                break;
+        }
+    }
+
+    if (actor->id == ACTOR_EN_IK) {
+        int actorIndex = GetActorListIndex(actor);
+        if (gPlayState->sceneNum == SCENE_GANONS_TOWER) {
+            if (actorIndex == 1) gSaveContext.ship.bingo.ironKnucklesDefeated[0] = true;
+            if (actorIndex == 2) gSaveContext.ship.bingo.ironKnucklesDefeated[1] = true;
+        }
+        // 2 & 3 indices are *supposed* to be handled in SCENE_FLAG_CLEAR,
+        // but I'm handling them here since that's where the others are being handled.
+        // Also, it kinda just doesn't matter really.
+        if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE) {
+            if (gPlayState->roomCtx.curRoom.num == 0xA) gSaveContext.ship.bingo.ironKnucklesDefeated[2] = true;
+            if (gPlayState->roomCtx.curRoom.num == 0x14) gSaveContext.ship.bingo.ironKnucklesDefeated[3] = true;
+        }
+        if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE_BOSS) {
+            gSaveContext.ship.bingo.ironKnucklesDefeated[4] = true;
+        }
+
+        if (std::count_if(std::begin(gSaveContext.ship.bingo.ironKnucklesDefeated), std::end(gSaveContext.ship.bingo.ironKnucklesDefeated), [](u8 defeated)
+            { return defeated != 0; }) >= 4) {
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_4_DIFFERENT_IRON_KNUCKLES);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_RR) {
+        switch(gPlayState->sceneNum) {
+            case SCENE_FIRE_TEMPLE:
+                gSaveContext.ship.bingo.likelikesDefeated[0] = true;
+                break;
+            case SCENE_WATER_TEMPLE:
+                gSaveContext.ship.bingo.likelikesDefeated[1] = true;
+                break;
+            case SCENE_GERUDO_TRAINING_GROUND:
+                gSaveContext.ship.bingo.likelikesDefeated[2] = true;
+                break;
+            case SCENE_SPIRIT_TEMPLE:
+                gSaveContext.ship.bingo.likelikesDefeated[3] = true;
+                break;
+            case SCENE_BOTTOM_OF_THE_WELL:
+                gSaveContext.ship.bingo.likelikesDefeated[4] = true;
+                break;
+            case SCENE_SHADOW_TEMPLE:
+                gSaveContext.ship.bingo.likelikesDefeated[5] = true;
+                break;
+            case SCENE_INSIDE_GANONS_CASTLE:
+                gSaveContext.ship.bingo.likelikesDefeated[6] = true;
+                break;
+            default:
+                break;
+        }
+
+        if (std::count_if(std::begin(gSaveContext.ship.bingo.likelikesDefeated), std::end(gSaveContext.ship.bingo.likelikesDefeated), [](u8 defeated)
+            { return defeated != 0; }) >= 3) {
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_3_DIFFERENT_DUNGEON_LIKE_LIKES);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_OKUTA && gPlayState->sceneNum == SCENE_JABU_JABU) {
+        int actorIndex = GetActorListIndex(actor);
+        switch(gPlayState->roomCtx.curRoom.num) {
+            case 0x0:
+                if (actorIndex == 0) gSaveContext.ship.bingo.jabuOctoroksDefeated[0] = true;
+                if (actorIndex == 1) gSaveContext.ship.bingo.jabuOctoroksDefeated[1] = true;
+                break;
+            case 0x1:
+                gSaveContext.ship.bingo.jabuOctoroksDefeated[2] = true;
+                break;
+            case 0x4:
+                gSaveContext.ship.bingo.jabuOctoroksDefeated[3] = true;
+                break;
+            case 0xD:
+                if (actorIndex == 0) gSaveContext.ship.bingo.jabuOctoroksDefeated[4] = true;
+                if (actorIndex == 1) gSaveContext.ship.bingo.jabuOctoroksDefeated[5] = true;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void BingoOnActorKillHandler(void* refActor) {
     Actor* actor = static_cast<Actor*>(refActor);
 
+    if (actor->id == ACTOR_BG_HAKA_TRAP) {
+        int actorIndex = GetActorListIndex(actor);
+        if (actorIndex == 3) gSaveContext.ship.bingo.woodWallsBurnt[0] = true;
+        if (actorIndex == 4) gSaveContext.ship.bingo.woodWallsBurnt[1] = true;
+
+        if (gSaveContext.ship.bingo.woodWallsBurnt[0] && gSaveContext.ship.bingo.woodWallsBurnt[1]) {
+            Flags_SetBingoInf(BINGO_INF_BURN_THE_WOOD_WALLS_IN_SHADOW);
+        }
+    }
 }
 
 void BingoOnSceneSpawnActorsHandler() {
