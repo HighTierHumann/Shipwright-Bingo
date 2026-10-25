@@ -17,6 +17,7 @@
 #include "soh/Enhancements/randomizer/RCToRandInf.h"
 #include "soh/Bingo/BingoSquareMap.h"
 #include "soh/ObjectExtension/ActorListIndex.h"
+#include "soh/Enhancements/randomizer/randomizer_grotto.h"
 
 #include <algorithm>
 #include <bitset>
@@ -25,6 +26,7 @@ extern "C" {
 #include "macros.h"
 #include "functions.h"
 #include "variables.h"
+#include "src/overlays/actors/ovl_En_Dns/z_en_dns.h"
 #include "src/overlays/actors/ovl_En_Dodongo/z_en_dodongo.h"
 #include "src/overlays/actors/ovl_En_Firefly/z_en_firefly.h"
 #include "src/overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
@@ -37,6 +39,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Honotrap/z_en_honotrap.h"
 #include "src/overlays/actors/ovl_En_Wf/z_en_wf.h"
 #include "src/overlays/actors/ovl_En_Zf/z_en_zf.h"
+#include "src/overlays/actors/ovl_En_Reeba/z_en_reeba.h"
 #include "src/overlays/actors/ovl_Bg_Haka_Tubo/z_bg_haka_tubo.h"
 #include "src/overlays/actors/ovl_Bg_Haka_Trap/z_bg_haka_trap.h"
 extern PlayState* gPlayState;
@@ -364,7 +367,48 @@ static void BingoRecordLockedDoors(int16_t sceneNum, int16_t flag) {
     checkDoorFlags();
 }
 
+static void BingoHandleMerchants(int16_t flag = -1, GetItemID getItemId = GI_NONE) {
+    switch(flag) {
+        case RAND_INF_MERCHANTS_MEDIGORON:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true;
+            break;
+        case RAND_INF_MERCHANTS_MAGIC_BEAN_SALESMAN:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[1] = true;
+            break;
+        case RAND_INF_MERCHANTS_CARPET_SALESMAN:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[3] = true;
+            break;
+        default:
+            break;
+    }
+
+    switch(getItemId) {
+        case GI_SWORD_KNIFE:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true;
+            break;
+        case GI_BEAN:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[1] = true;
+            break;
+        case GI_POTION_BLUE:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[2] = true;
+            break;
+        case GI_BOMBCHUS_10:
+            gSaveContext.ship.bingo.merchantsBoughtFrom[3] = true;
+            break;
+        default:
+            break;
+    }
+
+    auto& tracked = gSaveContext.ship.bingo.merchantsBoughtFrom;
+    if (std::count_if(std::begin(tracked), std::end(tracked),
+                    [](u8 merchants) { return merchants != 0; }) >= 3) {
+        Flags_SetBingoInf(BINGO_INF_BUY_FROM_3_MERCHANTS);
+    }
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
+    if (gPlayState == nullptr) return;
+
     Player* player = GET_PLAYER(gPlayState);
     auto ctx = Rando::Context::GetInstance();
 
@@ -415,6 +459,37 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
         if (Flags_GetRandomizerInf(RAND_INF_HAS_SKELETON_KEY)) {
             Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_WATER_DOORS);
             Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_SPIRIT_DOORS);
+        }
+
+        switch(flag) {
+            case RAND_INF_10_BIG_POES:
+                Flags_SetBingoInf(BINGO_INF_COLLECT_POE_COLLECTOR_CHECK);
+                break;
+            case RAND_INF_MERCHANTS_CARPET_SALESMAN:
+                Flags_SetBingoInf(BINGO_INF_CARPET_SALESMAN_ITEM);
+                [[fallthrough]];
+            case RAND_INF_MERCHANTS_MAGIC_BEAN_SALESMAN:
+                Flags_SetBingoInf(BINGO_INF_BEAN_GUY_ITEM);
+                [[fallthrough]];
+            case RAND_INF_MERCHANTS_MEDIGORON:
+                BingoHandleMerchants(flag);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (flagType == FLAG_BINGO_INF) {
+        switch (flag) {
+            case BINGO_INF_DEFEAT_DEAD_HAND_BOTTOM_OF_THE_WELL:
+            case BINGO_INF_DEFEAT_DEAD_HAND_SHADOW_TEMPLE:
+                if (Flags_GetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_BOTTOM_OF_THE_WELL) &&
+                    Flags_GetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_SHADOW_TEMPLE)) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_BOTH_DEAD_HANDS);
+                }
+                break;
+            default:
+                break;
         }
     }
 }
@@ -865,6 +940,22 @@ void BingoOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
 
         LUSLOG_DEBUG("medallionsHeld: %d, stonesHeld: %d", medallionsHeld, stonesHeld);
     }
+
+    if (receivedItemEntry.getItemId == GI_BOMBCHUS_10 && gPlayState->sceneNum == SCENE_HAUNTED_WASTELAND) {
+        Flags_SetBingoInf(BINGO_INF_CARPET_SALESMAN_ITEM);
+        BingoHandleMerchants(-1, GI_BOMBCHUS_10);
+    }
+    if (receivedItemEntry.getItemId == GI_POTION_BLUE && gPlayState->sceneNum == SCENE_POTION_SHOP_GRANNY) {
+        Flags_SetBingoInf(BINGO_INF_GRANNYS_POTION);
+        BingoHandleMerchants(-1, GI_POTION_BLUE);
+    }
+    if (receivedItemEntry.getItemId == GI_BEAN && gPlayState->sceneNum == SCENE_ZORAS_RIVER) {
+        Flags_SetBingoInf(BINGO_INF_BEAN_GUY_ITEM);
+        BingoHandleMerchants(-1, GI_BEAN);
+    }
+    if (receivedItemEntry.getItemId == GI_SWORD_KNIFE && gPlayState->sceneNum == SCENE_GORON_CITY) {
+        BingoHandleMerchants(-1, GI_SWORD_KNIFE);
+    }
 }
 
 void BingoOnDialogMessageHandler() {
@@ -872,7 +963,7 @@ void BingoOnDialogMessageHandler() {
     Actor* actor = msgCtx->talkActor;
 
     if (gPlayState->sceneNum == SCENE_DODONGOS_CAVERN) {
-        if (actor && actor->id == ACTOR_EN_DNS) {
+        if (actor->id == ACTOR_EN_DNS) {
             static constexpr struct { int16_t params; uint8_t index; } dcScrubs[] = {
                     { 0x0, 0 }, { 0x1, 1 }, { 0x3, 2 }, { 0x4, 3 }
                 };
@@ -889,10 +980,47 @@ void BingoOnDialogMessageHandler() {
             Flags_SetBingoInf(BINGO_INF_SPEAK_WITH_4_DC_BUSINESS_SCRUBS);
         }
     }
+
+    if (actor->id == ACTOR_EN_GM && (CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BIGGORON) ||
+        CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE)) && CUR_UPG_VALUE(UPG_WALLET) >= 1) {
+        gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true; // Knife "bought" for bingo purposes in this scenario
+        BingoHandleMerchants(-1, GI_NONE);
+    }
+}
+
+static void BingoRecordScrubPurchase(EnDns* enDns) {
+    s32 params = enDns->actor.params;
+    // Scrubs that are 0x06 are loaded as 0x03 when child, switching from selling arrows to seeds
+    if (params == 0x06) {
+        params = 0x03;
+    }
+    if (gPlayState->sceneNum == SCENE_GROTTOS) {
+        s16 respawnData = gSaveContext.respawn[RESPAWN_MODE_RETURN].data & ((1 << 8) - 1);
+        params = TWO_ACTOR_PARAMS(params, respawnData);
+    }
+
+    Rando::Location* location =
+        OTRGlobals::Instance->gRandomizer->GetCheckObjectFromActor(ACTOR_EN_DNS, gPlayState->sceneNum, params);
+    auto it = rcToRandomizerInf.find(location->GetRandomizerCheck());
+    if (it == rcToRandomizerInf.end() || it->second < 13 || it->second > 58) {
+        return;
+    }
+
+    gSaveContext.ship.bingo.scrubsPurchasedFrom[it->second - 13] = true;
+
+    auto& spoken = gSaveContext.ship.bingo.dcScrubsSpoken;
+    if (std::count_if(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; }) >= 10) {
+        Flags_SetBingoInf(BINGO_INF_BUY_THE_WARES_OF_10_SCRUBS);
+    }
 }
 
 void BingoOnActorUpdateHandler(void* refActor) {
     Actor* actor = static_cast<Actor*>(refActor);
+
+    // dropCollectible is only set on purchases
+    if (actor->id == ACTOR_EN_DNS && reinterpret_cast<EnDns*>(actor)->dropCollectible) {
+        BingoRecordScrubPurchase(reinterpret_cast<EnDns*>(actor));
+    }
 
     if (actor->id == ACTOR_EN_DODONGO) {
         EnDodongo* dodongo = reinterpret_cast<EnDodongo*>(actor);
@@ -1220,6 +1348,76 @@ void BingoOnEnemyDefeatHandler(void* refActor) {
                 break;
         }
     }
+
+    if (gPlayState->sceneNum == SCENE_GROTTOS) {
+        s8 grottoID = Grotto_CurrentGrotto();
+        auto& defeated = gSaveContext.ship.bingo.grottoEnemiesDefeated;
+        if (grottoID >= 0 && grottoID < ARRAY_COUNT(defeated)) {
+            defeated[grottoID] = true;
+
+            if (std::count_if(std::begin(defeated), std::end(defeated),
+                            [](u8 d) { return d != 0; }) >= 3) {
+                Flags_SetBingoInf(BINGO_INF_DEFEAT_ENEMY_3_DIFFERENT_GROTTOS);
+            }
+        }
+    }
+
+    if (actor->id == ACTOR_EN_REEBA && actor->params == LEEVER_BIG) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_A_PURPLE_LEEVER);
+    }
+
+    if (actor->id == ACTOR_EN_CROW && actor->params == 1) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_A_LARGE_GUAY);
+    }
+
+    if (actor->id == ACTOR_EN_SKB && actor->scale.x >= 0.015f) {
+        Flags_SetBingoInf(BINGO_INF_DEFEAT_A_LARGE_STALCHILD);
+    }
+
+    if (actor->id == ACTOR_EN_PEEHAT) Flags_SetBingoInf(BINGO_INF_DEFEAT_A_PEAHAT);
+    if (actor->id == ACTOR_EN_SKJ) Flags_SetBingoInf(BINGO_INF_DEFEAT_A_SKULL_KID);
+    if (actor->id == ACTOR_EN_GELDB) Flags_SetBingoInf(BINGO_INF_DEFEAT_A_GERUDO);
+
+    if (actor->id == ACTOR_EN_TITE && gPlayState->sceneNum == SCENE_LAKE_HYLIA) {
+        int actorIndex = GetActorListIndex(actor);
+        gSaveContext.ship.bingo.lakeHyliaTektites[actorIndex - 22] = true;
+
+        auto& defeated = gSaveContext.ship.bingo.lakeHyliaTektites;
+        if (std::count_if(std::begin(defeated), std::end(defeated),
+                        [](u8 d) { return d != 0; }) >= 8) {
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_HYLIA_TEKTITES);
+        }
+    }
+}
+
+void BingoOnBossDefeatHandler(void* refActor) {
+    Actor* actor = static_cast<Actor*>(refActor);
+
+    switch(actor->id) {
+        // Discussion still ongoing for Beat X Dungeon VS Defeat X Boss, so
+        // gonna leave this switch as-is for now.
+        case ACTOR_BOSS_GOMA:
+        case ACTOR_BOSS_DODONGO:
+            break;
+        case ACTOR_BOSS_VA:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_BARINADE);
+            break;
+        case ACTOR_BOSS_GANONDROF:
+            break;
+        case ACTOR_BOSS_FD:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_VOLVAGIA);
+            break;
+        case ACTOR_BOSS_MO:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_MORPHA);
+            break;
+        case ACTOR_BOSS_TW:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_TWINROVA);
+            break;
+        case ACTOR_BOSS_SST:
+            break;
+        default:
+            break;
+    }
 }
 
 void BingoOnActorKillHandler(void* refActor) {
@@ -1273,6 +1471,7 @@ static void BingoRegisterHooks() {
     static uint32_t onExitGameHook = 0;
     static uint32_t onKaleidoUpdateHook = 0;
     static uint32_t onEnemyDefeatHook = 0;
+    static uint32_t onBossDefeatHook = 0;
     static uint32_t onActorKillHook = 0;
 
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnLoadGame>([](int32_t fileNum) {
@@ -1301,6 +1500,7 @@ static void BingoRegisterHooks() {
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnExitGame>(onExitGameHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnKaleidoscopeUpdate>(onKaleidoUpdateHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnEnemyDefeat>(onEnemyDefeatHook);
+        GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnBossDefeat>(onBossDefeatHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnActorKill>(onActorKillHook);
 
         onFlagSetHook = 0;
@@ -1322,6 +1522,7 @@ static void BingoRegisterHooks() {
         onExitGameHook = 0;
         onKaleidoUpdateHook = 0;
         onEnemyDefeatHook = 0;
+        onBossDefeatHook = 0;
         onActorKillHook = 0;
 
         if (!IS_RANDO)
@@ -1374,6 +1575,8 @@ static void BingoRegisterHooks() {
         //     BingoOnKaleidoscopeUpdateHandler);
         onEnemyDefeatHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnEnemyDefeat>(
             BingoOnEnemyDefeatHandler);
+        onBossDefeatHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnBossDefeat>(
+            BingoOnBossDefeatHandler);
         onActorKillHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnActorKill>(
             BingoOnActorKillHandler);
     });

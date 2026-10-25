@@ -273,6 +273,10 @@ typedef struct ShipBingoSaveContextData {
     u8 jabuOctoroksDefeated[6];
     u8 skullPotsDestroyed[4];
     u8 woodWallsBurnt[2];
+    u8 grottoEnemiesDefeated[33];
+    u8 lakeHyliaTektites[8];
+    u8 merchantsBoughtFrom[4];
+    u8 scrubsPurchasedFrom[46];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {
