@@ -461,3 +461,9 @@ soh/properties.h
 /clang-format
 /clang-format.exe
 *.o2r
+AGENTS.md
+.clinerules/caveman.md
+.cursor/rules/caveman.mdc
+.github/copilot-instructions.md
+.github/instructions/copilot-instructions.md.instructions.md
+.windsurf/rules/caveman.md
