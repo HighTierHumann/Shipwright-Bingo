@@ -1766,6 +1766,7 @@ void Player_PlaySteppingSfx(Player* this, f32 pitchAdjustment) {
     }
 
     func_800F4010(&this->actor.projectedPos, sfxId, pitchAdjustment);
+
     // Gameplay stats: Count footsteps
     // Only count while game isn't complete and don't count Link's idle animations or crawling in crawlspaces
     if (!gSaveContext.ship.stats.gameComplete && !(this->stateFlags2 & PLAYER_STATE2_IDLE_FIDGET) &&
@@ -2140,7 +2141,7 @@ LinkAnimationHeader* func_80833438(Player* this) {
     if (this->unk_890 != 0) {
         return GET_PLAYER_ANIM(PLAYER_ANIMGROUP_damage_run, this->modelAnimType);
     } else if (!(this->stateFlags1 & (PLAYER_STATE1_IN_WATER | PLAYER_STATE1_IN_CUTSCENE)) &&
-               (this->currentBoots == PLAYER_BOOTS_IRON)) {
+               ((this->currentBoots == PLAYER_BOOTS_IRON) || CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0))) {
         return GET_PLAYER_ANIM(PLAYER_ANIMGROUP_heavy_run, this->modelAnimType);
     } else {
         return GET_PLAYER_ANIM(PLAYER_ANIMGROUP_run, this->modelAnimType);

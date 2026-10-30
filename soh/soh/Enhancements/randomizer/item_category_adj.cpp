@@ -32,5 +32,10 @@ GetItemCategory Randomizer_AdjustItemCategory(GetItemEntry item) {
         category = ITEM_CATEGORY_JUNK;
     }
 
+    // Downgrade boss keys to junk if the player already has skeleton boss key
+    if (category == ITEM_CATEGORY_BOSS_KEY && Flags_GetRandomizerInf(RAND_INF_HAS_SKELETON_BOSS_KEY)) {
+        category = ITEM_CATEGORY_JUNK;
+    }
+
     return category;
 }

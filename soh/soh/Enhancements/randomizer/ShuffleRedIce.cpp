@@ -28,7 +28,7 @@ uint8_t BgIceShelter_RandomizerHoldsItem(Actor* actor) {
 
     // Don't pull randomized item if icicle isn't randomized or is already checked
     if (!IS_RANDO || Flags_GetRandomizerInf(redIceIdentity->randomizerInf) ||
-        redIceIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        redIceIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(redIceIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

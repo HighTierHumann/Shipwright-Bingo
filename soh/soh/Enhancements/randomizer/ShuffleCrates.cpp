@@ -142,7 +142,7 @@ uint8_t ObjKibako2_RandomizerHoldsItem(ObjKibako2* crateActor, PlayState* play) 
     // Don't pull randomized item if crate isn't randomized or is already checked
     if (!IS_RANDO || (crateSetting.Is(RO_SHUFFLE_CRATES_OVERWORLD) && isDungeon) ||
         (crateSetting.Is(RO_SHUFFLE_CRATES_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK  || (Rando::Context::GetInstance()->GetItemLocation(crateIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;
@@ -162,7 +162,7 @@ uint8_t ObjKibako_RandomizerHoldsItem(ObjKibako* smallCrateActor, PlayState* pla
     // Don't pull randomized item if crate isn't randomized or is already checked
     if (!IS_RANDO || (crateSetting.Is(RO_SHUFFLE_CRATES_OVERWORLD) && isDungeon) ||
         (crateSetting.Is(RO_SHUFFLE_CRATES_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(crateIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

@@ -25,7 +25,7 @@ uint8_t Sign_RandomizerHoldsItem(Actor* actor, PlayState* play) {
     // Don't pull randomized item if sign isn't randomized or is already checked
     if (!IS_RANDO || (signSetting.Is(RO_SHUFFLE_SIGNS_OVERWORLD) && isDungeon) ||
         (signSetting.Is(RO_SHUFFLE_SIGNS_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(signIdentity->randomizerInf) || signIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(signIdentity->randomizerInf) || signIdentity->randomizerCheck == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(signIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

@@ -16,7 +16,7 @@ void ObjComb_RandomizerChooseItemDrop(ObjComb* objComb, PlayState* play) {
     const auto beehiveIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(&objComb->actor);
 
     if (RAND_GET_OPTION(RSK_SHUFFLE_BEEHIVES) && beehiveIdentity != nullptr &&
-        !Flags_GetRandomizerInf(beehiveIdentity->randomizerInf)) {
+        !Flags_GetRandomizerInf(beehiveIdentity->randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(beehiveIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         EnItem00* item00 = (EnItem00*)Item_DropCollectible2(play, &objComb->actor.world.pos, ITEM00_SOH_DUMMY);
         item00->randoInf = beehiveIdentity->randomizerInf;
         item00->itemEntry =
@@ -46,7 +46,7 @@ void ObjComb_RandomizerWait(ObjComb* objComb, PlayState* play) {
 
     const auto beehiveIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(&objComb->actor);
     if (RAND_GET_OPTION(RSK_SHUFFLE_BEEHIVES) && beehiveIdentity != nullptr &&
-        !Flags_GetRandomizerInf(beehiveIdentity->randomizerInf)) {
+        !Flags_GetRandomizerInf(beehiveIdentity->randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(beehiveIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         if (objComb->unk_1B0 <= -5000) {
             objComb->unk_1B0 = 1500;
         }

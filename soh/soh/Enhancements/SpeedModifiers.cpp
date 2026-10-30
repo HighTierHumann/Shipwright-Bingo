@@ -44,7 +44,7 @@ static f32 GetSpeedModifierJumpFactor() {
 
 static f32 GetBunnyHoodRunFactor(Player* player) {
     if (CVarGetInteger(CVAR_BUNNY_HOOD_NAME, BUNNY_HOOD_VANILLA) != BUNNY_HOOD_VANILLA &&
-        player->currentMask == PLAYER_MASK_BUNNY) {
+        player->currentMask == PLAYER_MASK_BUNNY && !(CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0))) {
         return 1.5f;
     }
     return 1.0f;
@@ -52,7 +52,7 @@ static f32 GetBunnyHoodRunFactor(Player* player) {
 
 static f32 GetBunnyHoodJumpFactor(Player* player) {
     if (CVarGetInteger(CVAR_BUNNY_HOOD_NAME, BUNNY_HOOD_VANILLA) == BUNNY_HOOD_FAST_AND_JUMP &&
-        player->currentMask == PLAYER_MASK_BUNNY) {
+        player->currentMask == PLAYER_MASK_BUNNY && !(CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0))) {
         return 1.5f;
     }
     return 1.0f;

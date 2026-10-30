@@ -896,6 +896,15 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_SHUFFLE_ICICLES, "Shuffle Icicles", CVAR_RANDOMIZER_SETTING("ShuffleIcicles"), mOptionDescriptions[RSK_SHUFFLE_ICICLES]);
     OPT_BOOL(RSK_SHUFFLE_RED_ICE, "Shuffle Red Ice", CVAR_RANDOMIZER_SETTING("ShuffleRedIce"), mOptionDescriptions[RSK_SHUFFLE_RED_ICE]);
     OPT_U8(RSK_SHUFFLE_SIGNS, "Shuffle Signs", {"Off", "Dungeons", "Overworld", "All Signs"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleSigns"), mOptionDescriptions[RSK_SHUFFLE_SIGNS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_SIGNS_OFF);
+    OPT_U8(RSK_ADDITIONAL_HAZARD_ROOMS, "Additional Hazard Rooms to Shuffle", {NumOpts(0, 200)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AdditionalHazardRooms"), mOptionDescriptions[RSK_ADDITIONAL_HAZARD_ROOMS], WIDGET_CVAR_SLIDER_INT, 0, true);
+    OPT_U8(RSK_SHUFFLE_HAZARD_ROOMS, "Shuffle Hazard Rooms", {"Off", "Dungeons Only", "Overworld Only", "Anywhere"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ShuffleHazardRooms"), mOptionDescriptions[RSK_SHUFFLE_HAZARD_ROOMS], WIDGET_CVAR_COMBOBOX, RO_SHUFFLE_HAZARD_ROOMS_OFF);
+    OPT_CALLBACK(RSK_SHUFFLE_HAZARD_ROOMS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleHazardRooms"), RO_GENERIC_OFF)) {
+            mOptions[RSK_ADDITIONAL_HAZARD_ROOMS].Unhide();
+        } else {
+            mOptions[RSK_ADDITIONAL_HAZARD_ROOMS].Hide();
+        }
+    });
     OPT_BOOL(RSK_SHUFFLE_FISHING_POLE, "Shuffle Fishing Pole", CVAR_RANDOMIZER_SETTING("ShuffleFishingPole"), mOptionDescriptions[RSK_SHUFFLE_FISHING_POLE]);
     OPT_CALLBACK(RSK_SHUFFLE_FISHING_POLE, {
         // Disable fishing pole hint if the fishing pole is not shuffled
@@ -1532,12 +1541,14 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_LULLABY_HINT, "Zelda's Lullaby Hint", CVAR_RANDOMIZER_SETTING("LullabyHint"), mOptionDescriptions[RSK_LULLABY_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_STORMS_HINT, "Song of Storms Hint", CVAR_RANDOMIZER_SETTING("StormsHint"), mOptionDescriptions[RSK_STORMS_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_EPONAS_HINT, "Epona's Song Hint", CVAR_RANDOMIZER_SETTING("EponasHint"), mOptionDescriptions[RSK_EPONAS_HINT], IMFLAG_NONE);
+    OPT_BOOL(RSK_SONG_OF_TIME_HINT, "Song of Time Hint", CVAR_RANDOMIZER_SETTING("SongOfTimeHint"), mOptionDescriptions[RSK_SONG_OF_TIME_HINT], IMFLAG_NONE);
     // TODO: Compasses show rewards/woth, maps show dungeon mode
     OPT_BOOL(RSK_BLUE_FIRE_ARROWS, "Blue Fire Arrows", CVAR_RANDOMIZER_SETTING("BlueFireArrows"), mOptionDescriptions[RSK_BLUE_FIRE_ARROWS]);
     OPT_BOOL(RSK_SUNLIGHT_ARROWS, "Sunlight Arrows", CVAR_RANDOMIZER_SETTING("SunlightArrows"), mOptionDescriptions[RSK_SUNLIGHT_ARROWS]);
     OPT_BOOL(RSK_ROCS_FEATHER, "Roc's Feather", CVAR_RANDOMIZER_SETTING("RocsFeather"), mOptionDescriptions[RSK_ROCS_FEATHER]);
     OPT_U8(RSK_INFINITE_UPGRADES, "Infinite Upgrades", {"Off", "Progressive", "Condensed Progressive"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("InfiniteUpgrades"), mOptionDescriptions[RSK_INFINITE_UPGRADES]);
     OPT_BOOL(RSK_SKELETON_KEY, "Skeleton Key", CVAR_RANDOMIZER_SETTING("SkeletonKey"), mOptionDescriptions[RSK_SKELETON_KEY]);
+    OPT_BOOL(RSK_SKELETON_BOSS_KEY, "Skeleton Boss Key", CVAR_RANDOMIZER_SETTING("SkeletonBossKey"), mOptionDescriptions[RSK_SKELETON_BOSS_KEY]);
     OPT_BOOL(RSK_SLINGBOW_BREAK_BEEHIVES, "Slingshot/Bow Can Break Beehives", CVAR_RANDOMIZER_SETTING("SlingBowBeehives"), mOptionDescriptions[RSK_SLINGBOW_BREAK_BEEHIVES]);
     OPT_U8(RSK_ITEM_POOL, "Item Pool", {"Plentiful", "Balanced", "Scarce", "Minimal"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ItemPool"), mOptionDescriptions[RSK_ITEM_POOL], WIDGET_CVAR_COMBOBOX, RO_ITEM_POOL_BALANCED);
     OPT_BOOL(RSK_BASE_ICE_TRAPS, "Base Ice Traps", CVAR_RANDOMIZER_SETTING("BaseIceTraps"), mOptionDescriptions[RSK_BASE_ICE_TRAPS], IMFLAG_NONE, WIDGET_CVAR_COMBOBOX, RO_GENERIC_ON);
@@ -1574,6 +1585,13 @@ void Settings::CreateOptions() {
     });
     OPT_BOOL(RSK_STARTING_BEANS, "Start with Magic Beans", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingBeans"), "", WIDGET_CVAR_CHECKBOX, RO_GENERIC_OFF);
     OPT_BOOL(RSK_INDIVIDUAL_BEANS, "Reworked Magic Beans", CVAR_RANDOMIZER_SETTING("IndividualBeans"), mOptionDescriptions[RSK_INDIVIDUAL_BEANS]);
+    OPT_CALLBACK(RSK_INDIVIDUAL_BEANS, {
+        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("IndividualBeans"), 1) == 1) {
+            mOptions[RSK_SKIP_PLANTING_BEANS].Disable("Magic Beans Rework is not currently compatible with Skip Planting Beans.");
+        } else {
+            mOptions[RSK_SKIP_PLANTING_BEANS].Enable();
+        }
+    });
     OPT_CALLBACK(RSK_SHUFFLE_MERCHANTS, {
         if ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_OFF) ||
             (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleMerchants"), RO_GENERIC_OFF) == RO_SHUFFLE_MERCHANTS_ALL_BUT_BEANS)) {
@@ -2281,6 +2299,8 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_SHUFFLE_ICICLES],
                                   &mOptions[RSK_SHUFFLE_RED_ICE],
                                   &mOptions[RSK_SHUFFLE_SIGNS],
+                                  &mOptions[RSK_SHUFFLE_HAZARD_ROOMS],
+                                  &mOptions[RSK_ADDITIONAL_HAZARD_ROOMS],
                                   &mOptions[RSK_SHUFFLE_FROG_SONG_RUPEES],
                                   &mOptions[RSK_SHUFFLE_ADULT_TRADE],
                                   &mOptions[RSK_SHUFFLE_100_GS_REWARD],
@@ -2357,6 +2377,7 @@ void Settings::CreateOptions() {
                                                                                  &mOptions[RSK_ENABLE_BOMBCHU_DROPS],
                                                                                  &mOptions[RSK_INFINITE_UPGRADES],
                                                                                  &mOptions[RSK_SKELETON_KEY],
+                                                                                 &mOptions[RSK_SKELETON_BOSS_KEY],
                                                                              },
                                                                              WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_ADDITIONAL_ITEMS] =
@@ -2415,6 +2436,7 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_HOVERS_HINT],        &mOptions[RSK_OCARINA_HINT],
                                   &mOptions[RSK_SCALE_HINT],         &mOptions[RSK_LULLABY_HINT],
                                   &mOptions[RSK_STORMS_HINT],        &mOptions[RSK_EPONAS_HINT],
+                                  &mOptions[RSK_SONG_OF_TIME_HINT],
                                   &mOptions[RSK_BOOMERANG_HINT],     &mOptions[RSK_HAMMER_HINT],
                                   &mOptions[RSK_MIRROR_HINT],
                               },
@@ -2583,6 +2605,8 @@ void Settings::CreateOptions() {
                                             &mOptions[RSK_SHUFFLE_ICICLES],
                                             &mOptions[RSK_SHUFFLE_RED_ICE],
                                             &mOptions[RSK_SHUFFLE_SIGNS],
+                                            &mOptions[RSK_SHUFFLE_HAZARD_ROOMS],
+                                            &mOptions[RSK_ADDITIONAL_HAZARD_ROOMS],
                                             &mOptions[RSK_SHUFFLE_KOKIRI_SWORD],
                                             &mOptions[RSK_SHUFFLE_OCARINA],
                                             &mOptions[RSK_SHUFFLE_OCARINA_BUTTONS],
@@ -2779,6 +2803,7 @@ void Settings::CreateOptions() {
                                               &mOptions[RSK_SUNLIGHT_ARROWS],
                                               &mOptions[RSK_INFINITE_UPGRADES],
                                               &mOptions[RSK_SKELETON_KEY],
+                                              &mOptions[RSK_SKELETON_BOSS_KEY],
                                               &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                           });
     mOptionGroups[RSG_ITEM_POOL] =
@@ -3487,6 +3512,10 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
 
     if (mOptions[RSK_STARTING_SONG_OF_STORMS]) {
         mOptions[RSK_STORMS_HINT].Set(RO_GENERIC_OFF);
+    }
+
+    if (mOptions[RSK_STARTING_SONG_OF_TIME]) {
+        mOptions[RSK_SONG_OF_TIME_HINT].Set(RO_GENERIC_OFF);
     }
 }
 

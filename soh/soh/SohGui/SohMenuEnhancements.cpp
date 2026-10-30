@@ -927,6 +927,9 @@ void SohMenu::AddMenuEnhancements() {
     AddWidget(path, "Ask to Equip New Items", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("AskToEquip"))
         .Options(CheckboxOptions().Tooltip("Adds a prompt to equip newly-obtained Swords, Shields, and Tunics."));
+    AddWidget(path, "Double Defense affects Environment Timers", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("DDAffectsTimers"))
+        .Options(CheckboxOptions().Tooltip("Double Defense will double the duration of environmental hazard timers."));
 
     AddWidget(path, "Ocarina", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Prevent Dropped Ocarina Inputs", WIDGET_CVAR_CHECKBOX)
@@ -1879,6 +1882,21 @@ void SohMenu::AddMenuEnhancements() {
             "The amount of damage each mimic does when touching the player. Set to 40 "
             "to always kill the player on contact, even with Double Defense."
         ));
+    AddWidget(path, "Sprain Link's Leg", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("SprainedLegMode"))
+        .Options(CheckboxOptions().Tooltip(
+            "Oh no! Link sprained his leg while adventuring and is now mildly inconvenienced!\n\n"
+            "Link will move at the same speed as Iron Boots, but his overall agility and ability to "
+            "downroll and sideroll will be unaffected!\n\n"
+            "Oooooohhhh nooooooooo!!!\n\n"
+            "Note: Some glitches may not be possible while enabled. Most should work as normal, however."));
+    AddWidget(path, "Enable the Screams of the Damned", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("ScreamsOfTheDamned"))
+        .PreFunc([](WidgetInfo& info) {
+            info.options->disabled = !CVarGetInteger(CVAR_ENHANCEMENT("SprainedLegMode"), 0);
+        })
+        .Options(CheckboxOptions().Tooltip(
+            "Stepping with Link's bum leg makes him yell.\n\nYou will regret this."));
     AddWidget(path, "Hurt Container Mode", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_ENHANCEMENT("HurtContainer"))
         .Options(CheckboxOptions().Tooltip("Changes Heart Piece and Heart Container functionality.\n\n"

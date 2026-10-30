@@ -5961,7 +5961,11 @@ void Interface_Draw(PlayState* play) {
                 case TIMER_STATE_ENV_HAZARD_INIT:
                     sTimerStateTimer = 20;
                     sTimerNextSecondTimer = 20;
-                    gSaveContext.timerSeconds = gSaveContext.health >> 1;
+                    if (CVarGetInteger(CVAR_ENHANCEMENT("DDAffectsTimers"), 0) && gSaveContext.isDoubleDefenseAcquired) {
+                        gSaveContext.timerSeconds = (gSaveContext.health >> 1) * 2;
+                    } else {
+                        gSaveContext.timerSeconds = gSaveContext.health >> 1;
+                    }
                     gSaveContext.timerState = TIMER_STATE_ENV_HAZARD_PREVIEW;
                     break;
                 case TIMER_STATE_ENV_HAZARD_PREVIEW:

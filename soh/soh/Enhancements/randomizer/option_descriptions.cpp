@@ -866,6 +866,8 @@ void Settings::CreateOptionDescriptions() {
         "Talking to the man in the Windmill as child will reveal the location of the Song of Storms.";
     mOptionDescriptions[RSK_EPONAS_HINT] =
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
+    mOptionDescriptions[RSK_SONG_OF_TIME_HINT] =
+        "Navi will tell you where to find the Song of Time when prompted from targeting a visible Song of Time block.";
     // end
     mOptionDescriptions[RSK_FULL_WALLETS] = "Start with a full wallet. All wallet upgrades come filled with rupees.";
     mOptionDescriptions[RSK_BOMBCHU_BAG] =
@@ -900,6 +902,8 @@ void Settings::CreateOptionDescriptions() {
         "Item placement logic will respect this option, so it might be required to use this to progress.";
     mOptionDescriptions[RSK_SKELETON_KEY] =
         "Adds a new item called the \"Skeleton Key\", it unlocks every dungeon door locked by a small key.";
+    mOptionDescriptions[RSK_SKELETON_BOSS_KEY] =
+        "Adds a new item called the \"Skeleton Boss Key\", it unlocks every boss door.";
     mOptionDescriptions[RSK_SUNLIGHT_ARROWS] =
         "Light Arrows can be used to light up the sun switches instead of using the Mirror Shield. "
         "Item placement logic will respect this option, so it might be required to use this to progress.";
@@ -923,5 +927,13 @@ void Settings::CreateOptionDescriptions() {
     mOptionDescriptions[RSK_SHUFFLE_BOSS_SOULS] =
         "Shuffles 8 boss souls (one for each blue warp dungeon). A boss will not appear until you collect its "
         "respective soul.";
+    mOptionDescriptions[RSK_SHUFFLE_HAZARD_ROOMS] =
+        "Shuffles hazard rooms throughout the game.\n\n"
+        "Hazard rooms are rooms that either require the Goron or Zora Tunic to survive prolonged periods of time in, indicated by the environmental fog of the room. "
+        "Do note that a \"room\" is the different parts of a scene that can be loaded; for example, the lower and upper halves "
+        "of Zora's River are technically two \"rooms\" separated by a loading zone.\n\n"
+        "Depending on the setting, you may restrict hazard rooms to dungeons only, overworld only, or anywhere in the game.\n\n"
+        "Without adding additional hazard rooms, only the 7 heated rooms present in the vanilla game will be shuffled. Additionally, Child will be "
+        "able to equip tunics to avoid situations where progression is Child-only, but would be blocked by hazard rooms.";
 }
 } // namespace Rando

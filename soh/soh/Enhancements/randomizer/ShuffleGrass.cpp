@@ -100,7 +100,7 @@ uint8_t EnKusa_RandomizerHoldsItem(EnKusa* grassActor, PlayState* play) {
     // Don't pull randomized item if grass isn't randomized or is already checked
     if (!IS_RANDO || (grassSetting.Is(RO_SHUFFLE_GRASS_OVERWORLD) && isDungeon) ||
         (grassSetting.Is(RO_SHUFFLE_GRASS_DUNGEONS) && !isDungeon) ||
-        Flags_GetRandomizerInf(grassIdentity->randomizerInf) || rc == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(grassIdentity->randomizerInf) || rc == RC_UNKNOWN_CHECK || (Rando::Context::GetInstance()->GetItemLocation(grassIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     } else {
         return true;

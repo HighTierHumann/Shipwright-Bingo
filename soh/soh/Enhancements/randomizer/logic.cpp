@@ -186,6 +186,7 @@ bool Logic::HasItem(RandomizerGet itemName) {
         case RG_LOST_WOODS_BEAN_SOUL:
         case RG_ZORAS_RIVER_BEAN_SOUL:
         case RG_SKELETON_KEY:
+        case RG_SKELETON_BOSS_KEY:
         case RG_RUTOS_LETTER:
             return CheckRandoInf(StaticData::RandoGetToRandInf.at(itemName));
             // Boss Souls
@@ -235,7 +236,7 @@ bool Logic::HasItem(RandomizerGet itemName) {
         case RG_SPIRIT_TEMPLE_BOSS_KEY:
         case RG_SHADOW_TEMPLE_BOSS_KEY:
         case RG_GANONS_CASTLE_BOSS_KEY:
-            return CheckDungeonItem(DUNGEON_KEY_BOSS, RandoGetToDungeonScene.at(itemName));
+            return HasItem(RG_SKELETON_BOSS_KEY) || CheckDungeonItem(DUNGEON_KEY_BOSS, RandoGetToDungeonScene.at(itemName));
             // Maps
         case RG_DEKU_TREE_MAP:
         case RG_DODONGOS_CAVERN_MAP:
@@ -1874,6 +1875,7 @@ std::map<RandomizerGet, uint32_t> StaticData::RandoGetToRandInf = {
     { RG_GERUDO_MASK, RAND_INF_CHILD_TRADES_HAS_MASK_GERUDO },
     { RG_MASK_OF_TRUTH, RAND_INF_CHILD_TRADES_HAS_MASK_TRUTH },
     { RG_SKELETON_KEY, RAND_INF_HAS_SKELETON_KEY },
+    { RG_SKELETON_BOSS_KEY, RAND_INF_HAS_SKELETON_BOSS_KEY },
     { RG_GREG_RUPEE, RAND_INF_GREG_FOUND },
     { RG_TREASURE_GAME_HEART, RAND_INF_WINNER_FOUND },
     { RG_SPEAK_DEKU, RAND_INF_CAN_SPEAK_DEKU },

@@ -36,7 +36,7 @@ CheckIdentity ShuffleBeggar_GetBeggarIdentity(int32_t textId) {
 uint8_t EnHy_RandomizerHoldsItem(int32_t textId) {
     CheckIdentity beggarIdentity = ShuffleBeggar_GetBeggarIdentity(textId);
     if (beggarIdentity.randomizerCheck == RC_UNKNOWN_CHECK || !IS_RANDO ||
-        Flags_GetRandomizerInf(beggarIdentity.randomizerInf)) {
+        Flags_GetRandomizerInf(beggarIdentity.randomizerInf) || (Rando::Context::GetInstance()->GetItemLocation(beggarIdentity.randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0))) {
         return false;
     }
     return true;

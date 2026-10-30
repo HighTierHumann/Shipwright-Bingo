@@ -1343,6 +1343,56 @@ extern "C" void Randomizer_DrawSkeletonKey(PlayState* play, GetItemEntry* getIte
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+extern "C" void Randomizer_DrawSkeletonBossKey(PlayState* play, GetItemEntry* getItemEntry) {
+    // Draw the blue fire DL
+    OPEN_DISPS(play->state.gfxCtx);
+    Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+    gSPSegment(POLY_XLU_DISP++, 8,
+               (uintptr_t)Gfx_TwoTexScrollEx(play->state.gfxCtx, 0, 0 * (play->state.frames * 0),
+                                             0 * (play->state.frames * 0), 16, 32, 1, 1 * (play->state.frames * 1),
+                                             -1 * (play->state.frames * 8), 16, 32, 0, 0, 1, -8));
+    Matrix_Push();
+    Matrix_Translate(0.0f, -70.0f, 0.0f, MTXMODE_APPLY);
+    Matrix_Scale(5.0f, 5.0f, 5.0f, MTXMODE_APPLY);
+    Matrix_ReplaceRotation(&play->billboardMtxF);
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+    gDPSetGrayscaleColor(POLY_XLU_DISP++, 255, 255, 0, 255);
+    gSPGrayscale(POLY_XLU_DISP++, true);
+    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)gGiBlueFireFlameDL);
+    gSPGrayscale(POLY_XLU_DISP++, false);
+    Matrix_Pop();
+    CLOSE_DISPS(play->state.gfxCtx);
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+
+    Color_RGB8 keyColor = { 115, 105, 90 };
+    keyColor = CVarGetColor24(CVAR_COSMETIC("Key.SkeletonBoss.Value"), keyColor);
+    gDPSetEnvColor(POLY_OPA_DISP++, keyColor.r, keyColor.g, keyColor.b, 255);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gSkeletonKeyDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+
+    // Boss Key Gem
+    OPEN_DISPS(play->state.gfxCtx);
+    Gfx_SetupDL_25Xlu(play->state.gfxCtx);
+
+    Matrix_Translate(12.0f, 13.0f, 9.0f, MTXMODE_APPLY);
+    Matrix_Scale(0.8f, 0.8f, 0.8f, MTXMODE_APPLY);
+
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+            G_MTX_MODELVIEW | G_MTX_LOAD);
+
+    gDPSetEnvColor(POLY_XLU_DISP++, 255, 0, 0, 255);
+    gSPDisplayList(POLY_XLU_DISP++, (Gfx*)gGiBossKeyGemDL);
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 extern "C" void Randomizer_DrawBombchuBag(PlayState* play, GetItemEntry* getItemEntry) {
     OPEN_DISPS(play->state.gfxCtx);
 

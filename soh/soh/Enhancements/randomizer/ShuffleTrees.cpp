@@ -41,7 +41,7 @@ uint8_t EnWood02_RandomizerHoldsItem(EnWood02* treeActor, PlayState* play) {
     // Don't pull randomized item if tree isn't randomized or is already checked
     const auto treeIdentity = ObjectExtension::GetInstance().Get<CheckIdentity>(&treeActor->actor);
     return treeIdentity != nullptr && treeIdentity->randomizerCheck != RC_UNKNOWN_CHECK &&
-           treeIdentity->randomizerInf != RAND_INF_MAX && !Flags_GetRandomizerInf(treeIdentity->randomizerInf);
+           treeIdentity->randomizerInf != RAND_INF_MAX && !Flags_GetRandomizerInf(treeIdentity->randomizerInf) && !(Rando::Context::GetInstance()->GetItemLocation(treeIdentity->randomizerCheck)->IsExcluded() && CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("JunkIsUnshuffled"), 0));
 }
 
 extern "C" void EnWood02_RandomizerDraw(Actor* thisx, PlayState* play) {
