@@ -406,6 +406,32 @@ static void BingoHandleMerchants(int16_t flag = -1, GetItemID getItemId = GI_NON
     }
 }
 
+static void BingoRecordScrubPurchase(EnDns* enDns) {
+    s32 params = enDns->actor.params;
+    // Scrubs that are 0x06 are loaded as 0x03 when child, switching from selling arrows to seeds
+    if (params == 0x06) {
+        params = 0x03;
+    }
+    if (gPlayState->sceneNum == SCENE_GROTTOS) {
+        s16 respawnData = gSaveContext.respawn[RESPAWN_MODE_RETURN].data & ((1 << 8) - 1);
+        params = TWO_ACTOR_PARAMS(params, respawnData);
+    }
+
+    Rando::Location* location =
+        OTRGlobals::Instance->gRandomizer->GetCheckObjectFromActor(ACTOR_EN_DNS, gPlayState->sceneNum, params);
+    auto it = rcToRandomizerInf.find(location->GetRandomizerCheck());
+    if (it == rcToRandomizerInf.end() || it->second < 13 || it->second > 58) {
+        return;
+    }
+
+    gSaveContext.ship.bingo.scrubsPurchasedFrom[it->second - 13] = true;
+
+    auto& spoken = gSaveContext.ship.bingo.dcScrubsSpoken;
+    if (std::count_if(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; }) >= 10) {
+        Flags_SetBingoInf(BINGO_INF_BUY_THE_WARES_OF_10_SCRUBS);
+    }
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     if (gPlayState == nullptr) return;
 
@@ -985,32 +1011,6 @@ void BingoOnDialogMessageHandler() {
         CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE)) && CUR_UPG_VALUE(UPG_WALLET) >= 1) {
         gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true; // Knife "bought" for bingo purposes in this scenario
         BingoHandleMerchants(-1, GI_NONE);
-    }
-}
-
-static void BingoRecordScrubPurchase(EnDns* enDns) {
-    s32 params = enDns->actor.params;
-    // Scrubs that are 0x06 are loaded as 0x03 when child, switching from selling arrows to seeds
-    if (params == 0x06) {
-        params = 0x03;
-    }
-    if (gPlayState->sceneNum == SCENE_GROTTOS) {
-        s16 respawnData = gSaveContext.respawn[RESPAWN_MODE_RETURN].data & ((1 << 8) - 1);
-        params = TWO_ACTOR_PARAMS(params, respawnData);
-    }
-
-    Rando::Location* location =
-        OTRGlobals::Instance->gRandomizer->GetCheckObjectFromActor(ACTOR_EN_DNS, gPlayState->sceneNum, params);
-    auto it = rcToRandomizerInf.find(location->GetRandomizerCheck());
-    if (it == rcToRandomizerInf.end() || it->second < 13 || it->second > 58) {
-        return;
-    }
-
-    gSaveContext.ship.bingo.scrubsPurchasedFrom[it->second - 13] = true;
-
-    auto& spoken = gSaveContext.ship.bingo.dcScrubsSpoken;
-    if (std::count_if(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; }) >= 10) {
-        Flags_SetBingoInf(BINGO_INF_BUY_THE_WARES_OF_10_SCRUBS);
     }
 }
 
