@@ -1542,6 +1542,8 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_STORMS_HINT, "Song of Storms Hint", CVAR_RANDOMIZER_SETTING("StormsHint"), mOptionDescriptions[RSK_STORMS_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_EPONAS_HINT, "Epona's Song Hint", CVAR_RANDOMIZER_SETTING("EponasHint"), mOptionDescriptions[RSK_EPONAS_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_SONG_OF_TIME_HINT, "Song of Time Hint", CVAR_RANDOMIZER_SETTING("SongOfTimeHint"), mOptionDescriptions[RSK_SONG_OF_TIME_HINT], IMFLAG_NONE);
+    OPT_BOOL(RSK_FISHING_SIGN_HINT, "Fishing Pond Sign Hint", CVAR_RANDOMIZER_SETTING("FishingSignHint"), mOptionDescriptions[RSK_FISHING_SIGN_HINT], IMFLAG_NONE);
+    OPT_BOOL(RSK_ARCHERY_SIGN_HINT, "Archery Sign Hint", CVAR_RANDOMIZER_SETTING("ArcherySignHint"), mOptionDescriptions[RSK_ARCHERY_SIGN_HINT], IMFLAG_NONE);
     // TODO: Compasses show rewards/woth, maps show dungeon mode
     OPT_BOOL(RSK_BLUE_FIRE_ARROWS, "Blue Fire Arrows", CVAR_RANDOMIZER_SETTING("BlueFireArrows"), mOptionDescriptions[RSK_BLUE_FIRE_ARROWS]);
     OPT_BOOL(RSK_SUNLIGHT_ARROWS, "Sunlight Arrows", CVAR_RANDOMIZER_SETTING("SunlightArrows"), mOptionDescriptions[RSK_SUNLIGHT_ARROWS]);
@@ -2436,7 +2438,8 @@ void Settings::CreateOptions() {
                                   &mOptions[RSK_HOVERS_HINT],        &mOptions[RSK_OCARINA_HINT],
                                   &mOptions[RSK_SCALE_HINT],         &mOptions[RSK_LULLABY_HINT],
                                   &mOptions[RSK_STORMS_HINT],        &mOptions[RSK_EPONAS_HINT],
-                                  &mOptions[RSK_SONG_OF_TIME_HINT],
+                                  &mOptions[RSK_SONG_OF_TIME_HINT],  &mOptions[RSK_FISHING_SIGN_HINT],
+                                  &mOptions[RSK_ARCHERY_SIGN_HINT],
                                   &mOptions[RSK_BOOMERANG_HINT],     &mOptions[RSK_HAMMER_HINT],
                                   &mOptions[RSK_MIRROR_HINT],
                               },
