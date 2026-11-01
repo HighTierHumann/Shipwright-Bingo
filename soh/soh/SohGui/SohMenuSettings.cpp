@@ -274,7 +274,7 @@ void SohMenu::AddMenuSettings() {
     path.column = SECTION_COLUMN_2;
 
     AddWidget(path, "About", WIDGET_SEPARATOR_TEXT);
-    AddWidget(path, "Ship Of Harkinian", WIDGET_TEXT);
+    AddWidget(path, "Ship Of Harkinian Bingo v1.1.0", WIDGET_TEXT);
     if (gGitCommitTag[0] != 0) {
         AddWidget(path, gBuildVersion, WIDGET_TEXT);
     } else {
