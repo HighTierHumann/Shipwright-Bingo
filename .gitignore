@@ -20,6 +20,7 @@ expected/
 notes/
 baserom/
 docs/doxygen/
+docs/seeds
 *.elf
 *.sra
 *.z64
