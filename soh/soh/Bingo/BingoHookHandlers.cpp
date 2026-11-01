@@ -98,6 +98,17 @@ constexpr SceneID bossScenes[] = {
     SCENE_GANONDORF_BOSS,
 };
 
+typedef enum {
+    KOKIRI_SHOP,
+    GORON_SHOP,
+    ZORA_SHOP,
+    KAK_BAZAAR,
+    KAK_POTION,
+    MKT_BAZAAR,
+    MKT_POTION,
+    MKT_CHU,
+} ShopTypes;
+
 bool IsDungeonScene(int16_t scene) {
     for (SceneID dungeonScene : dungeonScenes) {
         if (scene == dungeonScene) {
@@ -432,6 +443,39 @@ static void BingoRecordScrubPurchase(EnDns* enDns) {
     }
 }
 
+static void BingoHandleShops(int8_t shopType) {
+    switch(shopType) {
+        case KOKIRI_SHOP:
+            //if (std::count_if(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; }) >= 10) {
+            //    Flags_SetBingoInf(BINGO_INF_BUY_THE_WARES_OF_10_SCRUBS);
+            //}
+            break;
+        case GORON_SHOP:
+            // Handle shop type 2
+            break;
+        case ZORA_SHOP:
+            // Handle shop type 3
+            break;
+        case KAK_BAZAAR:
+            // Handle shop type 5
+            break;
+        case KAK_POTION:
+            // Handle shop type 6
+            break;
+        case MKT_BAZAAR:
+            // Handle shop type 7
+            break;
+        case MKT_POTION:
+            // Handle shop type 8
+            break;
+        case MKT_CHU:
+            // Handle shop type 9
+            break;
+        default:
+            break;
+    }
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     if (gPlayState == nullptr) return;
 
@@ -485,6 +529,10 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
         if (Flags_GetRandomizerInf(RAND_INF_HAS_SKELETON_KEY)) {
             Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_WATER_DOORS);
             Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_SPIRIT_DOORS);
+        }
+
+        if (flag <= RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_8 && flag >= RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1) {
+            BingoHandleShops(KOKIRI_SHOP);
         }
 
         switch(flag) {
