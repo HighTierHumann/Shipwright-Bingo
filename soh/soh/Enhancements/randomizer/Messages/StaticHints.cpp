@@ -469,6 +469,32 @@ void BuildSongOfTimeHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
     *loadFromMessageTable = false;
 }
 
+void BuildFishingPondSignHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    CustomMessage msg = RAND_GET_HINT(RH_FISHING_SIGN_HINT)->GetHintMessage(MF_AUTO_FORMAT);
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
+void BuildArcherySignHintMessage(uint16_t* textId, bool* loadFromMessageTable) {
+    RandomizerCheck rc = RC_UNKNOWN_CHECK;
+    if (LINK_IS_CHILD) {
+        rc = RC_MARKET_SHOOTING_GALLERY_REWARD;
+    } else {
+        rc = RC_KAK_SHOOTING_GALLERY_REWARD;
+    }
+    Rando::Item& item = Rando::StaticData::RetrieveItem(RAND_GET_ITEM_LOC(rc)->GetPlacedRandomizerGet());
+    CustomMessage msg = CustomMessage("Test your skills!&Sharpshooters can win [[color]][[1]]!",
+                                      /*german*/
+                                      TODO_TRANSLATE,
+                                      /*french*/
+                                      TODO_TRANSLATE, TEXTBOX_TYPE_WOODEN);
+    msg.Replace("[[color]]", item.GetColor());
+    msg.InsertNames({ item.GetHint().GetHintMessage() });
+    msg.AutoFormat();
+    msg.LoadIntoFont();
+    *loadFromMessageTable = false;
+}
+
 void RegisterStaticHints() {
     // Ganondorf
     COND_ID_HOOK(OnOpenText, TEXT_GANONDORF, RAND_GET_OPTION(RSK_GANONDORF_HINT), BuildGanondorfHint);
@@ -594,6 +620,10 @@ void RegisterStaticHints() {
     // Song of Time Block Hint
     COND_ID_HOOK(OnOpenText, TEXT_NAVI_SONG_OF_TIME_HINT, RAND_GET_OPTION(RSK_SONG_OF_TIME_HINT), BuildSongOfTimeHintMessage);
     COND_ID_HOOK(OnOpenText, TEXT_NAVI_HEY_ISNT_THAT_THE_SAME_DESIGN, RAND_GET_OPTION(RSK_SONG_OF_TIME_HINT), BuildSongOfTimeHintMessage);
+    // Fishing Pond Sign Hint
+    COND_ID_HOOK(OnOpenText, TEXT_OUTSIDE_FISHING_POND, RAND_GET_OPTION(RSK_FISHING_SIGN_HINT), BuildFishingPondSignHintMessage);
+    // Archery Sign Hint
+    COND_ID_HOOK(OnOpenText, TEXT_ARCHERY_SIGN, RAND_GET_OPTION(RSK_ARCHERY_SIGN_HINT), BuildArcherySignHintMessage);
     // Child Malon
     COND_ID_HOOK(OnOpenText, TEXT_MALON_EPONA_FOND, RAND_GET_OPTION(RSK_EPONAS_HINT), BuildChildMalonMessage);
     // Boss C-Up Text

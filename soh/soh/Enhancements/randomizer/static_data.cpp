@@ -106,6 +106,7 @@ std::unordered_map<uint32_t, CustomMessage> StaticData::hintNames = {
     { RH_STORMS_HINT, CustomMessage("Song of Storms Hint") },
     { RH_EPONAS_HINT, CustomMessage("Epona's Song Hint") },
     { RH_SONG_OF_TIME_HINT, CustomMessage("Song of Time Hint") },
+    { RH_FISHING_SIGN_HINT, CustomMessage("Fishing Pond Hint") },
 };
 
 std::unordered_map<RandomizerCheck, RandomizerHint> StaticData::gossipStoneCheckToHint{
@@ -234,6 +235,8 @@ std::unordered_map<RandomizerHint, StaticHintInfo> StaticData::staticHintInfoMap
   {RH_STORMS_HINT,          StaticHintInfo(HINT_TYPE_AREA,     {RHT_STORMS_HINT},                   RSK_STORMS_HINT,         true, {}, {RG_SONG_OF_STORMS},          {RC_STORMS_HINT})},
   {RH_EPONAS_HINT,          StaticHintInfo(HINT_TYPE_AREA,     {RHT_EPONAS_HINT},                   RSK_EPONAS_HINT,         true, {}, {RG_EPONAS_SONG},             {RC_EPONAS_HINT})},
   {RH_SONG_OF_TIME_HINT,    StaticHintInfo(HINT_TYPE_AREA,     {RHT_SONG_OF_TIME_HINT},             RSK_SONG_OF_TIME_HINT,   true, {}, {RG_SONG_OF_TIME},            {RC_SONG_OF_TIME_HINT})},
+  {RH_FISHING_SIGN_HINT,    StaticHintInfo(HINT_TYPE_ITEM,     {RHT_FISHING_SIGN_HINT},             RSK_FISHING_SIGN_HINT,   true, {RC_LH_CHILD_FISHING, RC_LH_ADULT_FISHING}, {}, {RC_FISHING_SIGN_HINT})},
+
   // Static hints for hard-required items on the boss C-Up text
   {RH_BOOMERANG_HINT,       StaticHintInfo(HINT_TYPE_AREA,     {RHT_BOOMERANG_HINT},                RSK_BOOMERANG_HINT,      true, {}, {RG_BOOMERANG},               {RC_BOOMERANG_HINT})},
   {RH_HAMMER_HINT,          StaticHintInfo(HINT_TYPE_AREA,     {RHT_HAMMER_HINT},                   RSK_HAMMER_HINT,         true, {}, {RG_MEGATON_HAMMER},          {RC_HAMMER_HINT})},

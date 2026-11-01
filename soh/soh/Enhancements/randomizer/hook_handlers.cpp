@@ -968,6 +968,21 @@ void RandomizerOnDialogMessageHandler() {
                     reveal = RC_LH_HYRULE_LOACH;
                 }
                 break;
+            case TEXT_OUTSIDE_FISHING_POND:
+                if (ctx->GetOption(RSK_FISHING_SIGN_HINT)) {
+                    auto itemchild_loc = ctx->GetItemLocation(RC_LH_CHILD_FISHING);
+                    if (itemchild_loc->GetCheckStatus() == RCSHOW_UNCHECKED) {
+                        itemchild_loc->SetCheckStatus(RCSHOW_IDENTIFIED);
+                    }
+                    reveal = RC_LH_ADULT_FISHING;
+                }
+                break;
+            case TEXT_ARCHERY_SIGN:
+                if (ctx->GetOption(RSK_ARCHERY_SIGN_HINT)) {
+                    if (LINK_IS_CHILD) reveal = RC_MARKET_SHOOTING_GALLERY_REWARD;
+                    else reveal = RC_KAK_SHOOTING_GALLERY_REWARD;
+                }
+                break;
         }
     }
 

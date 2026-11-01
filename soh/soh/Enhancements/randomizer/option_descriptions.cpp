@@ -868,6 +868,10 @@ void Settings::CreateOptionDescriptions() {
         "Talking to Malon as a child after showing her the Ocarina will tell you the location of Epona's Song.";
     mOptionDescriptions[RSK_SONG_OF_TIME_HINT] =
         "Navi will tell you where to find the Song of Time when prompted from targeting a visible Song of Time block.";
+    mOptionDescriptions[RSK_FISHING_SIGN_HINT] =
+        "Reading the poster outside of the Fishing Pond will reveal the prizes for Child and Adult fishing.";
+    mOptionDescriptions[RSK_ARCHERY_SIGN_HINT] =
+        "Reading the signs in the Shooting Galleries will reveal their prizes.";
     // end
     mOptionDescriptions[RSK_FULL_WALLETS] = "Start with a full wallet. All wallet upgrades come filled with rupees.";
     mOptionDescriptions[RSK_BOMBCHU_BAG] =

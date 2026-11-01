@@ -2338,6 +2338,11 @@ void StaticData::HintTable_Init() {
 	                                                    /*german*/ "Wenn ich mich recht erinnere,&habe ich sie irgendwo&#[[1]]#&verloren...&Sag mir Bescheid, wenn Du sie findest!",
 													    /*french*/ "Si je me souviens bien, il me&semble que je l'ai perdue&quelque part dans&#[[1]]#...^Fais-moi signe si jamais&tu la trouves!",
                                                                    {QM_RED}));
+
+    hintTextTable[RHT_FISHING_SIGN_HINT] = HintText(CustomMessage("Join the %gFishing Pond Contest%w!&Catch the biggest Fish for a %rprize%w!^"
+                                                                  "%bChildren %wcan win: %r[[1]]%w!& %bAdults %wcan win: %r[[2]]%w!",
+	                                                    /*german*/ TODO_TRANSLATE,
+													                /*french*/ TODO_TRANSLATE, {}, {}, TEXTBOX_TYPE_WOODEN));
     // Custom Hints
     hintTextTable[RHT_STRENGTH_HINT] = HintText(CustomMessage("%rDANGER! HANDLE WITH CARE!^%wYou must obtain the %gProgressive Strength Upgrade %wfrom %r[[1]] %wto transport this Bomb Flower!",
                                                               TODO_TRANSLATE,
