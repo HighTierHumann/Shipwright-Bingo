@@ -42,8 +42,11 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Reeba/z_en_reeba.h"
 #include "src/overlays/actors/ovl_Bg_Haka_Tubo/z_bg_haka_tubo.h"
 #include "src/overlays/actors/ovl_Bg_Haka_Trap/z_bg_haka_trap.h"
+#include "src/overlays/actors/ovl_Bg_Spot11_Oasis/z_bg_spot11_oasis.h"
 extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
+
+extern void func_808B29F0(BgSpot11Oasis* bgOasis, PlayState* play);
 }
 
 static std::queue<RandomizerCheck> randomizerQueuedChecks;
@@ -384,9 +387,11 @@ static void BingoHandleMerchants(int16_t flag = -1, GetItemID getItemId = GI_NON
             gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true;
             break;
         case RAND_INF_MERCHANTS_MAGIC_BEAN_SALESMAN:
+            Flags_SetBingoInf(BINGO_INF_BEAN_GUY_ITEM);
             gSaveContext.ship.bingo.merchantsBoughtFrom[1] = true;
             break;
         case RAND_INF_MERCHANTS_CARPET_SALESMAN:
+            Flags_SetBingoInf(BINGO_INF_CARPET_SALESMAN_ITEM);
             gSaveContext.ship.bingo.merchantsBoughtFrom[3] = true;
             break;
         default:
@@ -443,36 +448,68 @@ static void BingoRecordScrubPurchase(EnDns* enDns) {
     }
 }
 
-static void BingoHandleShops(int8_t shopType) {
-    switch(shopType) {
-        case KOKIRI_SHOP:
-            //if (std::count_if(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; }) >= 10) {
-            //    Flags_SetBingoInf(BINGO_INF_BUY_THE_WARES_OF_10_SCRUBS);
-            //}
-            break;
-        case GORON_SHOP:
-            // Handle shop type 2
-            break;
-        case ZORA_SHOP:
-            // Handle shop type 3
-            break;
-        case KAK_BAZAAR:
-            // Handle shop type 5
-            break;
-        case KAK_POTION:
-            // Handle shop type 6
-            break;
-        case MKT_BAZAAR:
-            // Handle shop type 7
-            break;
-        case MKT_POTION:
-            // Handle shop type 8
-            break;
-        case MKT_CHU:
-            // Handle shop type 9
-            break;
-        default:
-            break;
+static void BingoHandleShops(int16_t flag) {
+    constexpr int kSlotsPerShop = 8;
+    const int shopStart = RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1 +
+                          ((flag - RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1) / kSlotsPerShop) * kSlotsPerShop;
+
+    int itemsBought = 0;
+    int leftSideShop = 0;
+    for (int slot = 0; slot < kSlotsPerShop; slot++) {
+        if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(shopStart + slot))) {
+            itemsBought++;
+            if (slot >= 4) {
+                leftSideShop++;
+            }
+        }
+    }
+    if (leftSideShop == 4) {
+        Flags_SetBingoInf(BINGO_INF_BUY_LEFT_SIDE_OF_SHOP);
+    }
+    if (itemsBought >= 4) {
+        Flags_SetBingoInf(BINGO_INF_BUY_4_ITEMS_IN_ONE_SHOP);
+    }
+}
+
+static void BingoHandleSariaActors() {
+    if (Flags_GetRandomizerInf(RAND_INF_DARUNIAS_JOY) &&
+        Flags_GetEventChkInf(EVENTCHKINF_PLAYED_SARIAS_SONG_FOR_MIDO_AS_ADULT) &&
+        Flags_GetItemGetInf(22)) { // 22 is Skull Kid check
+        Flags_SetBingoInf(BINGO_INF_3_SARIAS_SONG_ACTORS);
+    }
+}
+
+static void BingoHandleSuperFairies(int16_t flag) {
+    static constexpr struct { RandomizerInf randInf; int16_t arrayIndex; } superFairies[] = {
+        { RAND_INF_LH_ISLAND_SUN_FAIRY, 0 }, { RAND_INF_HF_POND_STORMS_FAIRY, 1 },
+        { RAND_INF_DMT_FLAG_SUN_FAIRY, 2 }, { RAND_INF_DMT_COW_GROTTO_STORMS_FAIRY, 3 },
+        { RAND_INF_HF_FENCE_GROTTO_STORMS_FAIRY, 4 }, { RAND_INF_LW_SHORTCUT_STORMS_FAIRY, 5 },
+        { RAND_INF_TH_KITCHEN_SUN_FAIRY, 6 }, { RAND_INF_LW_DEKU_SCRUB_GROTTO_SUN_FAIRY, 7 },
+        { RAND_INF_GRAVEYARD_ROYAL_FAMILYS_TOMB_SUN_FAIRY, 8 },
+
+        { RAND_INF_SPIRIT_TEMPLE_BOULDER_ROOM_SUN_FAIRY, 9 }, { RAND_INF_SPIRIT_TEMPLE_ARMOS_ROOM_SUN_FAIRY, 10 },
+        { RAND_INF_SHADOW_TEMPLE_BEAMOS_STORM_FAIRY, 11 }, { RAND_INF_SHADOW_TEMPLE_PIT_STORM_FAIRY, 12 },
+        { RAND_INF_SHADOW_TEMPLE_WIND_HINT_SUN_FAIRY, 13 }, { RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SUN_FAIRY, 14 },
+        { RAND_INF_ICE_CAVERN_ENTRANCE_STORMS_FAIRY, 15 }, { RAND_INF_GERUDO_TRAINING_GROUND_ENTRANCE_STORMS_FAIRY, 16 },
+        { RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SUN_FAIRY, 17 }
+    };
+
+    for (const auto& fairy : superFairies) {
+        if (flag == fairy.randInf) {
+            gSaveContext.ship.bingo.superFairies[fairy.arrayIndex] = true;
+        }
+    }
+
+    auto& superFairy = gSaveContext.ship.bingo.superFairies;
+    if (std::count_if(std::begin(superFairy), std::end(superFairy), [](u8 fairyCollected) { return fairyCollected != 0; }) >= 3) {
+        Flags_SetBingoInf(BINGO_INF_3_SUPER_FAIRIES_COLLECTED);
+    }
+    if (std::count_if(std::begin(superFairy) + 9, std::end(superFairy), [](u8 fairyCollected) { return fairyCollected != 0; }) >= 2) {
+        Flags_SetBingoInf(BINGO_INF_2_DIFFERENT_DUNGEON_SUPER_FAIRIES);
+    }
+    if (Flags_GetRandomizerInf(RAND_INF_HF_POND_STORMS_FAIRY) &&
+        Flags_GetRandomizerInf(RAND_INF_HF_FENCE_GROTTO_STORMS_FAIRY)) {
+        Flags_SetBingoInf(BINGO_INF_BOTH_FIELD_SUPER_FAIRIES);
     }
 }
 
@@ -520,6 +557,14 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
             Flags_GetRandomizerInf(RAND_INF_GANONS_CASTLE_LIGHT_TRIAL_POT_2)) {
                 Flags_SetBingoInf(BINGO_INF_BREAK_LIGHT_TRIAL_POTS);
         }
+        if (Flags_GetRandomizerInf(RAND_INF_COWS_MILKED_GV_COW) &&
+            Flags_GetRandomizerInf(RAND_INF_COWS_MILKED_DMT_COW_GROTTO_COW)) {
+            Flags_SetBingoInf(BINGO_INF_VALLEY_AND_TRAIL_COW_CHECKS);
+        }
+        if (Flags_GetRandomizerInf(RAND_INF_COWS_MILKED_HF_COW_GROTTO_COW) &&
+            Flags_GetRandomizerInf(RAND_INF_COWS_MILKED_KAK_IMPAS_HOUSE_COW)) {
+            Flags_SetBingoInf(BINGO_INF_FIELD_AND_KAKARIKO_COW_CHECKS);
+        }
 
         if (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_SILVER_RUPEE_1 &&
             flag <= RAND_INF_BOTTOM_OF_THE_WELL_BASEMENT_SILVER_RUPEE_5) {
@@ -531,22 +576,62 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
             Flags_SetBingoInf(BINGO_INF_UNLOCK_ALL_5_LOCKED_SPIRIT_DOORS);
         }
 
-        if (flag <= RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_8 && flag >= RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1) {
-            BingoHandleShops(KOKIRI_SHOP);
+        if (flag >= RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1 && flag <= RAND_INF_SHOP_ITEMS_MARKET_BOMBCHU_SHOP_ITEM_8) {
+            BingoHandleShops(flag);
         }
 
+        if ((flag >= RAND_INF_LH_ISLAND_SUN_FAIRY && flag <= RAND_INF_GRAVEYARD_ROYAL_FAMILYS_TOMB_SUN_FAIRY) ||
+            (flag >= RAND_INF_SPIRIT_TEMPLE_BOULDER_ROOM_SUN_FAIRY && flag <= RAND_INF_GANONS_CASTLE_SPIRIT_TRIAL_SUN_FAIRY)) {
+            BingoHandleSuperFairies(flag);
+        }
+
+        if (flag >= RAND_INF_COWS_MILKED_KF_LINKS_HOUSE_COW &&
+            flag <= RAND_INF_COWS_MILKED_GV_COW) {
+            int cowsMilked = 0;
+            for (int i = RAND_INF_COWS_MILKED_KF_LINKS_HOUSE_COW; i <= RAND_INF_COWS_MILKED_GV_COW; i++) {
+                if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(i))) {
+                    cowsMilked++;
+                }
+            }
+            if (cowsMilked >= 6) {
+                Flags_SetBingoInf(BINGO_INF_6_DIFFERENT_COW_CHECKS);
+            }
+        }
+
+        int greatFairies = 0;
         switch(flag) {
             case RAND_INF_10_BIG_POES:
                 Flags_SetBingoInf(BINGO_INF_COLLECT_POE_COLLECTOR_CHECK);
                 break;
             case RAND_INF_MERCHANTS_CARPET_SALESMAN:
-                Flags_SetBingoInf(BINGO_INF_CARPET_SALESMAN_ITEM);
-                [[fallthrough]];
             case RAND_INF_MERCHANTS_MAGIC_BEAN_SALESMAN:
-                Flags_SetBingoInf(BINGO_INF_BEAN_GUY_ITEM);
-                [[fallthrough]];
             case RAND_INF_MERCHANTS_MEDIGORON:
                 BingoHandleMerchants(flag);
+                break;
+            case RAND_INF_COWS_MILKED_KF_LINKS_HOUSE_COW:
+                Flags_SetBingoInf(BINGO_INF_COW_IN_HOUSE_CHECK);
+                break;
+            case RAND_INF_DARUNIAS_JOY:
+                BingoHandleSariaActors();
+                break;
+            case RAND_INF_ZF_GREAT_FAIRY_REWARD:
+            case RAND_INF_COLOSSUS_GREAT_FAIRY_REWARD:
+            case RAND_INF_DMT_GREAT_FAIRY_REWARD:
+            case RAND_INF_DMC_GREAT_FAIRY_REWARD:
+            case RAND_INF_HC_GREAT_FAIRY_REWARD:
+            case RAND_INF_OGC_GREAT_FAIRY_REWARD:
+                if (Flags_GetRandomizerInf(RAND_INF_HC_GREAT_FAIRY_REWARD) &&
+                    Flags_GetRandomizerInf(RAND_INF_OGC_GREAT_FAIRY_REWARD)) {
+                    Flags_SetBingoInf(BINGO_INF_LULLABY_FOR_OGC_AND_HC_FAIRIES);
+                }
+                for (int i = RAND_INF_HC_GREAT_FAIRY_REWARD; i <= RAND_INF_OGC_GREAT_FAIRY_REWARD; i++) {
+                    if (Flags_GetRandomizerInf(static_cast<RandomizerInf>(i))) {
+                        greatFairies++;
+                    }
+                }
+                if (greatFairies >= 4) {
+                    Flags_SetBingoInf(BINGO_INF_LULLABY_FOR_4_GREAT_FAIRIES);
+                }
                 break;
             default:
                 break;
@@ -566,6 +651,12 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
                 break;
         }
     }
+
+    if (flagType == FLAG_INF_TABLE) {
+        if (Flags_GetInfTable(INFTABLE_11E) && Flags_GetInfTable(INFTABLE_GORON_CITY_DOORS_UNLOCKED)) {
+            Flags_SetBingoInf(BINGO_INF_BOTH_ROLLING_GORON_CHECKS);
+        }
+    }
 }
 
 void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag) {
@@ -579,6 +670,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
         SCENE_SHADOW_TEMPLE,
         SCENE_GANONS_TOWER
     };
+
+    if ((flagType == FLAG_EVENT_CHECK_INF && flag == EVENTCHKINF_PLAYED_SARIAS_SONG_FOR_MIDO_AS_ADULT) ||
+        (flagType == FLAG_ITEM_GET_INF && flag == 22)) {
+        BingoHandleSariaActors();
+    }
 
     if (flagType == FLAG_SCENE_SWITCH) {
         BingoRecordEyeSwitch(sceneNum, flag);
@@ -660,6 +756,9 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                     Flags_SetBingoInf(BINGO_INF_LOWER_THE_WATER_IN_BOTTOM_OF_THE_WELL);
                 }
                 break;
+            case SCENE_GERUDOS_FORTRESS:
+                if (flag == 0x3A) Flags_SetBingoInf(BINGO_INF_OPEN_THE_DOOR_TO_GTG);
+                break;
             default:
                 break;
         }
@@ -728,6 +827,16 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 break;
             case SCENE_DESERT_COLOSSUS:
                 if (Flags_GetTreasure(gPlayState, 0x9) && Flags_GetTreasure(gPlayState, 0xB)) Flags_SetBingoInf(BINGO_INF_DESERT_COLOSSUS_HAND_CHESTS);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (flagType == FLAG_SCENE_COLLECTIBLE) {
+        switch (sceneNum) {
+            case SCENE_GORON_CITY:
+                if (flag == 0x1F) Flags_SetBingoInf(BINGO_INF_GORON_CITY_BIG_POT_CHECK);
                 break;
             default:
                 break;
@@ -835,6 +944,31 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 // Defeat boss squares not yet added
                 return;
             }
+        }
+    }
+
+    if (flagType == FLAG_EVENT_CHECK_INF) {
+        if (flag >= EVENTCHKINF_SONGS_FOR_FROGS_ZL && flag <= EVENTCHKINF_SONGS_FOR_FROGS_STORMS) {
+            int frogsEnlarged = 0;
+            for (int i = EVENTCHKINF_SONGS_FOR_FROGS_ZL; i < EVENTCHKINF_SONGS_FOR_FROGS_STORMS; ++i) {
+                if (Flags_GetEventChkInf(i)) {
+                    ++frogsEnlarged;
+                }
+            }
+            if (frogsEnlarged >= 4) {
+                Flags_SetBingoInf(BINGO_INF_ENLARGE_4_FROGS);
+            }
+            if (Flags_GetEventChkInf(EVENTCHKINF_SONGS_FOR_FROGS_STORMS)) {
+                Flags_SetBingoInf(BINGO_INF_FROGS_STORMS_CHECK);
+            }
+        }
+        if (flag == EVENTCHKINF_OFFERED_FISH_TO_JABU_JABU) Flags_SetBingoInf(BINGO_INF_FEED_JABU_A_FISH);
+        if (flag == EVENTCHKINF_TALON_WOKEN_IN_KAKARIKO) Flags_SetBingoInf(BINGO_INF_WAKE_UP_TALON);
+
+        if ((flag == EVENTCHKINF_CARPENTERS_FREE(0) || flag == EVENTCHKINF_CARPENTERS_FREE(1) ||
+             flag == EVENTCHKINF_CARPENTERS_FREE(2) || flag == EVENTCHKINF_CARPENTERS_FREE(3)) &&
+             GET_EVENTCHKINF_CARPENTERS_FREE_ALL()) {
+            Flags_SetBingoInf(BINGO_INF_REPAIR_THE_VALLEY_BRIDGE);
         }
     }
 }
@@ -1036,6 +1170,9 @@ void BingoOnDialogMessageHandler() {
     MessageContext* msgCtx = &gPlayState->msgCtx;
     Actor* actor = msgCtx->talkActor;
 
+    if (actor == nullptr)
+        return;
+
     if (gPlayState->sceneNum == SCENE_DODONGOS_CAVERN) {
         if (actor->id == ACTOR_EN_DNS) {
             static constexpr struct { int16_t params; uint8_t index; } dcScrubs[] = {
@@ -1055,10 +1192,12 @@ void BingoOnDialogMessageHandler() {
         }
     }
 
-    if (actor->id == ACTOR_EN_GM && (CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BIGGORON) ||
-        CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE)) && CUR_UPG_VALUE(UPG_WALLET) >= 1) {
-        gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true; // Knife "bought" for bingo purposes in this scenario
-        BingoHandleMerchants(-1, GI_NONE);
+    if (gPlayState->sceneNum == SCENE_GORON_CITY) {
+        if (actor->id == ACTOR_EN_GM && (CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BIGGORON) ||
+            CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE)) && CUR_UPG_VALUE(UPG_WALLET) >= 1) {
+            gSaveContext.ship.bingo.merchantsBoughtFrom[0] = true; // Knife "bought" for bingo purposes in this scenario
+            BingoHandleMerchants(-1, GI_NONE);
+        }
     }
 }
 
@@ -1100,6 +1239,13 @@ void BingoOnActorUpdateHandler(void* refActor) {
         EnRu1* ruto = reinterpret_cast<EnRu1*>(actor);
         if (ruto->waterState != 0) {
             Flags_SetBingoInf(BINGO_INF_DROWN_RUTO);
+        }
+    }
+
+    if (actor->id == ACTOR_BG_SPOT11_OASIS) {
+        BgSpot11Oasis* oasis = reinterpret_cast<BgSpot11Oasis*>(actor);
+        if (oasis->actionFunc == func_808B29F0) {
+            Flags_SetBingoInf(BINGO_INF_FILL_THE_OASIS);
         }
     }
 }
@@ -1434,6 +1580,19 @@ void BingoOnEnemyDefeatHandler(void* refActor) {
         if (std::count_if(std::begin(defeated), std::end(defeated),
                         [](u8 d) { return d != 0; }) >= 8) {
             Flags_SetBingoInf(BINGO_INF_DEFEAT_ALL_HYLIA_TEKTITES);
+        }
+    }
+
+    if (actor->id == ACTOR_EN_MB) {
+        int actorIndex = GetActorListIndex(actor);
+        if (actorIndex >= 5 && actorIndex <= 10) {
+            gSaveContext.ship.bingo.moblinsDefeated[actorIndex - 5] = true;
+
+            auto& defeated = gSaveContext.ship.bingo.moblinsDefeated;
+            if (std::count_if(std::begin(defeated), std::end(defeated),
+                            [](u8 d) { return d != 0; }) >= 6) {
+                Flags_SetBingoInf(BINGO_INF_DEFEAT_EVERY_MOBLIN);
+            }
         }
     }
 }

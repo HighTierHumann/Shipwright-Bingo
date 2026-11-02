@@ -277,6 +277,8 @@ typedef struct ShipBingoSaveContextData {
     u8 lakeHyliaTektites[8];
     u8 merchantsBoughtFrom[4];
     u8 scrubsPurchasedFrom[46];
+    u8 moblinsDefeated[6];
+    u8 superFairies[18];
 } ShipBingoSaveContextData;
 
 typedef union ShipQuestSpecificSaveContextData {
