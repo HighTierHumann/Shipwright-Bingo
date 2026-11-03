@@ -1053,7 +1053,6 @@ s32 EnKo_CanSpawn(EnKo* this, PlayState* play) {
         case SCENE_LOST_WOODS:
             return GameInteractor_Should(VB_SPAWN_LW_FADO,
                                          ((INV_CONTENT(ITEM_TRADE_ADULT) == ITEM_ODD_POTION) ? true : false), this);
-            LUSLOG_DEBUG("VB_SPAWN_LW_FADO: %d", ((INV_CONTENT(ITEM_TRADE_ADULT) == ITEM_ODD_POTION) ? true : false));
         default:
             return false;
     }
