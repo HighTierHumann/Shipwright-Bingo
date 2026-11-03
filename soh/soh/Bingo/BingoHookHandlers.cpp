@@ -34,6 +34,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Ru1/z_en_ru1.h"
 #include "src/overlays/actors/ovl_En_Wonder_Item/z_en_wonder_item.h"
 #include "src/overlays/actors/ovl_Obj_Switch/z_obj_switch.h"
+#include "src/overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
 #include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
 #include "src/overlays/actors/ovl_Door_Killer/z_door_killer.h"
 #include "src/overlays/actors/ovl_En_Honotrap/z_en_honotrap.h"
@@ -42,6 +43,9 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Reeba/z_en_reeba.h"
 #include "src/overlays/actors/ovl_En_Gs/z_en_gs.h"
 #include "src/overlays/actors/ovl_En_Go2/z_en_go2.h"
+#include "src/overlays/actors/ovl_En_Ge2/z_en_ge2.h"
+#include "src/overlays/actors/ovl_En_Niw/z_en_niw.h"
+#include "src/overlays/actors/ovl_En_Horse/z_en_horse.h"
 #include "src/overlays/actors/ovl_En_Diving_Game/z_en_diving_game.h"
 #include "src/overlays/actors/ovl_En_Bom_Bowl_Man/z_en_bom_bowl_man.h"
 #include "src/overlays/actors/ovl_Bg_Haka_Tubo/z_bg_haka_tubo.h"
@@ -51,6 +55,8 @@ extern PlayState* gPlayState;
 extern SaveContext gSaveContext;
 
 extern void func_808B29F0(BgSpot11Oasis* bgOasis, PlayState* play);
+extern void EnGe2_CaptureTurn(EnGe2* enGe2, PlayState* play);
+extern void ObjBean_Fly(ObjBean* objBean, PlayState* play);
 }
 
 static std::queue<RandomizerCheck> randomizerQueuedChecks;
@@ -517,27 +523,33 @@ static void BingoHandleSuperFairies(int16_t flag) {
     }
 }
 
-static void BingoRecordBeanPlant(int16_t sceneNum, int16_t flag) {
-    static constexpr struct { int16_t scene; int16_t mask; } beanSwitches[] = {
-        { SCENE_GRAVEYARD,             3 },
-        { SCENE_ZORAS_RIVER,           3 },
-        { SCENE_KOKIRI_FOREST,         9 },
-        { SCENE_LAKE_HYLIA,            1 },
-        { SCENE_GERUDO_VALLEY,         3 },
-        { SCENE_LOST_WOODS,            18 },
-        { SCENE_DESERT_COLOSSUS,       24 },
-        { SCENE_DEATH_MOUNTAIN_TRAIL,  6 },
-        { SCENE_DEATH_MOUNTAIN_CRATER, 3 },
+static void BingoHandleBeanSpots(int16_t sceneNum, int16_t roomNum = -1, bool beanJourney = false) {
+    static constexpr struct {
+        int16_t scene;
+        int16_t room;
+        int16_t switchFlag;
+        int16_t arrayIndex;
+    } beanSpots[] = {
+        { SCENE_GRAVEYARD,             -1,  3, 0 },
+        { SCENE_ZORAS_RIVER,           -1,  3, 1 },
+        { SCENE_KOKIRI_FOREST,         -1,  9, 2 },
+        { SCENE_LAKE_HYLIA,            -1,  1, 3 },
+        { SCENE_GERUDO_VALLEY,         -1,  3, 4 },
+        { SCENE_LOST_WOODS,             5,  4, 5 },
+        { SCENE_LOST_WOODS,             6, 18, 6 },
+        { SCENE_DESERT_COLOSSUS,       -1, 24, 7 },
+        { SCENE_DEATH_MOUNTAIN_TRAIL,  -1,  6, 8 },
+        { SCENE_DEATH_MOUNTAIN_CRATER, -1,  3, 9 },
     };
 
-    if (std::none_of(std::begin(beanSwitches), std::end(beanSwitches),
-        [sceneNum](const auto& beanSwitch) { return beanSwitch.scene == sceneNum; })) {
+    if (std::none_of(std::begin(beanSpots), std::end(beanSpots),
+        [sceneNum](const auto& beanSpot) { return beanSpot.scene == sceneNum; })) {
         return;
     }
 
     int beansPlanted = 0;
-    for (const auto& beanSwitch : beanSwitches) {
-        if (gSaveContext.sceneFlags[beanSwitch.scene].swch & (1 << beanSwitch.mask)) {
+    for (const auto& beanSpot : beanSpots) {
+        if (gSaveContext.sceneFlags[beanSpot.scene].swch & (1 << beanSpot.switchFlag)) {
             beansPlanted++;
         }
     }
@@ -545,7 +557,23 @@ static void BingoRecordBeanPlant(int16_t sceneNum, int16_t flag) {
     if (beansPlanted >= 5) Flags_SetBingoInf(BINGO_INF_PLANT_5_BEANS);
     if (gSaveContext.sceneFlags[SCENE_ZORAS_RIVER].swch & (1 << 3)) Flags_SetBingoInf(BINGO_INF_PLANT_A_BEAN_NEAR_BEAN_GUY);
     if (gSaveContext.sceneFlags[SCENE_DEATH_MOUNTAIN_CRATER].swch & (1 << 3)) Flags_SetBingoInf(BINGO_INF_PLANT_THE_DMC_BEAN);
+
+    if (!beanJourney) return;
+
+    for (const auto& beanSpot : beanSpots) {
+        if (sceneNum == beanSpot.scene && roomNum == beanSpot.room) {
+            gSaveContext.ship.bingo.beanJourneysCompleted[beanSpot.arrayIndex] = true;
+        }
+    }
+
+    auto& journeysComplete = gSaveContext.ship.bingo.beanJourneysCompleted;
+    if (std::count_if(std::begin(journeysComplete), std::end(journeysComplete),
+        [](u8 journeyCompleted) { return journeyCompleted != 0; }) >= 5) {
+        Flags_SetBingoInf(BINGO_INF_ACTIVATE_5_BEANFLOWERS);
+    }
 }
+
+// for tomb and lab squares, create structs with all the possible checks. only compare amounts with relevant settings off.
 
 static void BingoHandleAdultTrades(int16_t flag) {
     static constexpr struct { int16_t itemGetInf; int16_t randomizerInf; int16_t arrayIndex; } tradeQuests[] = {
@@ -920,7 +948,7 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
 
     if (flagType == FLAG_SCENE_SWITCH) {
         BingoRecordEyeSwitch(sceneNum, flag);
-        BingoRecordBeanPlant(sceneNum, flag);
+        BingoHandleBeanSpots(sceneNum);
 
         switch (sceneNum) {
             case SCENE_FOREST_TEMPLE:
@@ -1074,6 +1102,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
             case SCENE_DESERT_COLOSSUS:
                 if (Flags_GetTreasure(gPlayState, 0x9) && Flags_GetTreasure(gPlayState, 0xB)) Flags_SetBingoInf(BINGO_INF_DESERT_COLOSSUS_HAND_CHESTS);
                 break;
+            case SCENE_WINDMILL_AND_DAMPES_GRAVE:
+                if (flag == 0x00 && gSaveContext.sceneFlags[SCENE_GRAVEYARD].collect & (1 << 0x19)) {
+                    Flags_SetBingoInf(BINGO_INF_COLLECT_BOTH_DAMPE_CHECKS);
+                } 
+                break;
             default:
                 break;
         }
@@ -1088,6 +1121,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 if (Flags_GetCollectible(gPlayState, 0x1) && Flags_GetCollectible(gPlayState, 0x14)) {
                     Flags_SetBingoInf(BINGO_INF_BOTH_ZF_HEART_PIECE_CHECKS);
                 }
+                break;
+            case SCENE_GRAVEYARD:
+                if (flag == 0x19 && gSaveContext.sceneFlags[SCENE_WINDMILL_AND_DAMPES_GRAVE].chest & (1 << 0x00)) {
+                    Flags_SetBingoInf(BINGO_INF_COLLECT_BOTH_DAMPE_CHECKS);
+                } 
                 break;
             default:
                 break;
@@ -1429,14 +1467,14 @@ void BingoOnDialogMessageHandler() {
         case SCENE_DODONGOS_CAVERN:
             if (actor->id == ACTOR_EN_DNS) {
                 static constexpr struct { int16_t params; uint8_t index; } dcScrubs[] = {
-                        { 0x0, 0 }, { 0x1, 1 }, { 0x3, 2 }, { 0x4, 3 }
-                    };
-                    for (const auto& scrub : dcScrubs) {
-                        if ((actor->params & 0xFF) == scrub.params) {
-                            gSaveContext.ship.bingo.dcScrubsSpoken[scrub.index] = true;
-                            break;
-                        }
+                    { 0x0, 0 }, { 0x1, 1 }, { 0x3, 2 }, { 0x4, 3 }
+                };
+                for (const auto& scrub : dcScrubs) {
+                    if ((actor->params & 0xFF) == scrub.params) {
+                        gSaveContext.ship.bingo.dcScrubsSpoken[scrub.index] = true;
+                        break;
                     }
+                }
             }
 
             if (std::all_of(std::begin(spoken), std::end(spoken), [](u8 playerSpokeTo) { return playerSpokeTo != 0; })) {
@@ -1503,6 +1541,32 @@ void BingoOnActorUpdateHandler(void* refActor) {
         case ACTOR_EN_BOM_BOWL_MAN:
             if (reinterpret_cast<EnBomBowlMan*>(actor)->gameResult == 1) {
                 Flags_SetBingoInf(BINGO_INF_WIN_BOMBCHU_BOWLING_ONCE);
+            }
+            break;
+        case ACTOR_EN_HORSE:
+            if (reinterpret_cast<EnHorse*>(actor)->action == ENHORSE_ACT_BRIDGE_JUMP) {
+                Flags_SetBingoInf(BINGO_INF_JUMP_THE_VALLEY_BRIDGE_WITH_EPONA);
+            }
+            break;
+        case ACTOR_EN_GE2:
+            if (reinterpret_cast<EnGe2*>(actor)->actionFunc == EnGe2_CaptureTurn &&
+                CHECK_QUEST_ITEM(QUEST_GERUDO_CARD)) {
+                Flags_SetBingoInf(BINGO_INF_VOLUNTARILY_ENTER_JAIL);
+            }
+            break;
+        case ACTOR_EN_NIW:
+            if (reinterpret_cast<EnNiw*>(actor)->unk_2A8 != 0 &&
+                gPlayState->sceneNum == SCENE_KAKARIKO_VILLAGE && LINK_IS_ADULT) {
+                Flags_SetBingoInf(BINGO_INF_ADULT_KAKARIKO_CUCCO_STORM);
+            }
+            break;
+        case ACTOR_OBJ_BEAN:
+            if (reinterpret_cast<ObjBean*>(actor)->actionFunc == ObjBean_Fly) {
+                if (gPlayState->sceneNum == SCENE_LOST_WOODS) {
+                    BingoHandleBeanSpots(gPlayState->sceneNum, gPlayState->roomCtx.curRoom.num, true);
+                } else {
+                    BingoHandleBeanSpots(gPlayState->sceneNum, -1, true);
+                }
             }
             break;
     }
