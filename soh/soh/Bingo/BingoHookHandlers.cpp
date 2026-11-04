@@ -573,8 +573,6 @@ static void BingoHandleBeanSpots(int16_t sceneNum, int16_t roomNum = -1, bool be
     }
 }
 
-// for tomb and lab squares, create structs with all the possible checks. only compare amounts with relevant settings off.
-
 static void BingoHandleAdultTrades(int16_t flag) {
     static constexpr struct { int16_t itemGetInf; int16_t randomizerInf; int16_t arrayIndex; } tradeQuests[] = {
         { 0x2E, -1, 0 }, // Trade Pocket Cucco
@@ -728,8 +726,129 @@ static void BingoHandleSkulltulaTokens() {
     }
 }
 
+static bool BingoIsCheckCollected(RandomizerCheck rc) {
+    const Rando::SpoilerCollectionCheck check = Rando::StaticData::GetLocation(rc)->GetCollectionCheck();
+    switch (check.type) {
+        case SPOILER_CHK_ITEM_GET_INF:
+            return Flags_GetItemGetInf(check.flag);
+        case SPOILER_CHK_EVENT_CHK_INF:
+            return Flags_GetEventChkInf(check.flag);
+        case SPOILER_CHK_RANDOMIZER_INF:
+            return Flags_GetRandomizerInf(static_cast<RandomizerInf>(check.flag));
+        case SPOILER_CHK_CHEST:
+            return (gSaveContext.sceneFlags[check.scene].chest & (1 << check.flag)) != 0;
+        case SPOILER_CHK_GOLD_SKULLTULA:
+            return (GET_GS_FLAGS(check.scene) & check.flag) != 0;
+        default:
+            return false;
+    }
+}
+
+static void BingoHandleCollectChecksSquares() {
+    struct AreaCheck {
+        RandomizerCheck rc;
+        bool alwaysShuffled;
+    };
+
+    static constexpr AreaCheck labChecks[] = {
+        { RC_LH_LAB_DIVE, true },
+        { RC_LH_TRADE_FROG, true },
+        { RC_LH_GS_LAB_CRATE, true },
+        { RC_LH_LAB_FRONT_RUPEE, false },
+        { RC_LH_LAB_LEFT_RUPEE, false },
+        { RC_LH_LAB_RIGHT_RUPEE, false },
+        { RC_LH_LAB_CRATE, false },
+    };
+    static constexpr AreaCheck tombChecks[] = {
+        { RC_SONG_FROM_ROYAL_FAMILYS_TOMB, true },
+        { RC_GRAVEYARD_ROYAL_FAMILYS_TOMB_CHEST, true },
+        { RC_GRAVEYARD_ROYAL_FAMILYS_TOMB_SUN_FAIRY, false },
+    };
+    static constexpr AreaCheck goronCityChecks[] = {
+        { RC_GC_GS_BOULDER_MAZE, true },
+        { RC_GC_MAZE_LEFT_CHEST, true },
+        { RC_GC_MAZE_RIGHT_CHEST, true },
+        { RC_GC_MAZE_CENTER_CHEST, true },
+        { RC_GC_MAZE_CRATE, false },
+        { RC_GC_MAZE_GOSSIP_STONE_FAIRY, false },
+        { RC_GC_MAZE_GOSSIP_STONE_FAIRY_BIG, false },
+        { RC_GC_MAZE_SILVER_BOULDER_1, false },
+        { RC_GC_MAZE_SILVER_BOULDER_2, false },
+        { RC_GC_MAZE_SILVER_BOULDER_3, false },
+        { RC_GC_MAZE_SILVER_BOULDER_4, false },
+        { RC_GC_MAZE_SILVER_BOULDER_5, false },
+        { RC_GC_MAZE_SILVER_BOULDER_6, false },
+        { RC_GC_MAZE_SILVER_BOULDER_7, false },
+        { RC_GC_MAZE_SILVER_BOULDER_8, false },
+        { RC_GC_MAZE_SILVER_BOULDER_9, false },
+        { RC_GC_MAZE_SILVER_BOULDER_10, false },
+        { RC_GC_MAZE_SILVER_BOULDER_11, false },
+        { RC_GC_MAZE_SILVER_BOULDER_12, false },
+        { RC_GC_MAZE_SILVER_BOULDER_13, false },
+        { RC_GC_MAZE_SILVER_BOULDER_14, false },
+        { RC_GC_MAZE_SILVER_BOULDER_15, false },
+        { RC_GC_MAZE_SILVER_BOULDER_16, false },
+        { RC_GC_MAZE_SILVER_BOULDER_17, false },
+        { RC_GC_MAZE_SILVER_BOULDER_18, false },
+        { RC_GC_MAZE_SILVER_BOULDER_19, false },
+        { RC_GC_MAZE_SILVER_BOULDER_20, false },
+        { RC_GC_MAZE_SILVER_BOULDER_21, false },
+        { RC_GC_MAZE_SILVER_BOULDER_22, false },
+        { RC_GC_MAZE_SILVER_BOULDER_23, false },
+        { RC_GC_MAZE_SILVER_BOULDER_24, false },
+        { RC_GC_MAZE_SILVER_BOULDER_25, false },
+        { RC_GC_MAZE_SILVER_BOULDER_26, false },
+        { RC_GC_MAZE_SILVER_BOULDER_27, false },
+        { RC_GC_MAZE_SILVER_BOULDER_28, false },
+        { RC_GC_MAZE_SILVER_BOULDER_29, false },
+        { RC_GC_MAZE_BOULDER_1, false },
+        { RC_GC_MAZE_BOULDER_2, false },
+        { RC_GC_MAZE_BOULDER_3, false },
+        { RC_GC_MAZE_BOULDER_4, false },
+        { RC_GC_MAZE_BOULDER_5, false },
+        { RC_GC_MAZE_BOULDER_6, false },
+        { RC_GC_MAZE_BOULDER_7, false },
+        { RC_GC_MAZE_BOULDER_8, false },
+        { RC_GC_MAZE_BOULDER_9, false },
+        { RC_GC_MAZE_BOULDER_10, false },
+        { RC_GC_MAZE_BRONZE_BOULDER_1, false },
+        { RC_GC_MAZE_BRONZE_BOULDER_2, false },
+        { RC_GC_MAZE_BRONZE_BOULDER_3, false },
+        { RC_GC_MAZE_BRONZE_BOULDER_4, false },
+        { RC_GC_MAZE_BRONZE_BOULDER_5, false },
+        { RC_GC_MAZE_ROCK, false },
+    };
+
+    const auto allCollected = [](const auto& checks) {
+        for (const AreaCheck& check : checks) {
+            if (!check.alwaysShuffled && !CheckTracker::IsCheckShuffled(check.rc)) {
+                continue;
+            }
+            if (!BingoIsCheckCollected(check.rc)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    if (allCollected(labChecks)) {
+        Flags_SetBingoInf(BINGO_INF_COLLECT_ALL_LAKESIDE_LAB_CHECKS);
+    }
+    if (allCollected(tombChecks)) {
+        Flags_SetBingoInf(BINGO_INF_COLLECT_ALL_ROYAL_TOMB_CHECKS);
+    }
+    if (allCollected(goronCityChecks)) {
+        Flags_SetBingoInf(BINGO_INF_COLLECT_ALL_GORON_MAZE_CHECKS);
+    }
+}
+
 void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     if (gPlayState == nullptr) return;
+
+    if (gPlayState->sceneNum == SCENE_LAKESIDE_LABORATORY || gPlayState->sceneNum == SCENE_ROYAL_FAMILYS_TOMB ||
+        gPlayState->sceneNum == SCENE_GORON_CITY) {
+        BingoHandleCollectChecksSquares();
+    }
 
     Player* player = GET_PLAYER(gPlayState);
     auto ctx = Rando::Context::GetInstance();
@@ -866,12 +985,37 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
     }
 
     if (flagType == FLAG_BINGO_INF) {
+        int bossesDefeated = 0;
+        int templeBosses = 0;
         switch (flag) {
             case BINGO_INF_DEFEAT_DEAD_HAND_BOTTOM_OF_THE_WELL:
             case BINGO_INF_DEFEAT_DEAD_HAND_SHADOW_TEMPLE:
                 if (Flags_GetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_BOTTOM_OF_THE_WELL) &&
                     Flags_GetBingoInf(BINGO_INF_DEFEAT_DEAD_HAND_SHADOW_TEMPLE)) {
                     Flags_SetBingoInf(BINGO_INF_DEFEAT_BOTH_DEAD_HANDS);
+                }
+                break;
+            case BINGO_INF_DEFEAT_PHANTOM_GANON:
+            case BINGO_INF_DEFEAT_VOLVAGIA:
+            case BINGO_INF_DEFEAT_MORPHA:
+            case BINGO_INF_DEFEAT_TWINROVA:
+            case BINGO_INF_DEFEAT_BONGO_BONGO:
+                for (int i = BINGO_INF_DEFEAT_GOHMA; i <= BINGO_INF_DEFEAT_BONGO_BONGO; i++) {
+                    if (i >= BINGO_INF_DEFEAT_PHANTOM_GANON) {
+                        templeBosses++;
+                    }
+                    if (Flags_GetBingoInf(static_cast<BingoInf>(i))) {
+                        bossesDefeated++;
+                    }
+                }
+                if (bossesDefeated >= 3) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_3_BOSSES);
+                }
+                if (bossesDefeated >= 5) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_5_BOSSES);
+                }
+                if (templeBosses >= 3) {
+                    Flags_SetBingoInf(BINGO_INF_DEFEAT_3_TEMPLE_BOSSES);
                 }
                 break;
             default:
@@ -927,10 +1071,28 @@ void BingoOnFlagSetHandler(int16_t flagType, int16_t flag) {
         }
         if (flag >= 0xDA && flag <= 0xDE) Flags_SetBingoInf(BINGO_INF_OBTAIN_ANY_SKULLTULA_HOUSE_CHECK);
     }
+
+    if (flagType == FLAG_GS_TOKEN) {
+        LUSLOG_DEBUG("GS Flag: %d", flag);
+        switch (gPlayState->sceneNum) {
+            case SCENE_ZORAS_FOUNTAIN:
+                if (flag == 0x5120) Flags_SetBingoInf(BINGO_INF_COMPLETE_HIDDEN_CAVE_GS);
+                break;
+            case SCENE_HAUNTED_WASTELAND:
+                if (flag == 0x3502 && Flags_GetTreasure(gPlayState, 0x0)) Flags_SetBingoInf(BINGO_INF_COLLECT_WASTELAND_CHEST_AND_SKULL);
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag) {
     auto ctx = Rando::Context::GetInstance();
+
+    if ((sceneNum == SCENE_ROYAL_FAMILYS_TOMB || sceneNum == SCENE_GORON_CITY) && flagType == FLAG_SCENE_TREASURE) {
+        BingoHandleCollectChecksSquares();
+    }
 
     constexpr int bossKeyScenes[] = { // I dont think this is actually necessary (as I don't believe mini-dungeons and
         SCENE_FOREST_TEMPLE,          // child dungeons use 0x14) but better safe than sorry?
@@ -1107,6 +1269,11 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                     Flags_SetBingoInf(BINGO_INF_COLLECT_BOTH_DAMPE_CHECKS);
                 } 
                 break;
+            case SCENE_HAUNTED_WASTELAND:
+                if (flag == 0x0 && (GET_GS_FLAGS((0x3502 & 0x1F00) >> 8) & (0x3502 & 0xFF))) {
+                    Flags_SetBingoInf(BINGO_INF_COLLECT_WASTELAND_CHEST_AND_SKULL);
+                } 
+                break;
             default:
                 break;
         }
@@ -1126,6 +1293,9 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
                 if (flag == 0x19 && gSaveContext.sceneFlags[SCENE_WINDMILL_AND_DAMPES_GRAVE].chest & (1 << 0x00)) {
                     Flags_SetBingoInf(BINGO_INF_COLLECT_BOTH_DAMPE_CHECKS);
                 } 
+                break;
+            case SCENE_GROTTOS:
+                if (flag == 0x01) Flags_SetBingoInf(BINGO_INF_COLLECT_TEKTITE_GROTTO_BOTTOM_ITEM);
                 break;
             default:
                 break;
@@ -1168,72 +1338,6 @@ void BingoOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t flag
             default:
                 break;
         }
-
-        if (flag == 0x1 && IsBossScene(sceneNum)) {
-            if (!previousDungeonScenes.empty()) {
-                bool beatTemple = false;
-                for (int16_t previousDungeonsList : previousDungeonScenes) {
-                    switch (previousDungeonsList) {
-                        case SCENE_DEKU_TREE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_DEKU_TREE);
-                            break;
-                        case SCENE_DODONGOS_CAVERN:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_DODONGOS_CAVERN);
-                            break;
-                        case SCENE_JABU_JABU:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_JABU_JABUS_BELLY);
-                            break;
-                        case SCENE_FOREST_TEMPLE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_FOREST_TEMPLE);
-                            beatTemple = true;
-                            break;
-                        case SCENE_FIRE_TEMPLE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_FIRE_TEMPLE);
-                            beatTemple = true;
-                            break;
-                        case SCENE_WATER_TEMPLE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_WATER_TEMPLE);
-                            beatTemple = true;
-                            break;
-                        case SCENE_SPIRIT_TEMPLE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_SPIRIT_TEMPLE);
-                            beatTemple = true;
-                            break;
-                        case SCENE_SHADOW_TEMPLE:
-                            Flags_SetBingoInf(BINGO_INF_BEAT_SHADOW_TEMPLE);
-                            beatTemple = true;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                if (beatTemple) {
-                    constexpr BingoInf templeBeatFlags[] = {
-                        BINGO_INF_BEAT_FOREST_TEMPLE,
-                        BINGO_INF_BEAT_FIRE_TEMPLE,
-                        BINGO_INF_BEAT_WATER_TEMPLE,
-                        BINGO_INF_BEAT_SPIRIT_TEMPLE,
-                        BINGO_INF_BEAT_SHADOW_TEMPLE,
-                    };
-                    int templesBeaten = 0;
-                    for (BingoInf templeBeatFlag : templeBeatFlags) {
-                        if (Flags_GetBingoInf(templeBeatFlag)) {
-                            ++templesBeaten;
-                        }
-                    }
-                    if (templesBeaten >= 2) {
-                        Flags_SetBingoInf(BINGO_INF_BEAT_2_TEMPLES);
-                    }
-                    if (templesBeaten >= 4) {
-                        Flags_SetBingoInf(BINGO_INF_BEAT_4_TEMPLES);
-                    }
-                }
-            } else {
-                // Defeat boss squares not yet added
-                return;
-            }
-        }
     }
 }
 
@@ -1270,72 +1374,6 @@ void BingoOnSceneInitHandler(int16_t sceneNum) {
             Flags_SetBingoInf(BINGO_INF_ENTER_EVERY_DUNGEON);
             LUSLOG_DEBUG("All dungeons entered");
         }
-    }
-
-    // If we have mixed entracnes and the player enters a mini-dungeon from a main dungeon,
-    // we will consider the main dungeons as being beaten, since mini-dungeons lack bosses to kill.
-    // Currently lacks the ability to detect entering a boss door and exiting to overworld, but I don't
-    // think that's something ship does anyways? Cross that bridge when we get there.
-    if (IsMiniDungeonScene(sceneNum) && !previousDungeonScenes.empty() &&
-        ctx->GetOption(RSK_MIX_DUNGEON_ENTRANCES) && ctx->GetOption(RSK_MIX_BOSS_ENTRANCES)) {
-            bool beatTemple = false;
-            for (int16_t previousDungeonsList : previousDungeonScenes) {
-                switch (previousDungeonsList) {
-                    case SCENE_DEKU_TREE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_DEKU_TREE);
-                        break;
-                    case SCENE_DODONGOS_CAVERN:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_DODONGOS_CAVERN);
-                        break;
-                    case SCENE_JABU_JABU:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_JABU_JABUS_BELLY);
-                        break;
-                    case SCENE_FOREST_TEMPLE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_FOREST_TEMPLE);
-                        beatTemple = true;
-                        break;
-                    case SCENE_FIRE_TEMPLE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_FIRE_TEMPLE);
-                        beatTemple = true;
-                        break;
-                    case SCENE_WATER_TEMPLE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_WATER_TEMPLE);
-                        beatTemple = true;
-                        break;
-                    case SCENE_SPIRIT_TEMPLE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_SPIRIT_TEMPLE);
-                        beatTemple = true;
-                        break;
-                    case SCENE_SHADOW_TEMPLE:
-                        Flags_SetBingoInf(BINGO_INF_BEAT_SHADOW_TEMPLE);
-                        beatTemple = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (beatTemple) {
-                constexpr BingoInf templeBeatFlags[] = {
-                    BINGO_INF_BEAT_FOREST_TEMPLE,
-                    BINGO_INF_BEAT_FIRE_TEMPLE,
-                    BINGO_INF_BEAT_WATER_TEMPLE,
-                    BINGO_INF_BEAT_SPIRIT_TEMPLE,
-                    BINGO_INF_BEAT_SHADOW_TEMPLE,
-                };
-                int templesBeaten = 0;
-                for (BingoInf templeBeatFlag : templeBeatFlags) {
-                    if (Flags_GetBingoInf(templeBeatFlag)) {
-                        ++templesBeaten;
-                    }
-                }
-                if (templesBeaten >= 2) {
-                    Flags_SetBingoInf(BINGO_INF_BEAT_2_TEMPLES);
-                }
-                if (templesBeaten >= 4) {
-                    Flags_SetBingoInf(BINGO_INF_BEAT_4_TEMPLES);
-                }
-            }
     }
 
     BingoHandleGrottoEntry(sceneNum);
@@ -1435,11 +1473,12 @@ void BingoOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
         case GI_ARROW_LIGHT:
         case GI_KEY_BOSS:
         case GI_BOW:
-        case RG_LIGHT_ARROWS:
+        case RG_BIGGEST_QUIVER:
+        case RG_BIG_QUIVER:
         case RG_MASTER_SWORD:
         case RG_GANONS_CASTLE_BOSS_KEY:
-        case RG_PROGRESSIVE_MAGIC_METER:
-        case RG_PROGRESSIVE_BOW:
+        case RG_MAGIC_SINGLE:
+        case RG_MAGIC_DOUBLE:
             if (CHECK_DUNGEON_ITEM(DUNGEON_KEY_BOSS, SCENE_GANONS_TOWER) && INV_CONTENT(ITEM_BOW) == ITEM_BOW &&
                 INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT && CHECK_OWNED_EQUIP(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_MASTER) &&
                 gSaveContext.isMagicAcquired == 1) {
@@ -1449,6 +1488,10 @@ void BingoOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
         case RG_GOLD_SKULLTULA_TOKEN:
             if (gSaveContext.inventory.gsTokens >= 20) Flags_SetBingoInf(BINGO_INF_COLLECT_20_SKULLTULA_TOKENS);
             if (gSaveContext.inventory.gsTokens >= 30) Flags_SetBingoInf(BINGO_INF_COLLECT_30_SKULLTULA_TOKENS);
+            break;
+        case GI_NUT_UPGRADE_40:
+        case GI_STICK_UPGRADE_30:
+            Flags_SetBingoInf(BINGO_INF_40_NUTS_OR_30_STICKS_UPGRADE);
             break;
         default:
             break;
@@ -1931,15 +1974,17 @@ void BingoOnBossDefeatHandler(void* refActor) {
     Actor* actor = static_cast<Actor*>(refActor);
 
     switch(actor->id) {
-        // Discussion still ongoing for Beat X Dungeon VS Defeat X Boss, so
-        // gonna leave this switch as-is for now.
         case ACTOR_BOSS_GOMA:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_GOHMA);
+            break;
         case ACTOR_BOSS_DODONGO:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_KING_DODONGO);
             break;
         case ACTOR_BOSS_VA:
             Flags_SetBingoInf(BINGO_INF_DEFEAT_BARINADE);
             break;
         case ACTOR_BOSS_GANONDROF:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_PHANTOM_GANON);
             break;
         case ACTOR_BOSS_FD:
             Flags_SetBingoInf(BINGO_INF_DEFEAT_VOLVAGIA);
@@ -1951,6 +1996,7 @@ void BingoOnBossDefeatHandler(void* refActor) {
             Flags_SetBingoInf(BINGO_INF_DEFEAT_TWINROVA);
             break;
         case ACTOR_BOSS_SST:
+            Flags_SetBingoInf(BINGO_INF_DEFEAT_BONGO_BONGO);
             break;
         default:
             break;
@@ -1968,6 +2014,18 @@ void BingoOnActorKillHandler(void* refActor) {
         if (gSaveContext.ship.bingo.woodWallsBurnt[0] && gSaveContext.ship.bingo.woodWallsBurnt[1]) {
             Flags_SetBingoInf(BINGO_INF_BURN_THE_WOOD_WALLS_IN_SHADOW);
         }
+    }
+
+    if (gPlayState->sceneNum == SCENE_LOST_WOODS && gPlayState->roomCtx.curRoom.num == 0x3 &&
+        actor->id == ACTOR_EN_ITEM00) {
+        int actorIndex = GetActorListIndex(actor);
+        gSaveContext.ship.bingo.lwPoolItems[actorIndex - 4] = true;
+
+        auto& collected = gSaveContext.ship.bingo.lwPoolItems;
+        if (std::count_if(std::begin(collected), std::end(collected),
+                            [](u8 d) { return d != 0; }) >= 8) {
+                Flags_SetBingoInf(BINGO_INF_COLLECT_ALL_LW_POOL_ITEMS);
+            }
     }
 }
 
