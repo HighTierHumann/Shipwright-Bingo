@@ -6,6 +6,8 @@
 #include "soh/Enhancements/randomizer/3drando/pool_functions.hpp"
 
 #include <random>
+#include <cstdint>
+#include <utility>
 #include <algorithm>
 #include "soh/Enhancements/randomizer/randomizer.h"
 
@@ -236,7 +238,18 @@ void GiveRandomStartingItems() {
     std::seed_seq seq{ seedHash, 0x9e3779b9u /* golden ratio constant as salt */ };
     std::mt19937 gen(seq);
 
-    std::shuffle(itemToGive.begin(), itemToGive.end(), gen);
+    // std::shuffle and std::uniform_int_distribution are implementation-defined, so their results differ between
+    // standard libraries. mt19937 and seed_seq are fully specified, so build the shuffle on raw engine output.
+    // Fisher-Yates with rejection sampling for an unbiased index.
+    for (size_t i = itemToGive.size() - 1; i > 0; i--) {
+        const uint32_t range = static_cast<uint32_t>(i) + 1;
+        const uint32_t limit = UINT32_MAX - (UINT32_MAX % range);
+        uint32_t r;
+        do {
+            r = static_cast<uint32_t>(gen());
+        } while (r >= limit);
+        std::swap(itemToGive[i], itemToGive[r % range]);
+    }
 
     int picked = 0;
     for (int candidate : itemToGive) {
